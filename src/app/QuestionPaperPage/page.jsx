@@ -1,493 +1,947 @@
 'use client'
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { 
+  Search, 
+  PlusCircle, 
+  Filter, 
+  Download, 
+  Upload, 
+  Settings, 
+  ChevronDown, 
+  Layers, 
+  Edit3, 
+  Trash2,
+  Check,
+  X,
+  Grid,
+  List,
+  MoreHorizontal,
+  FileText,
+  Eye,
+  EyeOff
+} from 'lucide-react';
 
-const generateQuestions = () => {
-  const fillInTheBlankQuestions = [
-    { id: 1, text: 'The sum of angles in a triangle is always _____.', answer: '180 degrees' },
-    { id: 2, text: 'The formula for the area of a circle is π * _____.', answer: 'r²' },
-    { id: 3, text: 'The number of sides in a hexagon is _____.', answer: '6' },
-    { id: 4, text: 'The value of π is approximately _____.', answer: '3.14159' },
-    { id: 5, text: 'A square has _____ equal sides.', answer: '4' },
-    { id: 6, text: 'The sum of interior angles in a quadrilateral is _____ degrees.', answer: '360' },
-    { id: 7, text: 'The Pythagorean theorem relates the sides of a right-angled triangle with the equation a² + b² = _____.', answer: 'c²' },
-    { id: 8, text: 'The circumference of a circle is calculated as 2π * _____.', answer: 'r (radius)' },
-    { id: 9, text: 'A regular pentagon has _____ equal sides.', answer: '5' },
-    { id: 10, text: 'The value of the golden ratio is approximately _____.', answer: '1.618' }
-  ];
-
-  const multipleChoiceQuestions = [
-    {
-      id: 11,
-      text: 'What is the fundamental theorem of algebra?',
-      options: [
-        'Every non-zero complex number has a multiplicative inverse',
-        'Every non-constant polynomial has at least one complex root',
-        'The sum of interior angles of a triangle is 180 degrees'
-      ],
-      answer: 'Every non-constant polynomial has at least one complex root'
-    },
-    {
-      id: 12,
-      text: 'What is a prime number?',
-      options: [
-        'A number divisible by 2',
-        'A number greater than 10',
-        'A number only divisible by 1 and itself'
-      ],
-      answer: 'A number only divisible by 1 and itself'
-    },
-    {
-      id: 13,
-      text: 'What is the Fibonacci sequence?',
-      options: [
-        'A sequence where each number is the sum of the two preceding ones',
-        'A sequence of prime numbers',
-        'A sequence of exponential growth'
-      ],
-      answer: 'A sequence where each number is the sum of the two preceding ones'
-    },
-    {
-      id: 14,
-      text: 'What is a rational number?',
-      options: [
-        'A number that can be expressed as a fraction of two integers',
-        'A number greater than zero',
-        'A number with decimal places'
-      ],
-      answer: 'A number that can be expressed as a fraction of two integers'
-    },
-    {
-      id: 15,
-      text: 'What is the quadratic formula used for?',
-      options: [
-        'Finding the roots of a quadratic equation',
-        'Calculating the area of a circle',
-        'Determining the slope of a line'
-      ],
-      answer: 'Finding the roots of a quadratic equation'
-    },
-    {
-      id: 16,
-      text: 'What is the Pythagorean theorem?',
-      options: [
-        'A theorem about similar triangles',
-        'A relationship between the sides of a right-angled triangle',
-        'A method for calculating circumference'
-      ],
-      answer: 'A relationship between the sides of a right-angled triangle'
-    },
-    {
-      id: 17,
-      text: 'What is a geometric progression?',
-      options: [
-        'A sequence where each term is multiplied by a constant',
-        'A sequence of increasing geometric shapes',
-        'A method of measuring angles'
-      ],
-      answer: 'A sequence where each term is multiplied by a constant'
-    },
-    {
-      id: 18,
-      text: 'What is the difference between median and mean?',
-      options: [
-        'Median is the middle value, mean is the average',
-        'Median is the largest value, mean is the smallest',
-        'They are the same mathematical concept'
-      ],
-      answer: 'Median is the middle value, mean is the average'
-    },
-    {
-      id: 19,
-      text: 'What is an irrational number?',
-      options: [
-        'A number that cannot be expressed as a simple fraction',
-        'A number that is always positive',
-        'A number divisible by itself'
-      ],
-      answer: 'A number that cannot be expressed as a simple fraction'
-    },
-    {
-      id: 20,
-      text: 'What is the definition of a derivative?',
-      options: [
-        'The rate of change of a function at a specific point',
-        'A method of multiplying numbers',
-        'A way to calculate area'
-      ],
-      answer: 'The rate of change of a function at a specific point'
+// Mock data - will be replaced with MongoDB data
+const generateMockQuestions = (type, count = 20) => {
+  const questions = [];
+  
+  for (let i = 1; i <= count; i++) {
+    switch(type) {
+      case 'fill':
+        questions.push({
+          id: `fill-${i}`,
+          text: `Fill in the blank question ${i}: The sum of angles in a triangle is always _____.`,
+          answer: '180 degrees',
+          difficulty: i % 3 === 0 ? 'Hard' : i % 2 === 0 ? 'Medium' : 'Easy',
+          tags: [`math${i % 5}`, 'geometry']
+        });
+        break;
+      case 'brief':
+        questions.push({
+          id: `brief-${i}`,
+          text: `Answer briefly question ${i}: Explain Newton's First Law of Motion.`,
+          answer: 'An object at rest stays at rest, and an object in motion stays in motion with the same speed and direction unless acted upon by an external force.',
+          difficulty: i % 3 === 0 ? 'Hard' : i % 2 === 0 ? 'Medium' : 'Easy',
+          tags: [`physics${i % 5}`, 'newton']
+        });
+        break;
+      case 'sentence':
+        questions.push({
+          id: `sentence-${i}`,
+          text: `One sentence answer question ${i}: What is photosynthesis?`,
+          answer: 'Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize nutrients from carbon dioxide and water.',
+          difficulty: i % 3 === 0 ? 'Hard' : i % 2 === 0 ? 'Medium' : 'Easy',
+          tags: [`biology${i % 5}`, 'plants']
+        });
+        break;
+      case 'match':
+        questions.push({
+          id: `match-${i}`,
+          items: [
+            { id: `${i}-A`, left: `Country ${i}A`, right: `Capital ${i}A` },
+            { id: `${i}-B`, left: `Country ${i}B`, right: `Capital ${i}B` },
+            { id: `${i}-C`, left: `Country ${i}C`, right: `Capital ${i}C` },
+            { id: `${i}-D`, left: `Country ${i}D`, right: `Capital ${i}D` }
+          ],
+          difficulty: i % 3 === 0 ? 'Hard' : i % 2 === 0 ? 'Medium' : 'Easy',
+          tags: [`geography${i % 5}`, 'capitals']
+        });
+        break;
+      default:
+        break;
     }
-  ];
-
-  return { fillInTheBlankQuestions, multipleChoiceQuestions };
+  }
+  
+  return questions;
 };
 
-const QuestionPaperPageContent = () => {
+const Dashboard = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Retrieve the subject from search parameters
-  const subject = searchParams.get('subject') || 'Mathematics';
-
-  const { fillInTheBlankQuestions, multipleChoiceQuestions } = generateQuestions();
-  const [selectedFillInBlank, setSelectedFillInBlank] = useState([]);
-  const [selectedMultipleChoice, setSelectedMultipleChoice] = useState([]);
-  const [generatedPaper, setGeneratedPaper] = useState(null);
-  const [toast, setToast] = useState(null);
-  const [examDetails, setExamDetails] = useState(null);
+  // States
+  const [activeTab, setActiveTab] = useState('fill');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('fill'); // 'fill' or 'multiple'
+  const [currentPage, setCurrentPage] = useState(1);
+  const [questionsPerPage, setQuestionsPerPage] = useState(10);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [viewMode, setViewMode] = useState('grid');
   const [showAnswers, setShowAnswers] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newQuestion, setNewQuestion] = useState({
+    text: '',
+    answer: '',
+    difficulty: 'Medium',
+    tags: []
+  });
+  
+  // Mock questions data
+  const [questions, setQuestions] = useState({
+    fill: generateMockQuestions('fill', 50), // Simulate 50 for now, would be 1000+
+    brief: generateMockQuestions('brief', 50),
+    sentence: generateMockQuestions('sentence', 50),
+    match: generateMockQuestions('match', 50)
+  });
 
+  // Extract all unique tags for filters
   useEffect(() => {
-    const storedExamDetails = localStorage.getItem('examDetails');
-    if (storedExamDetails) {
-      setExamDetails(JSON.parse(storedExamDetails));
-    }
-  }, []);
+    const tags = new Set();
+    questions[activeTab].forEach(q => {
+      if (q.tags) {
+        q.tags.forEach(tag => tags.add(tag));
+      }
+    });
+    setAvailableTags(Array.from(tags));
+  }, [activeTab, questions]);
 
-  const showToast = (message, type = 'error') => {
+  // Show toast message
+  const showToastMessage = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  const toggleFillInBlank = (id) => {
-    setSelectedFillInBlank(prev => {
+  // Filter questions based on search query and filters
+  const filteredQuestions = questions[activeTab].filter(q => {
+    // Apply search
+    const matchesSearch = searchQuery === '' || 
+      (q.text && q.text.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (q.answer && q.answer.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (q.items && q.items.some(item => 
+        item.left.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        item.right.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
+    
+    // Apply difficulty filter
+    const matchesDifficulty = selectedDifficulty === 'All' || q.difficulty === selectedDifficulty;
+    
+    // Apply tags filter
+    const matchesTags = selectedTags.length === 0 || 
+      (q.tags && selectedTags.every(tag => q.tags.includes(tag)));
+    
+    return matchesSearch && matchesDifficulty && matchesTags;
+  });
+
+  // Pagination
+  const indexOfLastQuestion = currentPage * questionsPerPage;
+  const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+  const currentQuestions = filteredQuestions.slice(indexOfFirstQuestion, indexOfLastQuestion);
+  const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
+
+  // Handle page change
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Toggle question selection
+  const toggleQuestionSelection = (id) => {
+    setSelectedQuestions(prev => {
       if (prev.includes(id)) {
-        return prev.filter(selectedId => selectedId !== id);
+        return prev.filter(qId => qId !== id);
+      } else {
+        return [...prev, id];
       }
-      
-      if (prev.length >= 5) {
-        showToast('You can only select 5 Fill in the Blank questions');
-        return prev;
-      }
-      
-      return [...prev, id];
     });
   };
 
-  const toggleMultipleChoice = (id) => {
-    setSelectedMultipleChoice(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(selectedId => selectedId !== id);
+  // Select all visible questions
+  const selectAllVisible = () => {
+    const visibleIds = currentQuestions.map(q => q.id);
+    if (selectedQuestions.length === visibleIds.length) {
+      setSelectedQuestions([]);
+    } else {
+      setSelectedQuestions(visibleIds);
+    }
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = () => {
+    // In production, this would make an API call to delete from MongoDB
+    const updatedQuestions = {...questions};
+    updatedQuestions[activeTab] = questions[activeTab].filter(q => !selectedQuestions.includes(q.id));
+    setQuestions(updatedQuestions);
+    setSelectedQuestions([]);
+    showToastMessage(`${selectedQuestions.length} questions deleted successfully`);
+  };
+
+  // Toggle tag selection
+  const toggleTag = (tag) => {
+    setSelectedTags(prev => {
+      if (prev.includes(tag)) {
+        return prev.filter(t => t !== tag);
+      } else {
+        return [...prev, tag];
       }
-      
-      if (prev.length >= 5) {
-        showToast('You can only select 5 Multiple Choice questions');
-        return prev;
-      }
-      
-      return [...prev, id];
     });
   };
 
-  const generateQuestionPaper = () => {
-    // Validate selections exactly 5 questions
-    if (selectedFillInBlank.length !== 5 || selectedMultipleChoice.length !== 5) {
-      showToast('Please select exactly 5 questions from each section');
+  // Handle adding a new question
+  const handleAddQuestion = () => {
+    // Validate
+    if (!newQuestion.text || !newQuestion.answer) {
+      showToastMessage("Question text and answer are required", "error");
       return;
     }
 
-    // Select questions
-    const selectedFillInBlankQuestions = fillInTheBlankQuestions
-      .filter(q => selectedFillInBlank.includes(q.id));
-
-    const selectedMultipleChoiceQuestions = multipleChoiceQuestions
-      .filter(q => selectedMultipleChoice.includes(q.id));
-
-    const finalQuestionPaper = [...selectedFillInBlankQuestions, ...selectedMultipleChoiceQuestions];
+    // In production, this would make an API call to MongoDB
+    const updatedQuestions = {...questions};
+    const newId = `${activeTab}-${Date.now()}`;
     
-    // Store generated paper in localStorage
-    localStorage.setItem('generatedQuestionPaper', JSON.stringify(finalQuestionPaper));
+    const questionToAdd = {
+      id: newId,
+      text: newQuestion.text,
+      answer: newQuestion.answer,
+      difficulty: newQuestion.difficulty,
+      tags: newQuestion.tags.length > 0 ? newQuestion.tags : ['untagged']
+    };
     
-    // Navigate to Final Question Paper Page
-    router.push('/FinalQuestionPaperPage');
+    updatedQuestions[activeTab] = [questionToAdd, ...questions[activeTab]];
+    setQuestions(updatedQuestions);
+    
+    // Reset form
+    setNewQuestion({
+      text: '',
+      answer: '',
+      difficulty: 'Medium',
+      tags: []
+    });
+    
+    setIsCreating(false);
+    showToastMessage("Question added successfully");
   };
 
-  // Filter questions based on search query
-  const filteredFillInBlank = fillInTheBlankQuestions.filter(q => 
-    q.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (showAnswers && q.answer && q.answer.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-  
-  const filteredMultipleChoice = multipleChoiceQuestions.filter(q => 
-    q.text.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (q.options && q.options.some(opt => 
-      opt.toLowerCase().includes(searchQuery.toLowerCase())
-    )) ||
-    (showAnswers && q.answer && q.answer.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  // Auto-select first 5 questions
-  const quickSelect = (type) => {
-    if (type === 'fill') {
-      const firstFive = filteredFillInBlank.slice(0, 5).map(q => q.id);
-      setSelectedFillInBlank(firstFive);
-      showToast('Selected first 5 Fill in the Blank questions', 'success');
-    } else {
-      const firstFive = filteredMultipleChoice.slice(0, 5).map(q => q.id);
-      setSelectedMultipleChoice(firstFive);
-      showToast('Selected first 5 Multiple Choice questions', 'success');
+  // Handle adding a tag to new question
+  const addTagToNewQuestion = (tag) => {
+    if (tag && !newQuestion.tags.includes(tag)) {
+      setNewQuestion({...newQuestion, tags: [...newQuestion.tags, tag]});
     }
   };
 
+  // Remove tag from new question
+  const removeTagFromNewQuestion = (tag) => {
+    setNewQuestion({
+      ...newQuestion, 
+      tags: newQuestion.tags.filter(t => t !== tag)
+    });
+  };
+
+  // Tab titles with counts
+  const tabTitles = {
+    fill: `Fill in the Blanks (${questions.fill.length})`,
+    brief: `Brief Answers (${questions.brief.length})`,
+    sentence: `One Sentence (${questions.sentence.length})`,
+    match: `Match the Following (${questions.match.length})`
+  };
+
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      {/* Toast notification */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 p-4 rounded shadow-lg ${
-          toast.type === 'error' 
-            ? 'bg-red-500 text-white' 
-            : 'bg-green-500 text-white'
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center gap-2 ${
+          toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
         }`}>
-          {toast.message}
+          {toast.type === 'error' ? <X size={18} /> : <Check size={18} />}
+          <span>{toast.message}</span>
         </div>
       )}
-      
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-lg shadow-lg mb-6">
-        <h1 className="text-3xl font-bold text-center">{subject} Question Paper</h1>
-        <p className="text-center mt-2 text-blue-100">
-          Select 5 questions from each category
-        </p>
-        
-        {/* Enhanced search input with more visible styling */}
-        <div className="mt-4 relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-white" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search questions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-4 py-3 border-2 border-blue-400 bg-black/20 bg-opacity-50 text-white placeholder-blue-200 focus:ring-2 focus:ring-white focus:border-white rounded-lg text-lg shadow-inner transition-all duration-300 focus:shadow-lg"
-            style={{
-              boxShadow: "0 0 15px rgba(255, 255, 255, 0.1) inset",
-            }}
-          />
-          <div className="absolute inset-y-0 right-0 flex items-center">
-            {searchQuery && (
+
+      {/* Header Section */}
+      <header className="bg-gradient-to-r from-indigo-400 to-blue-600 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">Question Bank Dashboard</h1>
+              <p className="text-blue-100 mt-1">Manage your question library efficiently</p>
+            </div>
+            
+            <div className="flex items-center gap-3">
               <button 
-                onClick={() => setSearchQuery('')}
-                className="h-full px-4 text-blue-200 hover:text-white"
+                onClick={() => setIsCreating(true)}
+                className="bg-white text-blue-700 flex items-center gap-2 px-4 py-2 rounded-lg shadow-md hover:bg-blue-50 transition-all"
               >
-                ✕
+                <PlusCircle size={18} />
+                <span>Add New</span>
+              </button>
+              
+              <button className="bg-blue-700 text-white flex items-center gap-2 px-4 py-2 rounded-lg shadow-md hover:bg-blue-800 transition-all">
+                <Download size={18} />
+                <span>Export</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Search and Filters Row */}
+          <div className="mt-6 flex flex-col md:flex-row gap-4">
+            <div className="relative flex-grow">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search questions, answers or tags..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full pl-10 pr-4 py-3 border border-blue-300 bg-white bg-opacity-90 text-gray-800 placeholder-gray-500 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+            
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className={`px-4 py-3 rounded-lg shadow-sm flex items-center gap-2 transition-all ${
+                showFilters 
+                  ? 'bg-blue-200 text-blue-800 border border-blue-300' 
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <Filter size={18} />
+              <span>Filters</span>
+              <ChevronDown size={16} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+          
+          {/* Advanced Filters Section */}
+          {showFilters && (
+            <div className="mt-4 bg-white bg-opacity-90 p-4 rounded-lg shadow-sm border border-blue-200 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                  <select
+                    value={selectedDifficulty}
+                    onChange={(e) => setSelectedDifficulty(e.target.value)}
+                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  >
+                    <option value="All">All Difficulties</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+                
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                  <div className="flex flex-wrap gap-2">
+                    {availableTags.slice(0, 10).map(tag => (
+                      <button
+                        key={tag}
+                        onClick={() => toggleTag(tag)}
+                        className={`py-1 px-3 rounded-full text-sm font-medium transition-colors ${
+                          selectedTags.includes(tag)
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                    {availableTags.length > 10 && (
+                      <button className="py-1 px-3 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200">
+                        +{availableTags.length - 10} more
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end mt-4">
+                <button 
+                  onClick={() => {
+                    setSelectedDifficulty('All');
+                    setSelectedTags([]);
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tabs Navigation */}
+        <div className="flex overflow-x-auto scrollbar-hide space-x-1 border-b border-gray-200">
+          {Object.keys(tabTitles).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setCurrentPage(1);
+                setSelectedQuestions([]);
+              }}
+              className={`py-3 px-6 font-medium whitespace-nowrap transition-colors ${
+                activeTab === tab
+                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              {tabTitles[tab]}
+            </button>
+          ))}
+        </div>
+        
+        {/* Create Question Form */}
+        {isCreating && (
+          <div className="bg-white shadow rounded-lg mt-6 p-6 border border-gray-200">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Add New Question</h2>
+              <button 
+                onClick={() => setIsCreating(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+                  <textarea
+                    value={newQuestion.text}
+                    onChange={(e) => setNewQuestion({...newQuestion, text: e.target.value})}
+                    placeholder="Enter your question here..."
+                    rows={4}
+                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Answer</label>
+                  <textarea
+                    value={newQuestion.answer}
+                    onChange={(e) => setNewQuestion({...newQuestion, answer: e.target.value})}
+                    placeholder="Enter the answer here..."
+                    rows={4}
+                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                  <select
+                    value={newQuestion.difficulty}
+                    onChange={(e) => setNewQuestion({...newQuestion, difficulty: e.target.value})}
+                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {newQuestion.tags.map(tag => (
+                      <span 
+                        key={tag} 
+                        className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1"
+                      >
+                        {tag}
+                        <button 
+                          onClick={() => removeTagFromNewQuestion(tag)} 
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <X size={14} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add tags..."
+                      id="newTag"
+                      className="flex-grow border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.value) {
+                          e.preventDefault();
+                          addTagToNewQuestion(e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        const input = document.getElementById('newTag');
+                        if (input.value) {
+                          addTagToNewQuestion(input.value);
+                          input.value = '';
+                        }
+                      }}
+                      className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-end gap-3">
+              <button 
+                onClick={() => setIsCreating(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleAddQuestion}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Save Question
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-6 mb-4 gap-3">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="selectAll"
+              checked={selectedQuestions.length === currentQuestions.length && currentQuestions.length > 0}
+              onChange={selectAllVisible}
+              className="h-4 w-4 text-blue-600 rounded border-gray-300"
+            />
+            <label htmlFor="selectAll" className="ml-2 text-sm text-gray-600">
+              Select All ({selectedQuestions.length} selected)
+            </label>
+            
+            {selectedQuestions.length > 0 && (
+              <button 
+                onClick={handleBulkDelete}
+                className="ml-4 text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
+              >
+                <Trash2 size={16} />
+                Delete Selected
               </button>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Controls for showing answers */}
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-2 items-center">
-          <input 
-            type="checkbox" 
-            id="showAnswers" 
-            checked={showAnswers} 
-            onChange={() => setShowAnswers(!showAnswers)}
-            className="w-4 h-4 text-blue-600" 
-          />
-          <label htmlFor="showAnswers" className="text-gray-700">Questions with Answers</label>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+              <button 
+                onClick={() => setViewMode('grid')}
+                className={`p-2 ${viewMode === 'grid' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-100'}`}
+              >
+                <Grid size={18} />
+              </button>
+              <button 
+                onClick={() => setViewMode('list')}
+                className={`p-2 ${viewMode === 'list' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-100'}`}
+              >
+                <List size={18} />
+              </button>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setShowAnswers(!showAnswers)}
+                className={`flex items-center gap-1 text-sm font-medium py-1 px-3 rounded-full ${
+                  showAnswers 
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                    : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
+                }`}
+              >
+                {showAnswers ? <Eye size={16} /> : <EyeOff size={16} />}
+                {showAnswers ? 'Hide Answers' : 'Show Answers'}
+              </button>
+            </div>
+            
+            <select
+              value={questionsPerPage}
+              onChange={(e) => {
+                setQuestionsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-gray-300 rounded-md shadow-sm py-1 px-2 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value={10}>10 per page</option>
+              <option value={25}>25 per page</option>
+              <option value={50}>50 per page</option>
+              <option value={100}>100 per page</option>
+            </select>
+          </div>
         </div>
         
-        <button
-          onClick={() => quickSelect(activeTab)}
-          className="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 transition border border-blue-300"
-        >
-          Quick Select 5
-        </button>
-      </div>
-
-      {/* Tabs for question types */}
-      <div className="flex mb-4 border-b border-gray-300">
-        <button
-          className={`py-3 px-6 text-lg font-medium ${
-            activeTab === 'fill' 
-              ? 'text-blue-600 border-b-3 border-blue-600 bg-blue-50' 
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-          }`}
-          onClick={() => setActiveTab('fill')}
-          style={{
-            borderBottomWidth: activeTab === 'fill' ? '3px' : '0',
-            marginBottom: activeTab === 'fill' ? '-1px' : '0'
-          }}
-        >
-          Fill in the Blanks ({selectedFillInBlank.length}/5)
-        </button>
-        <button
-          className={`py-3 px-6 text-lg font-medium ${
-            activeTab === 'multiple' 
-              ? 'text-blue-600 border-b-3 border-blue-600 bg-blue-50' 
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-          }`}
-          onClick={() => setActiveTab('multiple')}
-          style={{
-            borderBottomWidth: activeTab === 'multiple' ? '3px' : '0',
-            marginBottom: activeTab === 'multiple' ? '-1px' : '0'
-          }}
-        >
-          Multiple Choice ({selectedMultipleChoice.length}/5)
-        </button>
-      </div>
-
-      {/* Fill in the Blank Questions (conditionally rendered) */}
-      {activeTab === 'fill' && (
-        <div className="bg-white shadow-md rounded-lg p-6 mb-6 border border-gray-200">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Fill in the Blanks</h2>
-          
-          {searchQuery && filteredFillInBlank.length === 0 && (
-            <div className="text-gray-500 italic bg-gray-50 p-4 rounded text-center">
-              No matching fill-in-the-blank questions found
-            </div>
-          )}
-          
-          <div className="grid gap-3">
-            {filteredFillInBlank.map((question) => (
-              <div 
-                key={question.id} 
-                className={`rounded-lg p-4 border transition-all ${
-                  selectedFillInBlank.includes(question.id) 
-                    ? 'border-blue-500 bg-blue-50 shadow-md' 
-                    : 'border-gray-200 hover:border-blue-300 hover:shadow'
-                }`}
-              >
-                <div className="flex items-start">
-                  <input
-                    type="checkbox"
-                    id={`fillblank-${question.id}`}
-                    checked={selectedFillInBlank.includes(question.id)}
-                    onChange={() => toggleFillInBlank(question.id)}
-                    className="mr-3 h-5 w-5 mt-1 text-blue-600 rounded border-gray-400 focus:ring-blue-500"
-                  />
-                  <div className="flex-grow">
-                    <label 
-                      htmlFor={`fillblank-${question.id}`}
-                      className="flex-grow cursor-pointer"
-                    >
-                      <span className="text-gray-600 text-sm font-medium mr-2">Q{question.id}.</span>
-                      <span className="text-gray-800">{question.text}</span>
-                    </label>
-                    
-                    {showAnswers && (
-                      <div className="mt-2 ml-6 text-green-700 bg-green-50 inline-block px-3 py-1 rounded-full text-sm font-medium border border-green-200">
-                        Answer: {question.answer}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* Question Grid / List */}
+        {filteredQuestions.length === 0 ? (
+          <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 text-center">
+            <FileText size={48} className="mx-auto text-gray-400 mb-3" />
+            <h3 className="text-lg font-medium text-gray-900 mb-1">No questions found</h3>
+            <p className="text-gray-500 mb-4">Try changing your search or filters</p>
+            <button 
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedDifficulty('All');
+                setSelectedTags([]);
+              }}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Clear all filters
+            </button>
           </div>
-        </div>
-      )}
-
-      {/* Multiple Choice Questions (conditionally rendered) */}
-      {activeTab === 'multiple' && (
-        <div className="bg-white shadow-md rounded-lg p-6 mb-6 border border-gray-200">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Multiple Choice Questions</h2>
-          
-          {searchQuery && filteredMultipleChoice.length === 0 && (
-            <div className="text-gray-500 italic bg-gray-50 p-4 rounded text-center">
-              No matching multiple-choice questions found
-            </div>
-          )}
-          
-          <div className="grid gap-4">
-            {filteredMultipleChoice.map((question) => (
+        ) : viewMode === 'grid' ? (
+          // Grid View
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {currentQuestions.map((question) => (
               <div 
-                key={question.id} 
-                className={`rounded-lg p-4 border transition-all ${
-                  selectedMultipleChoice.includes(question.id) 
-                    ? 'border-blue-500 bg-blue-50 shadow-md' 
-                    : 'border-gray-200 hover:border-blue-300 hover:shadow'
+                key={question.id}
+                className={`bg-white rounded-lg shadow-sm border p-4 transition-shadow hover:shadow-md ${
+                  selectedQuestions.includes(question.id) ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-200'
                 }`}
               >
-                <div className="flex items-start">
+                <div className="flex items-start mb-3">
                   <input
                     type="checkbox"
-                    id={`multiple-${question.id}`}
-                    checked={selectedMultipleChoice.includes(question.id)}
-                    onChange={() => toggleMultipleChoice(question.id)}
-                    className="mr-3 h-5 w-5 mt-1 text-blue-600 rounded border-gray-400 focus:ring-blue-500"
+                    checked={selectedQuestions.includes(question.id)}
+                    onChange={() => toggleQuestionSelection(question.id)}
+                    className="h-4 w-4 mt-1 text-blue-600 rounded border-gray-300"
                   />
-                  <div className="flex-grow">
-                    <label 
-                      htmlFor={`multiple-${question.id}`}
-                      className="font-medium cursor-pointer"
-                    >
-                      <span className="text-gray-600 text-sm font-medium mr-2">Q{question.id}.</span>
-                      <span className="text-gray-800">{question.text}</span>
-                    </label>
-                    
-                    <div className="ml-6 mt-2 text-sm text-gray-700 grid gap-2">
-                      {question.options.map((option, optIndex) => (
-                        <div key={optIndex} className={`flex items-start rounded p-2 ${
-                          showAnswers && option === question.answer 
-                            ? 'bg-green-50 border border-green-200' 
-                            : 'hover:bg-gray-50'
-                        }`}>
-                          <span className="mr-2 font-medium">{String.fromCharCode(65 + optIndex)}.</span>
-                          <span className={`${
-                            showAnswers && option === question.answer 
-                              ? 'font-medium' 
-                              : ''
-                          }`}>{option}</span>
-                          {showAnswers && option === question.answer && (
-                            <span className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Correct</span>
-                          )}
-                        </div>
-                      ))}
+                  
+                  <div className="ml-3 flex-grow">
+                    <div className="text-sm">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        question.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                        question.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {question.difficulty}
+                      </span>
+                      
+                      <span className="text-gray-500 ml-2">#{question.id}</span>
                     </div>
                     
-                    {showAnswers && (
-                      <div className="mt-3 ml-6 text-green-700 bg-green-50 inline-block px-3 py-1 rounded-full text-sm font-medium border border-green-200">
-                        Answer: {question.answer}
-                      </div>
-                    )}
+                    <p className="font-medium text-gray-900 mt-1 line-clamp-3">
+                      {question.text}
+                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Selection Summary */}
-      <div className="sticky bottom-4 bg-white rounded-lg p-4 mb-6 flex justify-between items-center shadow-lg border border-gray-300">
-        <div>
-          <div className="text-sm text-gray-600">Fill in the Blank: <span className="font-medium text-blue-600">{selectedFillInBlank.length}/5</span></div>
-          <div className="text-sm text-gray-600">Multiple Choice: <span className="font-medium text-blue-600">{selectedMultipleChoice.length}/5</span></div>
-        </div>
-        <button 
-          onClick={generateQuestionPaper}
-          disabled={selectedFillInBlank.length !== 5 || selectedMultipleChoice.length !== 5}
-          className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
-            selectedFillInBlank.length === 5 && selectedMultipleChoice.length === 5
-              ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-1' 
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          Generate Paper
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const QuestionPaperPage = () => {
-  return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading questions...</p>
-        </div>
-      </div>
-    }>
-      <QuestionPaperPageContent />
-    </Suspense>
-  );
-};
-
-export default QuestionPaperPage;
+                
+                {/* Matching items if it's a matching question */}
+                {question.items && (
+                  <div className="mb-3 border-t pt-2 border-dashed border-gray-200">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="text-gray-500 font-medium">Item</div>
+                      <div className="text-gray-500 font-medium">Match</div>
+                      {question.items.slice(0, 2).map((item) => (
+                        <React.Fragment key={item.id}>
+                          <div className="bg-gray-50 p-1 rounded">{item.left}</div>
+                          <div className="bg-gray-50 p-1 rounded">{item.right}</div>
+                        </React.Fragment>
+                      ))}
+                      {question.items.length > 2 && (
+                        <div className="col-span-2 text-center text-xs text-gray-500">
+                          +{question.items.length - 2} more items
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Show answer if toggled */}
+                {showAnswers && question.answer && (
+                  <div className="mt-3 p-2 bg-green-50 rounded-md border border-green-200">
+                    <div className="text-xs font-medium text-green-700 mb-1">Answer:</div>
+                    <p className="text-sm text-green-800 line-clamp-2">{question.answer}</p>
+                  </div>
+                   )}{/* Tags */}
+                   <div className="mt-3 flex flex-wrap gap-1">
+                     {question.tags && question.tags.map((tag) => (
+                       <span 
+                         key={tag}
+                         className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                       >
+                         {tag}
+                       </span>
+                     ))}
+                   </div>
+                   
+                   <div className="mt-3 pt-2 border-t border-gray-100 flex justify-end">
+                     <div className="flex space-x-2">
+                       <button className="p-1.5 text-gray-500 hover:text-blue-600 transition-colors">
+                         <Edit3 size={16} />
+                       </button>
+                       <button className="p-1.5 text-gray-500 hover:text-red-600 transition-colors">
+                         <Trash2 size={16} />
+                       </button>
+                       <button className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors">
+                         <MoreHorizontal size={16} />
+                       </button>
+                     </div>
+                   </div>
+                 </div>
+               ))}
+             </div>
+           ) : (
+             // List View
+             <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+               <table className="min-w-full divide-y divide-gray-200">
+                 <thead className="bg-gray-50">
+                   <tr>
+                     <th scope="col" className="px-4 py-3 w-10">
+                       <input
+                         type="checkbox"
+                         checked={selectedQuestions.length === currentQuestions.length && currentQuestions.length > 0}
+                         onChange={selectAllVisible}
+                         className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                       />
+                     </th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       ID
+                     </th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Question
+                     </th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Difficulty
+                     </th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Tags
+                     </th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                       Actions
+                     </th>
+                   </tr>
+                 </thead>
+                 <tbody className="bg-white divide-y divide-gray-200">
+                   {currentQuestions.map((question) => (
+                     <tr 
+                       key={question.id}
+                       className={selectedQuestions.includes(question.id) ? 'bg-blue-50' : 'hover:bg-gray-50'}
+                     >
+                       <td className="px-4 py-3 w-10">
+                         <input
+                           type="checkbox"
+                           checked={selectedQuestions.includes(question.id)}
+                           onChange={() => toggleQuestionSelection(question.id)}
+                           className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                         />
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                         #{question.id}
+                       </td>
+                       <td className="px-4 py-3">
+                         <div className="text-sm font-medium text-gray-900 line-clamp-2">
+                           {question.text}
+                         </div>
+                         {showAnswers && question.answer && (
+                           <div className="mt-1 text-sm text-green-700 bg-green-50 px-2 py-1 rounded">
+                             <span className="font-medium">Answer:</span> {question.answer}
+                           </div>
+                         )}
+                         {question.items && (
+                           <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600">
+                             {question.items.slice(0, 2).map((item) => (
+                               <React.Fragment key={item.id}>
+                                 <div>{item.left} → {item.right}</div>
+                               </React.Fragment>
+                             ))}
+                             {question.items.length > 2 && (
+                               <div className="text-gray-500">
+                                 +{question.items.length - 2} more
+                               </div>
+                             )}
+                           </div>
+                         )}
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap">
+                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                           question.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                           question.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                           'bg-red-100 text-red-800'
+                         }`}>
+                           {question.difficulty}
+                         </span>
+                       </td>
+                       <td className="px-4 py-3">
+                         <div className="flex flex-wrap gap-1">
+                           {question.tags && question.tags.slice(0, 3).map((tag) => (
+                             <span 
+                               key={tag}
+                               className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                             >
+                               {tag}
+                             </span>
+                           ))}
+                           {question.tags && question.tags.length > 3 && (
+                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                               +{question.tags.length - 3}
+                             </span>
+                           )}
+                         </div>
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                         <div className="flex space-x-2">
+                           <button className="p-1.5 text-gray-500 hover:text-blue-600 transition-colors">
+                             <Edit3 size={16} />
+                           </button>
+                           <button className="p-1.5 text-gray-500 hover:text-red-600 transition-colors">
+                             <Trash2 size={16} />
+                           </button>
+                           <button className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors">
+                             <MoreHorizontal size={16} />
+                           </button>
+                         </div>
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+           )}
+           
+           {/* Pagination */}
+           {totalPages > 1 && (
+             <div className="flex justify-between items-center mt-6">
+               <div className="text-sm text-gray-500">
+                 Showing {indexOfFirstQuestion + 1} to {Math.min(indexOfLastQuestion, filteredQuestions.length)} of {filteredQuestions.length} questions
+               </div>
+               
+               <div className="flex space-x-1">
+                 <button
+                   onClick={() => paginate(1)}
+                   disabled={currentPage === 1}
+                   className={`px-3 py-1 rounded ${
+                     currentPage === 1
+                       ? 'text-gray-400 cursor-not-allowed'
+                       : 'text-gray-700 hover:bg-gray-100'
+                   }`}
+                 >
+                   First
+                 </button>
+                 
+                 <button
+                   onClick={() => paginate(currentPage - 1)}
+                   disabled={currentPage === 1}
+                   className={`px-3 py-1 rounded ${
+                     currentPage === 1
+                       ? 'text-gray-400 cursor-not-allowed'
+                       : 'text-gray-700 hover:bg-gray-100'
+                   }`}
+                 >
+                   Previous
+                 </button>
+                 
+                 {/* Page Numbers */}
+                 {[...Array(totalPages).keys()].map(number => {
+                   // Show current page, one before, and one after (if they exist)
+                   if (
+                     number + 1 === currentPage ||
+                     number + 1 === currentPage - 1 ||
+                     number + 1 === currentPage + 1 ||
+                     number + 1 === 1 ||
+                     number + 1 === totalPages
+                   ) {
+                     return (
+                       <button
+                         key={number + 1}
+                         onClick={() => paginate(number + 1)}
+                         className={`px-3 py-1 rounded ${
+                           currentPage === number + 1
+                             ? 'bg-blue-600 text-white'
+                             : 'text-gray-700 hover:bg-gray-100'
+                         }`}
+                       >
+                         {number + 1}
+                       </button>
+                     );
+                   } else if (
+                     (number + 1 === currentPage - 2 && currentPage > 3) ||
+                     (number + 1 === currentPage + 2 && currentPage < totalPages - 2)
+                   ) {
+                     return <span key={number + 1} className="px-1 py-1">...</span>;
+                   } else {
+                     return null;
+                   }
+                 })}
+                 
+                 <button
+                   onClick={() => paginate(currentPage + 1)}
+                   disabled={currentPage === totalPages}
+                   className={`px-3 py-1 rounded ${
+                     currentPage === totalPages
+                       ? 'text-gray-400 cursor-not-allowed'
+                       : 'text-gray-700 hover:bg-gray-100'
+                   }`}
+                 >
+                   Next
+                 </button>
+                 
+                 <button
+                   onClick={() => paginate(totalPages)}
+                   disabled={currentPage === totalPages}
+                   className={`px-3 py-1 rounded ${
+                     currentPage === totalPages
+                       ? 'text-gray-400 cursor-not-allowed'
+                       : 'text-gray-700 hover:bg-gray-100'
+                   }`}
+                 >
+                   Last
+                 </button>
+               </div>
+             </div>
+           )}
+         </main>
+         
+         <footer className="border-t border-gray-200 bg-white">
+           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+               <div className="text-sm text-gray-500">
+                 © 2025 Question Bank Dashboard. All rights reserved.
+               </div>
+               
+               <div className="flex items-center gap-4">
+                 <button className="text-gray-500 hover:text-gray-700 text-sm">Help</button>
+                 <button className="text-gray-500 hover:text-gray-700 text-sm">Terms</button>
+                 <button className="text-gray-500 hover:text-gray-700 text-sm">Privacy</button>
+                 <button className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
+                   <Settings size={16} />
+                   Settings
+                 </button>
+               </div>
+             </div>
+           </div>
+         </footer>
+       </div>
+     );
+   };
+   
+   export default Dashboard;

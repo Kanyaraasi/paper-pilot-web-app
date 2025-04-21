@@ -78,7 +78,6 @@ const generateMockQuestions = (type, count = 20) => {
 
 const Dashboard = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   
   // States
   const [activeTab, setActiveTab] = useState('fill');

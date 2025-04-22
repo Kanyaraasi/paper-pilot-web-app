@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Menu, X, Clock, CheckCircle, RefreshCw, AlertTriangle, MessageCircle, Phone, Mail } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LandingPage() {
   const [username, setUsername] = useState("");
@@ -106,13 +107,19 @@ export default function LandingPage() {
       )}
 
       {/* Navigation Bar */}
-      <nav className="bg-white shadow-md fixed w-full z-10">
+      <nav className="bg-gray-50 shadow-md fixed w-full z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and brand */}
             <div className="flex items-center">
               <div className="flex-shrink-0">
-               <Image></Image>
+              <Image 
+                  src="/logo.jpg" 
+                  alt="PaperPilot Logo" 
+                  width={80} 
+                  height={80} 
+                  className="h-[8vh] w-auto"
+                />
               </div>
             </div>
             
@@ -141,6 +148,13 @@ export default function LandingPage() {
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t animate-fadeIn">
+             <Image 
+                  src="/ChatGPT Image Apr 20, 2025, 10_01_32 PM.png" 
+                  alt="PaperPilot Logo" 
+                  width={40} 
+                  height={40} 
+                  className="h-10 w-auto"
+                />
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <a href="#" className="text-gray-800 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300">Home</a>
               <a href="#" className="text-gray-800 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300">Features</a>

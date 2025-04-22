@@ -112,7 +112,7 @@ export default function LandingPage() {
             {/* Logo and brand */}
             <div className="flex items-center">
               <div className="flex-shrink-0">
-               <Image></Image>
+               {/* <Image></Image> */}
               </div>
             </div>
             

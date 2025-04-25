@@ -375,7 +375,7 @@ export default function LandingPage() {
                 className="flex items-center justify-center space-x-2 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
               >
                 <Mail className="h-5 w-5 text-blue-600" />
-                <span className="text-blue-600 font-medium">paperpilot@gmail.com</span>
+                <span className="text-blue-600 font-medium">paperpilott@gmail.com</span>
               </a>
               
               <a 

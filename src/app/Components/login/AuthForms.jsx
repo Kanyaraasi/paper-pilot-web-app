@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, UserPlus, Mail, User as UserIcon } from 'lucide-react';
-
+import axios from 'axios'
 function AuthForms() {
   const [loginData, setLoginData] = useState({
-    username: "",
+    schoolName: "",
     password: "",
   });
   
   const [registerData, setRegisterData] = useState({
-    fullName: "",
+    schoolName: "",
     email: "",
-    newUsername: "",
-    newPassword: "",
+    password: "",
     confirmPassword: "",
+    address: "",
   });
   
   const [error, setError] = useState("");
@@ -21,7 +21,7 @@ function AuthForms() {
   const [hideRegisterPass, setHideRegisterPass] = useState(true);
   const [hideConfirmPass, setHideConfirmPass] = useState(true);
   const [isRegisterForm, setIsRegisterForm] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   // Success message auto-hide effect
   useEffect(() => {
     if (success) {
@@ -42,42 +42,90 @@ function AuthForms() {
     }
   }, [error]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (loginData.username === "admin123" && loginData.password === "admin123") {
-      window.location.href = "/GradeSelector";
-    } else {
-      setError("Invalid username or password!");
+    setIsLoading(true);
+    
+    try {
+      const response = await axios.post(
+        'https://paper-pilot-backend.onrender.com/auth/v1/login',
+        {
+          schoolName: loginData.schoolName,
+          password: loginData.password,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      
+      // Store the token from the response
+      localStorage.setItem('token', response.data.token);
+      
+      setSuccess("Login successful!");
+      
+      // Redirect to dashboard after successful login
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1000);
+      
+    } catch (err) {
+      console.error('Login error details:', err);
+      // Get the error message from the response if available
+      const errorMsg = err.response?.data?.message || err.message || 'Login failed. Please try again.';
+      setError(errorMsg);
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     
     // Basic validation
-    if (registerData.newPassword !== registerData.confirmPassword) {
-      setError("Passwords do not match!");
-      return;
-    }
+    // if (registerData.password !== registerData.confirmPassword) {
+    //   setError("Passwords do not match!");
+    //   return;
+    // }
     
-    if (registerData.newPassword.length < 6) {
+    if (registerData.password.length < 6) {
       setError("Password must be at least 6 characters!");
       return;
     }
+
+    setIsLoading(true);
     
-    // Simulate successful registration
-    setSuccess("Registration successful! You can now login.");
-    setIsRegisterForm(false);
-    
-    // Reset register form
-    setRegisterData({
-      fullName: "",
-      email: "",
-      newUsername: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+    try {
+      const response = await axios.post(
+        'https://paper-pilot-backend.onrender.com/auth/v1/register-school',
+        {
+          schoolName: registerData.schoolName,
+          email: registerData.email,
+          password: registerData.password,
+          address: registerData.address,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      console.log('resposnsee', response)
+      setSuccess("Registration successful! You can now login.");
+      // Rest of the success handling...
+      
+    } catch (err) {
+      console.error('Registration error details:', err);
+      // Get the error message from the response if available
+      const errorMsg = err.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      setError(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   const togglePasswordVisibility = (field) => {
     if (field === 'login') {
@@ -149,28 +197,28 @@ function AuthForms() {
         </h2>
         
         <form onSubmit={handleLogin} className="space-y-5">
-          <div className="space-y-1">
-            <label 
-              htmlFor="username" 
-              className="block text-sm font-medium text-gray-700"
-            >
-              Username
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={loginData.username}
-                onChange={handleLoginInputChange}
-                required
-                className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-              />
-            </div>
-          </div>
+        <div className="space-y-1">
+    <label 
+      htmlFor="schoolName" 
+      className="block text-sm font-medium text-gray-700"
+    >
+      School Name
+    </label>
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <User className="h-5 w-5 text-gray-400" />
+      </div>
+      <input
+        id="schoolName"
+        type="text"
+        placeholder="Enter your school name"
+        value={loginData.schoolName}
+        onChange={handleLoginInputChange}
+        required
+        className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+      />
+    </div>
+  </div>
           
           <div className="space-y-1 relative">
             <label 
@@ -261,27 +309,27 @@ function AuthForms() {
         <form onSubmit={handleRegister} className="space-y-4">
           {/* Full Name Field */}
           <div className="space-y-1">
-            <label 
-              htmlFor="fullName" 
-              className="block text-sm font-medium text-gray-700"
-            >
-              Full Name
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <UserIcon className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                value={registerData.fullName}
-                onChange={handleRegisterInputChange}
-                required
-                className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-              />
-            </div>
-          </div>
+    <label 
+      htmlFor="schoolName" 
+      className="block text-sm font-medium text-gray-700"
+    >
+      School Name
+    </label>
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <UserIcon className="h-5 w-5 text-gray-400" />
+      </div>
+      <input
+        id="schoolName"
+        type="text"
+        placeholder="Enter your school name"
+        value={registerData.schoolName}
+        onChange={handleRegisterInputChange}
+        required
+        className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+      />
+    </div>
+  </div>
           
           {/* Email Field */}
           <div className="space-y-1">
@@ -306,13 +354,38 @@ function AuthForms() {
               />
             </div>
           </div>
+
+          <div className="space-y-1">
+    <label 
+      htmlFor="address" 
+      className="block text-sm font-medium text-gray-700"
+    >
+      School Address
+    </label>
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      </div>
+      <input
+        id="address"
+        type="text"
+        placeholder="Enter school address"
+        value={registerData.address}
+        onChange={handleRegisterInputChange}
+        required
+        className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+      />
+    </div>
+  </div>
           
           {/* Username Field - Added this field which was missing */}
 
           {/* Password Field */}
           <div className="space-y-1">
             <label 
-              htmlFor="newPassword" 
+              htmlFor="password" 
               className="block text-sm font-medium text-gray-700"
             >
               Password
@@ -322,10 +395,10 @@ function AuthForms() {
                 <Lock className="h-5 w-5 text-gray-400" />
               </div>
               <input
-                id="newPassword"
+                id="password"
                 type={hideRegisterPass ? "password" : "text"}
                 placeholder="Create a password"
-                value={registerData.newPassword}
+                value={registerData.password}
                 onChange={handleRegisterInputChange}
                 required
                 className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"

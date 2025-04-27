@@ -3,3 +3,118 @@
 @tailwind utilities;
 
 
+.animate-slideIn {
+    animation: slideIn 0.8s ease-out forwards;
+  }
+  
+  .animate-slideInRight {
+    animation: slideInRight 0.5s ease-out forwards;
+  }
+  
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }@tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  
+  /* @import './styles/animations.css'; */
+  
+  :root {
+    --primary-color: #3366FF;
+    --primary-light: #EBF0FF;
+    --primary-dark: #1E40AF;
+    --secondary-color: #14B8A6;
+    --accent-color: #F97316;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
+    --black: #111827;
+    --white: #FFFFFF;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    color: var(--gray-800);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  
+  /* Custom Focus Styles */
+  *:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+  
+  /* Custom 8px Spacing System */
+  .p-custom {
+    padding: 8px;
+  }
+  
+  .p-custom-2 {
+    padding: 16px;
+  }
+  
+  .p-custom-3 {
+    padding: 24px;
+  }
+  
+  /* Hover Animation for Links and Buttons */
+  a, button {
+    transition: all 0.3s ease;
+  }
+  
+  /* Improved button styles */
+  button {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  button:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+  }
+  
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    20% {
+      transform: scale(25, 25);
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(40, 40);
+    }
+  }
+  
+  button:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }

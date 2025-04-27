@@ -1,10 +1,11 @@
 
-import Login from './Components/login/Login'
+// import HomePage from './Components/HomePage'
+import HomePage from "./Components/login/Login";
 
 export default function Home() {
   return (
     <>
-      <Login/>
+      <HomePage/>
       {/* <GradeSelector/> */}
      {/* <QuestionPaper/> */}
     </>

@@ -18,8 +18,17 @@ const GradeSelector = () => {
   const [totalMarks, setTotalMarks] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState('grade'); // To track wizard steps
+  const [examConfigArray, setExamConfigArray] = useState([]);
   
   const router = useRouter();
+
+  // Load existing exam configurations from localStorage on component mount
+  useEffect(() => {
+    const savedConfigurations = localStorage.getItem('examConfigArray');
+    if (savedConfigurations) {
+      setExamConfigArray(JSON.parse(savedConfigurations));
+    }
+  }, []);
 
   const grades = [
     { number: 1, title: "1st Standard", subjects: ["English", "Mathematics", "Environmental Science", "Hindi"] },
@@ -131,6 +140,7 @@ const GradeSelector = () => {
     
     // Create exam details object
     const examDetails = {
+      id: Date.now(), // Add a unique identifier for each entry
       grade: selectedGrade.title,
       subject: selectedSubject,
       date: date,
@@ -139,13 +149,23 @@ const GradeSelector = () => {
       unit: unit,
       schoolName: schoolName,
       address: address,
-      totalMarks: totalMarks
+      totalMarks: totalMarks,
+      createdAt: new Date().toISOString() // Add timestamp for when this configuration was created
     };
     
     // Simulate network request
     setTimeout(() => {
-      // Store exam details in localStorage
+      // Update the array with the new exam config
+      const updatedConfigArray = [...examConfigArray, examDetails];
+      
+      // Store the updated array in localStorage
+      localStorage.setItem('examConfigArray', JSON.stringify(updatedConfigArray));
+      
+      // Also store the current exam details for immediate use
       localStorage.setItem('examDetails', JSON.stringify(examDetails));
+      
+      // Update state
+      setExamConfigArray(updatedConfigArray);
       
       // Success notification
       toast.success("Exam details added successfully!");
@@ -153,7 +173,7 @@ const GradeSelector = () => {
       setIsLoading(false);
       
       // Navigate to Question Paper Page with subject as a query parameter
-      router.push(`/QuestionPaperPage?subject=${encodeURIComponent(selectedSubject)}`);
+      router.push(`/QuestionPaperPage`);
     }, 800);
   };
   
@@ -222,8 +242,8 @@ const GradeSelector = () => {
           ></motion.div>
         </div>
         <div className="flex justify-between mt-2 text-xs text-indigo-700 font-medium">
-          <span className={activeSection === 'grade' ? 'text-indigo-900 font-bold' : ''}>Grade Selection</span>
-          <span className={activeSection === 'subject' ? 'text-indigo-900 font-bold' : ''}>Subject</span>
+          <span className={activeSection === 'grade' ? 'text-indigo-900 font-bold text-[16px]' : ''}>Grade Selection</span>
+          <span className={activeSection === 'subject' ? 'text-indigo-900 font-bold ' : ''}>Subject</span>
           <span className={activeSection === 'details' ? 'text-indigo-900 font-bold' : ''}>Exam Details</span>
         </div>
       </motion.div>
@@ -377,13 +397,20 @@ const GradeSelector = () => {
                   >
                     <div>
                       <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <Award className="w-5 h-5 text-indigo-500" /> 
+                        <Award className="w-5 h-5 text-indigo-500" />
                         Exam Details
                       </h2>
                       <p className="text-gray-500 text-sm mt-1">
                         {selectedGrade.title} - {selectedSubject}
                       </p>
                     </div>
+                    
+                    {/* Display count of saved configurations */}
+                    {examConfigArray.length > 0 && (
+                      <div className="text-sm text-indigo-600">
+                        {examConfigArray.length} saved configuration{examConfigArray.length !== 1 ? 's' : ''}
+                      </div>
+                    )}
                   </motion.div>
                   
                   <motion.div 

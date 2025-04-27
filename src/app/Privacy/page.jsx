@@ -10,7 +10,7 @@ const PrivacyPage = () => {
       <header className="bg-gradient-to-r from-indigo-400 to-blue-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <Link href="/QuestionPaperPage" className="flex items-center text-white font-medium hover:text-blue-100">
+            <Link href="/" className="flex items-center text-white font-medium hover:text-blue-100">
               <ArrowLeft size={18} className="mr-2" />
               Back to Dashboard
             </Link>

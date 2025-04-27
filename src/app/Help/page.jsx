@@ -10,7 +10,7 @@ const HelpPage = () => {
       <header className="bg-gradient-to-r from-indigo-400 to-blue-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <Link href="/QuestionPaperPage" className="flex items-center text-white font-medium hover:text-blue-100">
+            <Link href="/" className="flex items-center text-white font-medium hover:text-blue-100">
               <ArrowLeft size={18} className="mr-2" />
               Back to Dashboard
             </Link>
@@ -199,9 +199,9 @@ const HelpPage = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <Link href="/help" className="text-blue-600 hover:text-blue-800 text-sm">Help</Link>
-              <Link href="/terms" className="text-gray-500 hover:text-gray-700 text-sm">Terms</Link>
-              <Link href="/privacy" className="text-gray-500 hover:text-gray-700 text-sm">Privacy</Link>
+              <Link href="/Help" className="text-blue-600 hover:text-blue-800 text-sm">Help</Link>
+              <Link href="/TermsAndCondition" className="text-gray-500 hover:text-gray-700 text-sm">Terms</Link>
+              <Link href="/Privacy" className="text-gray-500 hover:text-gray-700 text-sm">Privacy</Link>
             </div>
           </div>
         </div>

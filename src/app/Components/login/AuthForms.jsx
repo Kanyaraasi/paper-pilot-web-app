@@ -67,7 +67,7 @@ function AuthForms() {
       
       // Redirect to dashboard after successful login
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        window.location.href = "/GradeSelector";
       }, 1000);
       
     } catch (err) {

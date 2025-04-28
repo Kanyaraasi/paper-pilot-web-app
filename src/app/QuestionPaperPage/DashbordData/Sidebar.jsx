@@ -14,7 +14,7 @@ const Sidebar = ({ allTags, questions, toggleTagSelection, selectedTags, activeT
   };
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto text-purple-200">
       <div className="p-4">
         <div className="space-y-1">
           <button className="flex items-center gap-2 text-sm font-medium text-purple-600 bg-purple-50 w-full p-2 rounded-md transition-colors duration-200">

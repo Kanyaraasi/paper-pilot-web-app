@@ -6,7 +6,7 @@ const QuestionCard = ({
   isSelected, 
   onSelect, 
   showAnswers, 
-  onDelete, 
+   
   onEdit, 
   onToggleStar, 
   viewMode 

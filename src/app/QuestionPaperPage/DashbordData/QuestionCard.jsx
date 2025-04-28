@@ -75,15 +75,7 @@ const QuestionCard = ({
             >
               <Edit3 size={14} />
             </button>
-            <button 
-              className="text-gray-400 hover:text-red-600 transition-colors duration-200"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(question.id);
-              }}
-            >
-              <Trash2 size={14} />
-            </button>
+            
           </div>
         </div>
       </div>

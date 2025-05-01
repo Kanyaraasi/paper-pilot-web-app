@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, UserPlus, Mail, User as UserIcon } from 'lucide-react';
 import axios from 'axios'
+import { toast } from 'react-toastify';
+
 function AuthForms() {
   const [loginData, setLoginData] = useState({
     schoolName: "",
@@ -47,36 +49,22 @@ function AuthForms() {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(
-        'https://paper-pilot-backend.onrender.com/auth/v1/login',
-        {
-          schoolName: loginData.schoolName,
-          password: loginData.password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
+      const response = await axios.post('https://paper-pilot-backend.onrender.com/api/auth/login', {
+        email: loginData.schoolName,
+        password: loginData.password,
+      });
+      const token = response.data.token;
+
+      // Save token to localStorage or cookie
+      localStorage.setItem('token', token);
+
+      setSuccess('Login successful');
+      console.log('JWT Token:', token);
+    } catch (error) {
+      console.error(error);
+      setError(
+        error.response?.data?.message || 'Login failed. Please try again.'
       );
-      
-      // Store the token from the response
-      localStorage.setItem('token', response.data.token);
-      
-      setSuccess("Login successful!");
-      
-      // Redirect to dashboard after successful login
-      setTimeout(() => {
-        window.location.href = "/GradeSelector";
-      }, 1000);
-      
-    } catch (err) {
-      console.error('Login error details:', err);
-      // Get the error message from the response if available
-      const errorMsg = err.response?.data?.message || err.message || 'Login failed. Please try again.';
-      setError(errorMsg);
-    } finally {
-      setIsLoading(false);
     }
   };
   
@@ -98,31 +86,19 @@ function AuthForms() {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(
-        'https://paper-pilot-backend.onrender.com/auth/v1/register-school',
-        {
-          schoolName: registerData.schoolName,
-          email: registerData.email,
-          password: registerData.password,
-          address: registerData.address,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
+      const response = await axios.post('https://paper-pilot-backend.onrender.com/api/auth/register', {
+        schoolName: registerData.schoolName,
+        email: registerData.email,
+        password: registerData.password,
+        address: registerData.address,
+      });
+      setSuccess(response.data.message || 'Registration successful');
+      console.log('JWT Token:', response.data.token);
+    } catch (error) {
+      console.error(error);
+      setError(
+        error.response?.data?.message || 'Registration failed. Please try again.'
       );
-      console.log('resposnsee', response)
-      setSuccess("Registration successful! You can now login.");
-      // Rest of the success handling...
-      
-    } catch (err) {
-      console.error('Registration error details:', err);
-      // Get the error message from the response if available
-      const errorMsg = err.response?.data?.message || err.message || 'Registration failed. Please try again.';
-      setError(errorMsg);
-    } finally {
-      setIsLoading(false);
     }
   };
 

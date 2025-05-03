@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AuthForms from '../Components/login/AuthForms';
+import AuthForms from './AuthForms';
 
 function Hero({ animated, onGetStarted }) {
   const [typedText, setTypedText] = useState("");

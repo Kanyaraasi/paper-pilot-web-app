@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, UserPlus, Mail, User as UserIcon } from 'lucide-react';
+
 import axios from 'axios'
 function AuthForms() {
   const [loginData, setLoginData] = useState({
@@ -22,6 +23,7 @@ function AuthForms() {
   const [hideConfirmPass, setHideConfirmPass] = useState(true);
   const [isRegisterForm, setIsRegisterForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordhide,setpasswordhide]=useState(true)
   // Success message auto-hide effect
   useEffect(() => {
     if (success) {
@@ -48,7 +50,7 @@ function AuthForms() {
     
     try {
       const response = await axios.post(
-        'https://paper-pilot-backend.onrender.com/auth/v1/login',
+        'https://paper-pilot-backend.onrender.com/api/auth/login',
         {
           schoolName: loginData.schoolName,
           password: loginData.password,
@@ -56,30 +58,35 @@ function AuthForms() {
         {
           headers: {
             'Content-Type': 'application/json',
-          }
+          },
+          timeout: 1000,
         }
       );
-      
-      // Store the token from the response
-      localStorage.setItem('token', response.data.token);
-      
+  
+      const { token, slotType } = response.data;
+      localStorage.setItem('token', token);
       setSuccess("Login successful!");
-      
-      // Redirect to dashboard after successful login
+  
       setTimeout(() => {
-        window.location.href = "/GradeSelector";
+        if (slotType === "admin") {
+          window.location.href = "/CreateUser";
+        } else if (slotType === "teacher") {
+          window.location.href = "/QuestionPaperPage";
+        } else {
+          setError("Unknown user type.");
+        }
       }, 1000);
-      
+  
     } catch (err) {
-      console.error('Login error details:', err);
-      // Get the error message from the response if available
-      const errorMsg = err.response?.data?.message || err.message || 'Login failed. Please try again.';
+      // console.error('Login error:', err.response?.data || err.message);
+      const errorMsg = err.response?.data?.message || 'Login failed. Please check credentials.';
       setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
   };
   
+   
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -99,7 +106,7 @@ function AuthForms() {
     
     try {
       const response = await axios.post(
-        'https://paper-pilot-backend.onrender.com/auth/v1/register-school',
+        'https://paper-pilot-backend.onrender.com/api/auth/register',
         {
           schoolName: registerData.schoolName,
           email: registerData.email,
@@ -128,6 +135,7 @@ function AuthForms() {
 
 
   const togglePasswordVisibility = (field) => {
+    console.log('hidepass')
     if (field === 'login') {
       setHidePass(!hidePass);
     } else if (field === 'register') {

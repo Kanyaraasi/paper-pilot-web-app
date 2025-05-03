@@ -3,6 +3,7 @@ import { Eye, EyeOff, User, Lock, UserPlus, Mail, User as UserIcon } from 'lucid
 
 import axios from 'axios'
 import { toast } from 'react-toastify';
+import { BASE_URL } from '../../../../BASE_URL';
 
 function AuthForms() {
   const [loginData, setLoginData] = useState({
@@ -51,16 +52,25 @@ function AuthForms() {
     setIsLoading(true);
     
     try {
-      const response = await axios.post('https://paper-pilot-backend.onrender.com/api/auth/login', {
+      const response = await axios.post(`${BASE_URL}/api/auth/login`, {
         email: loginData.schoolName,
         password: loginData.password,
       });
       const token = response.data.token;
-
+      const slotType = response.data.user?.role;
       // Save token to localStorage or cookie
       localStorage.setItem('token', token);
-
+      localStorage.setItem('roleType', slotType)
       setSuccess('Login successful');
+      setTimeout(() => {
+        if (slotType === "admin") {
+          window.location.href = "/CreateUser";
+        } else if (slotType === "teacher") {
+          window.location.href = "/QuestionPaperPage";
+        } else {
+          setError("Unknown user type.");
+        }
+      }, 1000);
       console.log('JWT Token:', token);
     } catch (error) {
       console.error(error);
@@ -89,12 +99,14 @@ function AuthForms() {
     setIsLoading(true);
     
     try {
-      const response = await axios.post('https://paper-pilot-backend.onrender.com/api/auth/register', {
+      const response = await axios.post(`${BASE_URL}/api/auth/register`, {
         schoolName: registerData.schoolName,
         email: registerData.email,
         password: registerData.password,
         address: registerData.address,
       });
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('roleType', 'admin')
       setSuccess(response.data.message || 'Registration successful');
       console.log('JWT Token:', response.data.token);
     } catch (error) {

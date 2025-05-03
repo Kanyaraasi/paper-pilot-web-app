@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import Hero from './Hero';
 import Features from './Features';
-
 import CallToAction from './CallToAction';
 import Footer from './Footer';
 import ContactModal from './ContactModal';
@@ -14,10 +13,20 @@ function HomePage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [animated, setAnimated] = useState(false);
+  const [error, setError] = useState('');
 
-  // Initialize animations after page load
+  // Initialize animations and check user role after page load
   useEffect(() => {
     setAnimated(true);
+    
+    // Check user role from localStorage and redirect automatically
+    const roleType = localStorage.getItem('roleType');
+    
+    if (roleType === "admin") {
+      window.location.href = "/CreateUser";
+    } else if (roleType === "teacher") {
+      window.location.href = "/QuestionPaperPage";
+    }
   }, []);
 
   // Toast auto-hide effect
@@ -31,6 +40,7 @@ function HomePage() {
   }, [showToast]);
 
   const handleGetStarted = () => {
+    // Show toast message for all users who click the button
     setToastMessage("Please login to get started!");
     setShowToast(true);
   };
@@ -50,6 +60,16 @@ function HomePage() {
         />
       )}
 
+      {/* Display error if any */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded fixed top-4 right-4 z-50">
+          {error}
+          <span className="absolute top-0 right-0 px-4 py-3" onClick={() => setError('')}>
+            <span className="sr-only">Close</span>
+            &times;
+          </span>
+        </div>
+      )}
 
       {/* Navigation */}
       <Header />
@@ -80,4 +100,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

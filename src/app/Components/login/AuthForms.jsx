@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, UserPlus, Mail, User as UserIcon } from 'lucide-react';
+
 import axios from 'axios'
 import { toast } from 'react-toastify';
 
@@ -24,6 +25,7 @@ function AuthForms() {
   const [hideConfirmPass, setHideConfirmPass] = useState(true);
   const [isRegisterForm, setIsRegisterForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordhide,setpasswordhide]=useState(true)
   // Success message auto-hide effect
   useEffect(() => {
     if (success) {
@@ -68,6 +70,7 @@ function AuthForms() {
     }
   };
   
+   
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -104,6 +107,7 @@ function AuthForms() {
 
 
   const togglePasswordVisibility = (field) => {
+    console.log('hidepass')
     if (field === 'login') {
       setHidePass(!hidePass);
     } else if (field === 'register') {

@@ -1,13 +1,13 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import Header from '../Header';
-import Hero from '../Hero';
-import Features from '../Features';
+import Header from './Header';
+import Hero from './Hero';
+import Features from './Features';
 
 import CallToAction from './CallToAction';
-import Footer from '../Footer';
+import Footer from './Footer';
 import ContactModal from './ContactModal';
-import Toast from '../Toast';
+import Toast from './Toast';
 
 function HomePage() {
   const [isContactOpen, setIsContactOpen] = useState(false);

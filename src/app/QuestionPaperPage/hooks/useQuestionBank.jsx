@@ -190,6 +190,7 @@ const useQuestionBank = () => {
         // Check if we've reached the 5-question limit
         if (currentTabSelections.length >= 5) {
           // Show error toast
+          console.log(currentTabSelections,'currentTabSelections')
           showToastMessage("upto 5 questions are not allowed.", "error");
           return prev;
         } else {
@@ -304,6 +305,7 @@ const useQuestionBank = () => {
     sentence: `One Sentence (${selectedQuestions.sentence.length}/5)`,
     match: `Matching (${selectedQuestions.match.length}/5)`
   };
+  // console.log(currentTabSelections,'currentTabSelections')
 
   return {
     // State

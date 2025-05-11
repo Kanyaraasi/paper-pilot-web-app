@@ -8,11 +8,12 @@ import Toolbar from './Toolbar';
 import QuestionGrid from './QuestionGrid';
 import Pagination from './Pagination';
 import QuestionForm from './QuestionForm';
-import DeleteConfirmation from './DeleteConfirmation';
+
 import StatsBar from './StatsBar';
 import Toast from './Toast';
 import SelectedBar from './SelectedBar';
 import { QuestionBankProvider } from './Context/QuestionBankContext'; 
+import Footer from '@/app/Footer/page';
 
 const Dashboard = () => {
   const questionBank = useQuestionBank();
@@ -20,9 +21,7 @@ const Dashboard = () => {
   // UI state
   const [isCreating, setIsCreating] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [questionToDelete, setQuestionToDelete] = useState(null);
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
+ const [showSortDropdown, setShowSortDropdown] = useState(false);
   
   // Handle edit question
   const handleEditQuestion = (question) => {
@@ -158,6 +157,10 @@ const Dashboard = () => {
             questions={questionBank.questions}
             toggleTagSelection={questionBank.toggleTagSelection}
             selectedTags={questionBank.selectedTags}
+            activeTab={questionBank.activeTab}
+            setActiveTab={questionBank.setActiveTab}
+            tabTitles={questionBank.tabTitles}
+            setCurrentPage={questionBank.setCurrentPage}
           />
         )}
 
@@ -262,6 +265,7 @@ const Dashboard = () => {
       {/* Delete Confirmation Modal */}
      
       </QuestionBankProvider>
+     <Footer/>
     </div>
   );
 };

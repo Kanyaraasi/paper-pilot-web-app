@@ -6,9 +6,9 @@ const QuestionCard = ({
   isSelected, 
   onSelect, 
   showAnswers, 
-   
   onEdit, 
   onToggleStar, 
+  onDelete, 
   viewMode 
 }) => {
   const formatDate = (date) => {
@@ -30,8 +30,8 @@ const QuestionCard = ({
           isSelected ? 'border-purple-400 ring-2 ring-purple-200' : 'border-gray-200 hover:border-purple-200'
         } cursor-pointer`}
       >
-        <div className="flex flex-1 items-center p-3">
-          <div className="flex items-center w-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center p-3 gap-2">
+          <div className="flex items-center">
             <input
               type="checkbox"
               checked={isSelected}
@@ -41,33 +41,36 @@ const QuestionCard = ({
               }}
               className="h-4 w-4 text-purple-600 rounded border-gray-300 cursor-pointer"
             />
+            
+            {question.starred && (
+              <Star size={16} className="text-yellow-500 ml-2" fill="currentColor" />
+            )}
           </div>
           
-          {question.starred && (
-            <Star size={16} className="text-yellow-500 ml-2" />
-          )}
-          
-          <div className="flex-1 ml-3 truncate">
+          <div className="flex-1 ml-0 sm:ml-3 truncate">
             <p className="text-sm font-medium text-gray-800 truncate">
               {question.text ? question.text.substring(0, 60) + (question.text.length > 60 ? '...' : '') : 'Matching Question'}
             </p>
           </div>
           
-          <div className="flex items-center gap-2 ml-4">
-            {question.tags && question.tags.map(tag => (
+          <div className="flex flex-wrap items-center gap-2 mt-1 sm:mt-0 w-full sm:w-auto">
+            {question.tags && question.tags.length > 0 && question.tags.slice(0, 2).map(tag => (
               <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
                 {tag}
               </span>
             ))}
+            {question.tags && question.tags.length > 2 && (
+              <span className="text-xs text-gray-500">+{question.tags.length - 2}</span>
+            )}
           </div>
           
-          <div className={`ml-4 text-xs font-semibold px-2 py-0.5 rounded ${difficultyStyles[question.difficulty]}`}>
+          <div className={`text-xs font-semibold px-2 py-0.5 rounded ${difficultyStyles[question.difficulty]}`}>
             {question.difficulty}
           </div>
 
-          <div className="ml-4 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <button 
-              className="text-gray-400 hover:text-blue-600 transition-colors duration-200"
+              className="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100"
               onClick={(e) => { 
                 e.stopPropagation(); 
                 onEdit(question);
@@ -76,6 +79,15 @@ const QuestionCard = ({
               <Edit3 size={14} />
             </button>
             
+            <button 
+              className="text-gray-400 hover:text-red-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100"
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                onDelete && onDelete(question.id);
+              }}
+            >
+              <Trash2 size={14} />
+            </button>
           </div>
         </div>
       </div>
@@ -88,9 +100,9 @@ const QuestionCard = ({
       onClick={() => onSelect(question.id)}
       className={`bg-white rounded-lg shadow-sm border transition-all duration-200 ${
         isSelected ? 'border-purple-400 ring-2 ring-purple-200' : 'border-gray-200 hover:border-purple-200'
-      } cursor-pointer h-full`}
+      } cursor-pointer h-full flex flex-col`}
     >
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2">
           <div 
             className={`text-xs font-semibold px-2 py-0.5 rounded ${difficultyStyles[question.difficulty]}`}
@@ -100,7 +112,7 @@ const QuestionCard = ({
           
           <div className="flex gap-1">
             <button 
-              className={`text-gray-400 hover:text-yellow-500 transition-colors duration-200 ${question.starred ? 'text-yellow-500' : ''}`}
+              className={`text-gray-400 hover:text-yellow-500 transition-colors duration-200 p-1 rounded-full hover:bg-gray-50 ${question.starred ? 'text-yellow-500' : ''}`}
               onClick={(e) => { 
                 e.stopPropagation(); 
                 onToggleStar(question.id);
@@ -109,7 +121,7 @@ const QuestionCard = ({
               <Star size={14} fill={question.starred ? "currentColor" : "none"} />
             </button>
             <button 
-              className="text-gray-400 hover:text-blue-600 transition-colors duration-200"
+              className="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-50"
               onClick={(e) => { 
                 e.stopPropagation(); 
                 onEdit(question);
@@ -118,10 +130,10 @@ const QuestionCard = ({
               <Edit3 size={14} />
             </button>
             <button 
-              className="text-gray-400 hover:text-red-600 transition-colors duration-200"
+              className="text-gray-400 hover:text-red-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-50"
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(question.id);
+                onDelete && onDelete(question.id);
               }}
             >
               <Trash2 size={14} />
@@ -129,7 +141,7 @@ const QuestionCard = ({
           </div>
         </div>
         
-        <div className="mb-3">
+        <div className="mb-3 flex-1">
           <p className="text-sm text-gray-900 font-medium line-clamp-2">
             {question.text || 'Matching Question'}
           </p>
@@ -180,7 +192,7 @@ const QuestionCard = ({
               }}
               className="h-3 w-3 text-purple-600 rounded border-gray-300 cursor-pointer"
             />
-            <label className="ml-1.5 text-xs text-gray-500">Select</label>
+            <label className="ml-1.5 text-xs text-gray-500 select-none">Select</label>
           </div>
           
           <div className="text-xs text-gray-500 flex items-center">

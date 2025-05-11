@@ -34,8 +34,8 @@ const Pagination = ({ currentPage, totalPages, paginate }) => {
   const pageNumbers = getPageNumbers();
   
   return (
-    <div className="mt-6 flex justify-center">
-      <nav className="flex items-center">
+    <div className="mt-4 md:mt-6 flex justify-center">
+      <nav className="flex flex-wrap items-center justify-center">
         <button
           onClick={() => paginate(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
@@ -47,7 +47,7 @@ const Pagination = ({ currentPage, totalPages, paginate }) => {
           <ChevronLeft size={18} />
         </button>
         
-        <div className="flex mx-1">
+        <div className="flex mx-1 flex-wrap justify-center">
           {/* First page if not in view */}
           {!pageNumbers.includes(1) && (
             <>
@@ -57,7 +57,7 @@ const Pagination = ({ currentPage, totalPages, paginate }) => {
               >
                 1
               </button>
-              <span className="mx-1 flex items-center text-gray-400">...</span>
+              <span className="mx-1 flex items-center text-gray-400 select-none">...</span>
             </>
           )}
           
@@ -66,7 +66,7 @@ const Pagination = ({ currentPage, totalPages, paginate }) => {
             <button
               key={number}
               onClick={() => paginate(number)}
-              className={`w-8 h-8 mx-0.5 flex items-center justify-center rounded-md text-sm transition-colors duration-200 ${
+              className={`w-8 h-8 mx-0.5 my-1 flex items-center justify-center rounded-md text-sm transition-colors duration-200 ${
                 currentPage === number
                   ? 'bg-purple-100 text-purple-600 font-medium'
                   : 'text-gray-600 hover:bg-gray-100'
@@ -77,9 +77,9 @@ const Pagination = ({ currentPage, totalPages, paginate }) => {
           ))}
           
           {/* Last page if not in view */}
-          {!pageNumbers.includes(totalPages) && (
+          {!pageNumbers.includes(totalPages) && totalPages > 1 && (
             <>
-              <span className="mx-1 flex items-center text-gray-400">...</span>
+              <span className="mx-1 flex items-center text-gray-400 select-none">...</span>
               <button
                 onClick={() => paginate(totalPages)}
                 className="w-8 h-8 mx-0.5 flex items-center justify-center rounded-md text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200"

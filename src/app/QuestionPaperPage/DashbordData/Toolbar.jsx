@@ -35,7 +35,7 @@ const Toolbar = ({
     (showOnlyStarred ? 1 : 0);
 
   return (
-    <div className="bg-white border-b border-gray-200 p-3 sticky top-[45px] z-10 shadow-sm">
+    <div className="bg-white border-b border-gray-200 p-3 sticky top-[45px] z-10 shadow-sm" >
       <div className="flex flex-wrap gap-2">
         <div className="flex-1 relative">
           <input
@@ -90,43 +90,9 @@ const Toolbar = ({
                   </select>
                 </div>
                 
-                <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-                  <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-md p-1.5">
-                    {allTags.length === 0 ? (
-                      <div className="text-xs text-gray-500">No tags available</div>
-                    ) : (
-                      allTags.map(tag => (
-                        <div key={tag} className="flex items-center mb-1">
-                          <input
-                            type="checkbox"
-                            id={`tag-${tag}`}
-                            checked={selectedTags.includes(tag)}
-                            onChange={() => toggleTagSelection(tag)}
-                            className="h-3 w-3 text-purple-600 rounded border-gray-300"
-                          />
-                          <label htmlFor={`tag-${tag}`} className="ml-2 text-sm text-gray-700">
-                            {tag}
-                          </label>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
+               
                 
-                <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Created</label>
-                  <select 
-                    value={dateRange}
-                    onChange={(e) => setDateRange(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded-md p-1.5 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
-                  >
-                    <option value="all">All time</option>
-                    <option value="today">Today</option>
-                    <option value="week">This week</option>
-                    <option value="month">This month</option>
-                  </select>
-                </div>
+               
                 
                 <div className="flex items-center">
                   <input
@@ -172,93 +138,7 @@ const Toolbar = ({
           {showAnswers ? 'Hide Answers' : 'Show Answers'}
         </button>
         
-        <div className="relative">
-          <button 
-            className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200"
-            onClick={() => setShowSortDropdown(!showSortDropdown)}
-          >
-            {sortBy === 'newest' && <ArrowDown size={16} />}
-            {sortBy === 'oldest' && <ArrowUp size={16} />}
-            {sortBy === 'a-z' && 'A-Z'}
-            {sortBy === 'z-a' && 'Z-A'}
-            {sortBy === 'difficulty-asc' && 'Easy → Hard'}
-            {sortBy === 'difficulty-desc' && 'Hard → Easy'}
-            {sortBy === 'most-used' && 'Most used'}
-            <ChevronDown size={14} />
-          </button>
-          
-          {showSortDropdown && (
-            <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-20">
-              <div className="py-1">
-                <button 
-                  onClick={() => {
-                    setSortBy('newest');
-                    setShowSortDropdown(false);
-                  }}
-                  className="flex items-center px-3 py-1.5 w-full text-left text-sm hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <ArrowDown size={14} className="mr-2" />
-                  Newest first
-                </button>
-                <button 
-                  onClick={() => {
-                    setSortBy('oldest');
-                    setShowSortDropdown(false);
-                  }}
-                  className="flex items-center px-3 py-1.5 w-full text-left text-sm hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <ArrowUp size={14} className="mr-2" />
-                  Oldest first
-                </button>
-                <button 
-                  onClick={() => {
-                    setSortBy('a-z');
-                    setShowSortDropdown(false);
-                  }}
-                  className="flex items-center px-3 py-1.5 w-full text-left text-sm hover:bg-gray-50 transition-colors duration-200"
-                >
-                  A to Z
-                </button>
-                <button 
-                  onClick={() => {
-                    setSortBy('z-a');
-                    setShowSortDropdown(false);
-                  }}
-                  className="flex items-center px-3 py-1.5 w-full text-left text-sm hover:bg-gray-50 transition-colors duration-200"
-                >
-                  Z to A
-                </button>
-                <button 
-                  onClick={() => {
-                    setSortBy('difficulty-asc');
-                    setShowSortDropdown(false);
-                  }}
-                  className="flex items-center px-3 py-1.5 w-full text-left text-sm hover:bg-gray-50 transition-colors duration-200"
-                >
-                  Easy to Hard
-                </button>
-                <button 
-                  onClick={() => {
-                    setSortBy('difficulty-desc');
-                    setShowSortDropdown(false);
-                  }}
-                  className="flex items-center px-3 py-1.5 w-full text-left text-sm hover:bg-gray-50 transition-colors duration-200"
-                >
-                  Hard to Easy
-                </button>
-                <button 
-                  onClick={() => {
-                    setSortBy('most-used');
-                    setShowSortDropdown(false);
-                  }}
-                  className="flex items-center px-3 py-1.5 w-full text-left text-sm hover:bg-gray-50 transition-colors duration-200"
-                >
-                  Most used
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+       
         
         <div className="relative ml-auto">
           <select

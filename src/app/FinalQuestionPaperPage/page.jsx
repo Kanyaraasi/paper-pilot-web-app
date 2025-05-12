@@ -19,10 +19,10 @@ const FinalQuestionPaperPage = () => {
   const [examDetails, setExamDetails] = useState({});
   const [questionPaper, setQuestionPaper] = useState(null);
 
-  useEffect(() => {
+  useEffect(async() => {
     // Retrieve exam details from localStorage
-    const storedExamDetails = localStorage.getItem('examDetails');
-    const storedQuestionPaper = localStorage.getItem('generatedQuestionPaper');
+    const storedExamDetails = await localStorage.getItem('examDetails');
+    const storedQuestionPaper =await localStorage.getItem('generatedQuestionPaper');
 
     if (storedExamDetails) {
       const parsedDetails = JSON.parse(storedExamDetails);

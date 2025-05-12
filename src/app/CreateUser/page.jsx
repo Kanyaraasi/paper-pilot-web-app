@@ -41,11 +41,13 @@ export default function page() {
   const fetchTeachers = async () => {
     try {
       setLoading(true);
+      const token = await localStorage.getItem('token');
       // Mock data for demonstration purposes
       // In a real app, you would fetch from your API:
       const response = await fetch(`${BASE_URL}/api/teachers`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
+      console.log('token', token)
       const data = await response.json();
       console.log('teachers', data)
       // Mock response data
@@ -81,7 +83,7 @@ export default function page() {
           ]
         }
       ];
-      
+      // console.log('teac')
       setTeachers(data);
       setLoading(false);
     } catch (err) {
@@ -155,12 +157,13 @@ export default function page() {
   
   const handleCreateTeacher = async () => {
     try {
+      const token = await localStorage.getItem('token')
       // In a real app, you would POST to your API:
       const response = await fetch(`${BASE_URL}/api/teachers/createTeacher`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
@@ -192,12 +195,13 @@ export default function page() {
   
   const handleUpdateTeacher = async () => {
     try {
+      const token = await localStorage.getItem('token')
       // In a real app, you would PUT to your API:
       const response = await fetch(`${BASE_URL}/api/teachers/${currentTeacher._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
@@ -222,11 +226,12 @@ export default function page() {
   
   const handleDeleteTeacher = async () => {
     try {
+      const token = await localStorage.getItem('token')
       // In a real app, you would DELETE to your API:
       const response = await fetch(`${BASE_URL}/api/teachers/${currentTeacher._id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       

@@ -23,8 +23,8 @@ const GradeSelector = () => {
   const router = useRouter();
 
   // Load existing exam configurations from localStorage on component mount
-  useEffect(() => {
-    const savedConfigurations = localStorage.getItem('examConfigArray');
+  useEffect(async() => {
+    const savedConfigurations = await localStorage.getItem('examConfigArray');
     if (savedConfigurations) {
       setExamConfigArray(JSON.parse(savedConfigurations));
     }

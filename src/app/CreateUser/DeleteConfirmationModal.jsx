@@ -5,7 +5,7 @@ function DeleteConfirmationModal({ onDelete, onCancel }) {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-600 bg-opacity-50 backdrop-blur-sm">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        {/* Background overlay */}
+        {/* Background overlay Deleteconfirmationmodel*/}
         <div 
           className="fixed inset-0 transition-opacity" 
           onClick={onCancel}

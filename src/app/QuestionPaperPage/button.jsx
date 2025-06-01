@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Buttoncard = () => {
+const Buttoncard = ({text}) => {
   return (
     <a href='/FinalQuestionPaperPage'>
 <button className="continue-application">
@@ -15,7 +15,7 @@ const Buttoncard = () => {
             <div className="paper"></div>
         </div>
     </div>
-   Genrate question paper
+  {text}
 </button></a>
   )
 }

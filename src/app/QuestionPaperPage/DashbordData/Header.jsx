@@ -135,7 +135,7 @@ const Header = ({ toggleSidebar, showSidebar, onAddNew, selectedCount }) => {
         </div>
         
         <div className="ml-auto flex items-center gap-3">
-          <Buttoncard/>
+          <Buttoncard text={"Genrate the question paper"}/>
           
           
           

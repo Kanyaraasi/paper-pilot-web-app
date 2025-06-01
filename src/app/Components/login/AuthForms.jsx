@@ -105,8 +105,8 @@ function AuthForms() {
         password: registerData.password,
         address: registerData.address,
       });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('roleType', 'admin')
+      await localStorage.setItem('token', response.data.token);
+      await localStorage.setItem('roleType', 'admin')
       setSuccess(response.data.message || 'Registration successful');
       console.log('JWT Token:', response.data.token);
     } catch (error) {

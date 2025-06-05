@@ -66,7 +66,7 @@ function AuthForms() {
         if (slotType === "admin") {
           window.location.href = "/CreateUser";
         } else if (slotType === "teacher") {
-          window.location.href = "/QuestionPaperPage";
+          window.location.href = "/GradeSelector";
         } else {
           setError("Unknown user type.");
         }

@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ArrowLeft, BookOpen, Calendar, Clock, School, MapPin, Award, Box } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
+import { BASE_URL } from '../../../BASE_URL';
 
 const GradeSelector = () => {
   const [selectedGrade, setSelectedGrade] = useState(null);
@@ -19,16 +20,65 @@ const GradeSelector = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState('grade'); // To track wizard steps
   const [examConfigArray, setExamConfigArray] = useState([]);
-  
+  const [teacherData, setTeacherData] = useState(null);
+const [availableAssignments, setAvailableAssignments] = useState([]);
+const [dynamicGrades, setDynamicGrades] = useState([]);
+
   const router = useRouter();
 
   // Load existing exam configurations from localStorage on component mount
-  useEffect(async() => {
-    const savedConfigurations = await localStorage.getItem('examConfigArray');
+  useEffect(() => {
+    fetchUserData();
+    const savedConfigurations = localStorage.getItem('examConfigArray');
     if (savedConfigurations) {
       setExamConfigArray(JSON.parse(savedConfigurations));
     }
   }, []);
+  
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${BASE_URL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      const userData = await response.json();
+      console.log('User Data:', userData);
+      
+      setTeacherData(userData);
+      setAvailableAssignments(userData.assignments || []);
+      
+      // Create dynamic grades from assignments
+      const uniqueStandards = [...new Set(userData.assignments?.map(assignment => assignment.standard) || [])];
+      const dynamicGradesList = uniqueStandards.map((standard, index) => {
+        // Extract subjects for this standard
+        const subjectsForStandard = userData.assignments
+          .filter(assignment => assignment.standard === standard)
+          .map(assignment => assignment.subject);
+        
+        // Extract number from standard (e.g., "Grade 10" -> 10)
+        const gradeNumber = standard.match(/\d+/)?.[0] || (index + 1);
+        
+        return {
+          number: parseInt(gradeNumber),
+          title: standard,
+          subjects: subjectsForStandard
+        };
+      });
+      
+      setDynamicGrades(dynamicGradesList);
+      
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      toast.error("Failed to fetch user data");
+    }
+  };
+  
+
+
 
   const grades = [
     { number: 1, title: "1st Standard", subjects: ["English", "Mathematics", "Environmental Science", "Hindi"] },
@@ -140,7 +190,7 @@ const GradeSelector = () => {
     
     // Create exam details object
     const examDetails = {
-      id: Date.now(), // Add a unique identifier for each entry
+      id: Date.now(),
       grade: selectedGrade.title,
       subject: selectedSubject,
       date: date,
@@ -150,8 +200,12 @@ const GradeSelector = () => {
       schoolName: schoolName,
       address: address,
       totalMarks: totalMarks,
-      createdAt: new Date().toISOString() // Add timestamp for when this configuration was created
+      teacherId: teacherData?._id,
+      teacherName: teacherData?.teacherName,
+      teacherEmail: teacherData?.email,
+      createdAt: new Date().toISOString()
     };
+    
     
     // Simulate network request
     setTimeout(() => {
@@ -276,27 +330,37 @@ const GradeSelector = () => {
             <AnimatePresence mode="wait">
               {/* Grade Selection Section */}
               {activeSection === 'grade' && (
-                <motion.div
-                  key="grade-selection"
-                  initial="hidden"
-                  animate="visible"
-                  exit={{ opacity: 0, x: -100 }}
-                  variants={fadeIn}
-                  className="min-h-[210px]"
-                >
-                  <motion.h2 
-                    className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-2"
-                    variants={itemFadeIn}
-                  >
-                    <School className="w-5 h-5 text-indigo-500" /> 
-                    Select Grade
-                  </motion.h2>
-                  
-                  <motion.div 
-                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"
-                    variants={staggerContainer}
-                  >
-                    {grades.map((grade) => (
+  <motion.div
+    key="grade-selection"
+    initial="hidden"
+    animate="visible"
+    exit={{ opacity: 0, x: -100 }}
+    variants={fadeIn}
+    className="min-h-[210px]"
+  >
+    <motion.h2 
+      className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-2"
+      variants={itemFadeIn}
+    >
+      <School className="w-5 h-5 text-indigo-500" /> 
+      Select Grade
+      {teacherData && (
+        <span className="text-sm font-normal text-gray-600 ml-2">
+          - {teacherData.teacherName}
+        </span>
+      )}
+    </motion.h2>
+    
+    {dynamicGrades.length === 0 ? (
+      <div className="flex items-center justify-center h-32">
+        <div className="text-gray-500">Loading your assigned grades...</div>
+      </div>
+    ) : (
+      <motion.div 
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"
+        variants={staggerContainer}
+      >
+        {(dynamicGrades.length > 0 ? dynamicGrades : grades).map((grade) => (
                       <motion.button
                         key={grade.number}
                         variants={itemFadeIn}
@@ -318,10 +382,10 @@ const GradeSelector = () => {
                         </div>
                       </motion.button>
                     ))}
-                  </motion.div>
-                </motion.div>
-              )}
-              
+      </motion.div>
+    )}
+  </motion.div>
+)}
               {/* Subject Selection Section */}
               {activeSection === 'subject' && selectedGrade && (
                 <motion.div
@@ -351,7 +415,7 @@ const GradeSelector = () => {
                     className="grid grid-cols-2 sm:grid-cols-3 gap-3"
                     variants={staggerContainer}
                   >
-                    {selectedGrade.subjects.map((subject) => (
+                    {selectedGrade?.subjects?.map((subject) => (
                       <motion.button
                         key={subject}
                         variants={itemFadeIn}
@@ -392,26 +456,39 @@ const GradeSelector = () => {
                   className="min-h-[400px]"
                 >
                   <motion.div 
-                    className="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b border-gray-100"
-                    variants={itemFadeIn}
-                  >
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <Award className="w-5 h-5 text-indigo-500" />
-                        Exam Details
-                      </h2>
-                      <p className="text-gray-500 text-sm mt-1">
-                        {selectedGrade.title} - {selectedSubject}
-                      </p>
-                    </div>
-                    
-                    {/* Display count of saved configurations */}
-                    {examConfigArray.length > 0 && (
-                      <div className="text-sm text-indigo-600">
-                        {examConfigArray.length} saved configuration{examConfigArray.length !== 1 ? 's' : ''}
-                      </div>
-                    )}
-                  </motion.div>
+  className="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b border-gray-100"
+  variants={itemFadeIn}
+>
+  <div>
+    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+      <Award className="w-5 h-5 text-indigo-500" />
+      Exam Details
+    </h2>
+    <p className="text-gray-500 text-sm mt-1">
+      {selectedGrade?.title} - {selectedSubject}
+      {teacherData && (
+        <span className="block text-xs text-indigo-600 mt-1">
+          Teacher: {teacherData.teacherName}
+        </span>
+      )}
+    </p>
+  </div>
+  
+  {examConfigArray.length > 0 && (
+    <div className="text-sm text-indigo-600">
+      {examConfigArray.length} saved configuration{examConfigArray.length !== 1 ? 's' : ''}
+    </div>
+  )}
+</motion.div>
+
+<input 
+  type="text"
+  value={schoolName}
+  onChange={(e) => setSchoolName(e.target.value)}
+  className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 text-sm"
+  placeholder={teacherData?.schoolId ? "Enter school name" : "Enter school name"}
+/>
+
                   
                   <motion.div 
                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4"

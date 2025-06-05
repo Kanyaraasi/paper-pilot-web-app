@@ -25,7 +25,7 @@ function HomePage() {
     if (roleType === "admin") {
       window.location.href = "/CreateUser";
     } else if (roleType === "teacher") {
-      window.location.href = "/QuestionPaperPage";
+      window.location.href = "/GradeSelector";
     }
   }, []);
 

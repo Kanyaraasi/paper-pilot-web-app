@@ -4,7 +4,7 @@ import Header from './Header';
 import Hero from './Hero';
 import Features from './Features';
 import CallToAction from './CallToAction';
-// import Footer from './Footer';
+import Footer from '@/app/Footer/page';
 import ContactModal from './ContactModal';
 import Toast from './Toast';
 
@@ -93,7 +93,7 @@ function HomePage() {
         <ContactModal onClose={toggleContact} />
       )}
 
-      {/* Footer */}
+      <Footer/>
       {/* <Footer /> */}
     </div>
   );

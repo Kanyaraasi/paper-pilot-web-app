@@ -481,15 +481,6 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
   )}
 </motion.div>
 
-<input 
-  type="text"
-  value={schoolName}
-  onChange={(e) => setSchoolName(e.target.value)}
-  className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 text-sm"
-  placeholder={teacherData?.schoolId ? "Enter school name" : "Enter school name"}
-/>
-
-                  
                   <motion.div 
                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4"
                     variants={staggerContainer}

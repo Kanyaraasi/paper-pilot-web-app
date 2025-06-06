@@ -39,6 +39,7 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('tokennn', token)
       const response = await fetch(`${BASE_URL}/api/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`

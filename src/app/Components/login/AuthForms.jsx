@@ -60,6 +60,7 @@ function AuthForms() {
       const slotType = response.data.user?.role;
       // Save token to localStorage or cookie
       localStorage.setItem('token', token);
+      console.log('tokennn', token)
       localStorage.setItem('roleType', slotType)
       setSuccess('Login successful');
       setTimeout(() => {

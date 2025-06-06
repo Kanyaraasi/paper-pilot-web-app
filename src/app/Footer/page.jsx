@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Github, Twitter, Linkedin, Mail, Heart } from 'lucide-react';
+import { Mail, Heart } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();

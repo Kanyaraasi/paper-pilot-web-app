@@ -51,7 +51,8 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
       
       setTeacherData(userData);
       setAvailableAssignments(userData.assignments || []);
-      
+      setSchoolName(userData.schoolId.schoolName)
+      setAddress(userData.schoolId.address)
       // Create dynamic grades from assignments
       const uniqueStandards = [...new Set(userData.assignments?.map(assignment => assignment.standard) || [])];
       const dynamicGradesList = uniqueStandards.map((standard, index) => {

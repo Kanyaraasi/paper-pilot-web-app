@@ -257,7 +257,7 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
       <div className="relative container mx-auto max-w-5xl mb-6">
         {/* Back button - Improved visibility */}
         <motion.button 
-          onClick={'/}
+          onClick={'/'}
           className="px-4 py-2 flex items-center gap-2 bg-white text-indigo-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-100"
           whileHover={{ x: -3, backgroundColor: "#f0f5ff" }}
           whileTap={{ scale: 0.95 }}

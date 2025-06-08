@@ -80,6 +80,10 @@ function AuthForms() {
         }
       }, 1000);
       console.log("JWT Token:", token);
+      setLoginData({
+    schoolName: "",
+    password: "",
+  })
     } catch (error) {
       console.error(error);
       setError(
@@ -115,6 +119,13 @@ function AuthForms() {
       await localStorage.setItem("roleType", "admin");
       setSuccess(response.data.message || "Registration successful");
       console.log("JWT Token:", response.data.token);
+      setRegisterData({
+    schoolName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    address: "",
+  })
     } catch (error) {
       console.error(error);
       setError(

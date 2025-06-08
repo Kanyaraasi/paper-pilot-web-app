@@ -7,6 +7,7 @@ import CallToAction from './CallToAction';
 import Footer from '@/app/Footer/page';
 import ContactModal from './ContactModal';
 import Toast from './Toast';
+import { usePathname } from 'next/navigation';
 
 function HomePage() {
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -14,20 +15,26 @@ function HomePage() {
   const [toastMessage, setToastMessage] = useState('');
   const [animated, setAnimated] = useState(false);
   const [error, setError] = useState('');
+  const pathname = usePathname();
+  // const [animated, setAnimated] = useState(false);
 
   // Initialize animations and check user role after page load
   useEffect(() => {
     setAnimated(true);
-    
-    // Check user role from localStorage and redirect automatically
     const roleType = localStorage.getItem('roleType');
-    
-    if (roleType === "admin") {
-      window.location.href = "/CreateUser";
-    } else if (roleType === "teacher") {
-      window.location.href = "/GradeSelector";
-    }
-  }, []);
+
+    const landing = sessionStorage.getItem('landing'); // flag to prevent redirect
+
+    // if (!landing && pathname === '/') {
+    //   sessionStorage.setItem('landing', 'true');
+
+    //   if (roleType === "admin") {
+    //     window.location.href = "/CreateUser";
+    //   } else if (roleType === "teacher") {
+    //     window.location.href = "/GradeSelector";
+    //   }
+    // }
+  }, [pathname]);
 
   // Toast auto-hide effect
   useEffect(() => {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 function Hero({ animated, onGetStarted }) {
   const [typedText, setTypedText] = useState("");
@@ -133,12 +134,13 @@ function Hero({ animated, onGetStarted }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
+              <Link href="/HowItWork" className="flex items-center justify-center">
               <button className="px-8 py-4 border-2 border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 duration-300 flex items-center justify-center">
-                Watch Demo
-                <svg className="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                Watch Demo                <svg className="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15" />
                 </svg>
               </button>
+              </Link>
             </div>
             
             <div className="pt-8">
@@ -203,7 +205,7 @@ function Hero({ animated, onGetStarted }) {
               </div>
               
               <div className="pt-2">
-                <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl border border-amber-200">
+                <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl border border-amber-200 p-2">
                   <div className="flex items-center space-x-3 mb-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

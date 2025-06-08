@@ -319,9 +319,7 @@ function AuthForms() {
           </button>
         </form>
 
-        <div className="mt-4 text-center text-sm text-gray-600">
-          <p>Test: Username and Password are both "admin123"</p>
-        </div>
+       
 
         <div className="mt-6 text-center text-sm">
           <p className="text-gray-600">

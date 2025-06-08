@@ -59,8 +59,8 @@ function HomePage() {
         window.location.href = "/GradeSelector";
       }
     // Show toast message for all users who click the button
-    setToastMessage("Please login to get started!");
-    setShowToast(true);
+    // setToastMessage("Please login to get started!");
+    // setShowToast(true);
   };
   
   const toggleContact = () => {

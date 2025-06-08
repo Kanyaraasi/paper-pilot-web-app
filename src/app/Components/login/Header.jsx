@@ -166,9 +166,7 @@ function Header() {
                               <p className="font-semibold text-gray-800 capitalize">
                                 {userRole}
                               </p>
-                              <p className="text-sm text-gray-500">
-                                Manage your account
-                              </p>
+                              
                             </div>
                           </div>
                         </div>

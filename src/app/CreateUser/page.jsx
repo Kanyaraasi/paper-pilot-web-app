@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Search, UserPlus, Edit, Trash2, X, Check, AlertCircle, ChevronDown, Copy } from "lucide-react";  
 import { BASE_URL } from "../../../BASE_URL";
+import axios from "axios";
 
 
 export default function page() {
@@ -155,40 +156,42 @@ export default function page() {
   const handleCreateTeacher = async () => {
     try {
       const token = await localStorage.getItem("token");
-      // In a real app, you would POST to your API:
-      const response = await fetch(`${BASE_URL}/api/teachers/createTeacher`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
+  
+      const response = await axios.post(
+        `${BASE_URL}/api/teachers/createTeacher`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      const data = response.data;
       console.log("add teacher", data);
-      // Mock response with generated password
-      const mockPassword = "Temp1234!";
-
-      // Add new teacher to state with mock ID
-      const newTeacher = {
-        _id: Date.now().toString(),
-        ...formData,
-      };
-
-      setTeachers([...teachers, newTeacher]);
+  
+      if (!data.success) {
+        showToastMessage(data.message || "Failed to add teacher", "error");
+        return;
+      }
+  
+      // Add new teacher to state using real teacher data from response
+      setTeachers([...teachers, data.teacher]);
       setShowModal(false);
-
+  
       // Show password modal
       setGeneratedPassword(data.generatedPassword);
       setModalType("password");
       setShowModal(true);
-
+  
       showToastMessage("Teacher added successfully", "success");
     } catch (err) {
       console.error("Error creating teacher:", err);
       showToastMessage("Failed to create teacher", "error");
     }
   };
+  
 
   const handleUpdateTeacher = async () => {
     try {

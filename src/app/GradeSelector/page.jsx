@@ -133,6 +133,11 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
     }
   };
 
+  // Function to handle home navigation
+  const handleHomeNavigation = () => {
+    router.push('/');
+  };
+
   const validateAndProceed = () => {
     if (activeSection === 'grade') {
       if (!selectedGrade) {
@@ -255,9 +260,9 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
       
       {/* Header with back button - Made more prominent */}
       <div className="relative container mx-auto max-w-5xl mb-6">
-        {/* Back button - Improved visibility */}
+        {/* Back button - Fixed onClick handler */}
         <motion.button 
-          onClick={'/'}
+          onClick={handleHomeNavigation}
           className="px-4 py-2 flex items-center gap-2 bg-white text-indigo-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-100"
           whileHover={{ x: -3, backgroundColor: "#f0f5ff" }}
           whileTap={{ scale: 0.95 }}

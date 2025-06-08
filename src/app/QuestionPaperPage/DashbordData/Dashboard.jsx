@@ -9,7 +9,7 @@ import QuestionGrid from './QuestionGrid';
 import Pagination from './Pagination';
 import QuestionForm from './QuestionForm';
 
-import StatsBar from './StatsBar';
+// import StatsBar from './StatsBar';
 import Toast from './Toast';
 import SelectedBar from './SelectedBar';
 import { QuestionBankProvider } from './Context/QuestionBankContext'; 
@@ -216,7 +216,7 @@ const Dashboard = () => {
 
           <div className="p-4">
             {/* Summary stats */}
-            <StatsBar stats={questionBank.questionStats} />
+            {/* <StatsBar stats={questionBank.questionStats} /> */}
             
             {/* Questions Grid/List */}
             <QuestionGrid 
@@ -229,7 +229,7 @@ const Dashboard = () => {
               showAnswers={questionBank.showAnswers}
               toggleQuestionSelection={questionBank.toggleQuestionSelection}
               handleDeleteQuestion={prepareDeleteQuestion}
-              handleEditQuestion={handleEditQuestion}
+              handleEditQuestion={handleEditQuestion} 
               toggleStarred={questionBank.toggleStarred}
               selectAllVisible={questionBank.selectAllVisible}
               resetFilters={questionBank.resetFilters}
@@ -237,6 +237,7 @@ const Dashboard = () => {
               indexOfLastQuestion={questionBank.indexOfLastQuestion}
               totalFilteredCount={questionBank.filteredQuestions.length}
               initNewQuestion={initNewQuestion}
+               setViewMode={questionBank.setViewMode}
             />
             
             {/* Pagination */}

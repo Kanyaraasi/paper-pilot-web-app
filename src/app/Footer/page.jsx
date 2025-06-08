@@ -1,5 +1,4 @@
 'use client'
-
 import React from 'react';
 import Link from 'next/link';
 import {  Mail, Heart } from 'lucide-react';
@@ -52,12 +51,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Alternative simpler footer design (uncomment to use) */}
-        {/* <div className="py-4 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            © {currentYear} EduQuest. All rights reserved.
-          </p>
-        </div> */}
+        
       </div>
     </footer>
   );

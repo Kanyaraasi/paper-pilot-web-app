@@ -7,8 +7,7 @@ import {
 const Sidebar = ({ 
   allTags, 
   questions, 
-  toggleTagSelection, 
-  selectedTags, 
+   
   activeTab,
   setActiveTab,
   tabTitles,
@@ -24,19 +23,19 @@ const Sidebar = ({
   });
 
   // State for tag search/filter
-  const [tagSearch, setTagSearch] = useState('');
+
   
   // Count questions of each type
   const totalQuestions = Object.values(questions).reduce((total, qs) => total + qs.length, 0);
-  const totalStarred = Object.values(questions).reduce((total, qs) => total + qs.filter(q => q.starred).length, 0);
-  const recentCount = Object.values(questions).reduce((total, qs) => 
-    total + qs.filter(q => {
-      const created = new Date(q.createdAt);
-      const now = new Date();
-      const diffTime = Math.abs(now - created);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays < 7;
-    }).length, 0);
+  // const totalStarred = Object.values(questions).reduce((total, qs) => total + qs.filter(q => q.starred).length, 0);
+  // const recentCount = Object.values(questions).reduce((total, qs) => 
+  //   total + qs.filter(q => {
+  //     const created = new Date(q.createdAt);
+  //     const now = new Date();
+  //     const diffTime = Math.abs(now - created);
+  //     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  //     return diffDays < 7;
+  //   }).length, 0);
   
   // Count questions with each tag and calculate popularity
   const tagCounts = {};
@@ -45,17 +44,7 @@ const Sidebar = ({
   });
 
   // Sort tags by frequency (most used first)
-  const sortedTags = allTags
-    .filter(tag => tag.toLowerCase().includes(tagSearch.toLowerCase()))
-    .sort((a, b) => tagCounts[b] - tagCounts[a]);
-
-  // Count questions with each difficulty
-  const difficultyCount = {
-    Easy: countQuestionsByDifficulty('Easy'),
-    Medium: countQuestionsByDifficulty('Medium'),
-    Hard: countQuestionsByDifficulty('Hard')
-  };
-
+ 
   // Helper function to get tag count
   function getTagCount(tag) {
     return Object.values(questions).reduce((count, qs) => 
@@ -112,31 +101,8 @@ const Sidebar = ({
           </span>
         </button>
         
-        <button 
-          onClick={() => {
-            // Logic to show only starred questions
-          }}
-          className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700 w-full p-2 rounded-md transition-colors duration-200"
-        >
-          <Star size={18} className="text-yellow-500" />
-          <span>Starred</span>
-          <span className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full">
-            {totalStarred}
-          </span>
-        </button>
         
-        <button 
-          onClick={() => {
-            // Logic for recently added questions
-          }}
-          className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700 w-full p-2 rounded-md transition-colors duration-200"
-        >
-          <Clock size={18} className="text-blue-500" />
-          <span>Recently Added</span>
-          <span className="ml-auto bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">
-            {recentCount}
-          </span>
-        </button>
+        
         
         <div className="mt-4 border-t border-gray-200 pt-4">
           {/* Categories Section */}

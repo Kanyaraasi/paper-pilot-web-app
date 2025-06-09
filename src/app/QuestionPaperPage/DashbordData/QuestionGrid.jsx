@@ -13,6 +13,7 @@ const QuestionGrid = ({
   showAnswers,
   toggleQuestionSelection,
   handleEditQuestion,
+  setViewMode,
   toggleStarred,
   selectAllVisible,
   resetFilters,
@@ -62,22 +63,22 @@ const QuestionGrid = ({
             </div>
             
             {/* View mode toggle */}
-            <div className="flex bg-gray-100 rounded-md p-1">
-              <button
-                onClick={toggleViewMode}
-                className={`p-1 rounded ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
-                aria-label="Grid view"
-              >
-                <Grid size={16} className="text-gray-600" />
-              </button>
-              <button
-                onClick={toggleViewMode}
-                className={`p-1 rounded ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}
-                aria-label="List view"
-              >
-                <List size={16} className="text-gray-600" />
-              </button>
-            </div>
+             <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                      <button 
+                        onClick={() => setViewMode('grid')}
+                        className={`p-1.5 transition-colors duration-200 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-800' : 'text-gray-500 hover:bg-gray-50'}`}
+                        aria-label="Grid view"
+                      >
+                        <Grid size={16} />
+                      </button>
+                      <button 
+                        onClick={() => setViewMode('list')}
+                        className={`p-1.5 transition-colors duration-200 ${viewMode === 'list' ? 'bg-gray-100 text-gray-800' : 'text-gray-500 hover:bg-gray-50'}`}
+                        aria-label="List view"
+                      >
+                        <List size={16} />
+                      </button>
+                    </div>
           </div>
         </div>
       )}

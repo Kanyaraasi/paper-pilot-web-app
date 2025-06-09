@@ -5,7 +5,7 @@ import { Settings, HelpCircle, LogOut, ChevronLeft, PlusCircle, Download, Save }
 import Buttoncard from '../button';
 import Link from 'next/link';
 
-const Header = ({  onAddNew, selectedCount }) => {
+const Header = ({  onAddNew }) => {
 
   const [isOpen, setIsOpen] = useState(false);
  
@@ -32,11 +32,6 @@ const Header = ({  onAddNew, selectedCount }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showPaperModal]);
-
-
- 
-
- 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
       <div className="flex items-center px-4 py-3">

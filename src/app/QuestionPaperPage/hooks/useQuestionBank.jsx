@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { generateMockQuestions } from './generateMockQuestions';
+import axios from 'axios';
+import { BASE_URL } from '../../../../BASE_URL';
 
 const useQuestionBank = () => {
   // State for tabs and questions
@@ -10,6 +11,10 @@ const useQuestionBank = () => {
     sentence: [],
     match: []
   });
+
+  // Loading and error states
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // State for selected questions
   const [selectedQuestions, setSelectedQuestions] = useState({
@@ -41,15 +46,128 @@ const useQuestionBank = () => {
   
   // Toast state
   const [toast, setToast] = useState(null);
-  
-  // Initialize mock data
-  useEffect(() => {
-    setQuestions({
-      fill: generateMockQuestions('fill', 500),
-      brief: generateMockQuestions('brief', 500),
-      sentence: generateMockQuestions('sentence', 500),
-      match: generateMockQuestions('match', 500)
+
+  // Function to get exam details from localStorage
+  const getExamDetails = () => {
+    try {
+      const examDetails = localStorage.getItem("examDetails");
+      if (examDetails) {
+        const parsedDetails = JSON.parse(examDetails);
+        return {
+          standard: parsedDetails.grade?.replace('th', ''), // Convert "10th" to "10"
+          subject: parsedDetails.subject
+        };
+      }
+    } catch (error) {
+      console.error('Error parsing exam details:', error);
+    }
+    return null;
+  };
+
+  // Function to map API question type to our tab structure
+  const mapQuestionTypeToTab = (apiType) => {
+    const typeMapping = {
+      'fill': 'fill',
+      'short': 'brief',
+      'medium': 'sentence', 
+      'long': 'sentence',
+      'mcq': 'match' // Treating MCQ as match for now, adjust as needed
+    };
+    return typeMapping[apiType] || 'brief';
+  };
+
+  // Function to determine difficulty based on marks
+  const getDifficultyFromMarks = (marks) => {
+    if (marks <= 2) return 'Easy';
+    if (marks <= 5) return 'Medium';
+    return 'Hard';
+  };
+
+  // Function to transform API response to our question format
+  const transformApiQuestions = (apiQuestions) => {
+    const categorizedQuestions = {
+      fill: [],
+      brief: [],
+      sentence: [],
+      match: []
+    };
+
+    apiQuestions.forEach(apiQuestion => {
+      const tab = mapQuestionTypeToTab(apiQuestion.type);
+      
+      const transformedQuestion = {
+        id: apiQuestion._id,
+        text: apiQuestion.text,
+        answer: apiQuestion.answer,
+        type: apiQuestion.type,
+        difficulty: getDifficultyFromMarks(apiQuestion.marks),
+        marks: apiQuestion.marks,
+        chapterNo: apiQuestion.chapterNo,
+        options: apiQuestion.options || [],
+        createdAt: apiQuestion.createdAt,
+        updatedAt: apiQuestion.updatedAt,
+        starred: false, // Default value, can be managed separately
+        timesUsed: 0, // Default value
+        tags: [`Chapter ${apiQuestion.chapterNo}`, `${apiQuestion.marks} marks`] // Generate tags
+      };
+
+      // For matching type questions, create items structure if needed
+      if (tab === 'match' && apiQuestion.options && apiQuestion.options.length > 0) {
+        transformedQuestion.items = apiQuestion.options.map((option, index) => ({
+          left: `Option ${index + 1}`,
+          right: option
+        }));
+      }
+
+      categorizedQuestions[tab].push(transformedQuestion);
     });
+
+    return categorizedQuestions;
+  };
+
+  // Function to fetch questions from API
+  const fetchQuestions = async () => {
+    const examDetails = getExamDetails();
+    
+    if (!examDetails) {
+      setError('Exam details not found in localStorage');
+      return;
+    }
+
+    const { standard, subject } = examDetails;
+    
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Extract subject name (remove "- 1" part if present)
+      const subjectName = subject.split(' - ')[0].toLowerCase();
+      console.log('subject name', subjectName)
+      console.log('standard name', standard)
+      const response = await axios.get(`${BASE_URL}/api/questions`, {
+        params: {
+          subjectName: subjectName,
+          standard: standard
+        }
+      });
+
+      if (response.data.success) {
+        const transformedQuestions = transformApiQuestions(response.data.data);
+        setQuestions(transformedQuestions);
+      } else {
+        setError('Failed to fetch questions');
+      }
+    } catch (err) {
+      console.error('API Error:', err);
+      setError(err.response?.data?.message || 'Failed to fetch questions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initialize questions from API
+  useEffect(() => {
+    fetchQuestions();
   }, []);
 
   // Toast message helper function
@@ -190,8 +308,7 @@ const useQuestionBank = () => {
         // Check if we've reached the 5-question limit
         if (currentTabSelections.length >= 5) {
           // Show error toast
-          console.log(currentTabSelections,'currentTabSelections')
-          showToastMessage("upto 5 questions are not allowed.", "error");
+          showToastMessage("Up to 5 questions are allowed per category.", "error");
           return prev;
         } else {
           // Add the question if under the limit
@@ -218,7 +335,7 @@ const useQuestionBank = () => {
     } else {
       // Select visible questions up to the 5-question limit
       if (visibleIds.length > 5) {
-        showToastMessage("upto 5 questions are not allowed.", "error");
+        showToastMessage("Up to 5 questions are allowed per category.", "error");
         
         // Select only the first 5 visible questions
         setSelectedQuestions({
@@ -236,48 +353,71 @@ const useQuestionBank = () => {
   };
 
   // Handle bulk delete
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     const currentTabSelections = selectedQuestions[activeTab];
     if (currentTabSelections.length === 0) return;
     
-    // In production, this would make an API call to delete from MongoDB
-    const updatedQuestions = {...questions};
-    updatedQuestions[activeTab] = questions[activeTab].filter(q => !currentTabSelections.includes(q.id));
-    setQuestions(updatedQuestions);
-    
-    // Clear selections for this tab
-    setSelectedQuestions({
-      ...selectedQuestions,
-      [activeTab]: []
-    });
-    
-    showToastMessage(`${currentTabSelections.length} questions deleted successfully`);
+    try {
+      // In production, make API calls to delete from MongoDB
+      // await axios.delete(`${BASE_URL}/api/questions/bulk`, { data: { ids: currentTabSelections } });
+      
+      // For now, just remove from local state
+      const updatedQuestions = {...questions};
+      updatedQuestions[activeTab] = questions[activeTab].filter(q => !currentTabSelections.includes(q.id));
+      setQuestions(updatedQuestions);
+      
+      // Clear selections for this tab
+      setSelectedQuestions({
+        ...selectedQuestions,
+        [activeTab]: []
+      });
+      
+      showToastMessage(`${currentTabSelections.length} questions deleted successfully`);
+    } catch (error) {
+      showToastMessage("Failed to delete questions", "error");
+    }
   };
 
   // Handle single question delete
-  const handleDeleteQuestion = (id) => {
-    const updatedQuestions = {...questions};
-    updatedQuestions[activeTab] = questions[activeTab].filter(q => q.id !== id);
-    setQuestions(updatedQuestions);
-    
-    // Remove from selection if selected
-    if (selectedQuestions[activeTab].includes(id)) {
-      setSelectedQuestions({
-        ...selectedQuestions,
-        [activeTab]: selectedQuestions[activeTab].filter(qId => qId !== id)
-      });
+  const handleDeleteQuestion = async (id) => {
+    try {
+      // In production, make API call to delete from MongoDB
+      // await axios.delete(`${BASE_URL}/api/questions/${id}`);
+      
+      // For now, just remove from local state
+      const updatedQuestions = {...questions};
+      updatedQuestions[activeTab] = questions[activeTab].filter(q => q.id !== id);
+      setQuestions(updatedQuestions);
+      
+      // Remove from selection if selected
+      if (selectedQuestions[activeTab].includes(id)) {
+        setSelectedQuestions({
+          ...selectedQuestions,
+          [activeTab]: selectedQuestions[activeTab].filter(qId => qId !== id)
+        });
+      }
+      
+      showToastMessage("Question deleted successfully");
+    } catch (error) {
+      showToastMessage("Failed to delete question", "error");
     }
-    
-    showToastMessage("Question deleted successfully");
   };
 
   // Toggle starred status for a question
-  const toggleStarred = (id) => {
-    const updatedQuestions = {...questions};
-    updatedQuestions[activeTab] = questions[activeTab].map(q => 
-      q.id === id ? {...q, starred: !q.starred} : q
-    );
-    setQuestions(updatedQuestions);
+  const toggleStarred = async (id) => {
+    try {
+      // In production, make API call to update starred status
+      // await axios.patch(`${BASE_URL}/api/questions/${id}/star`);
+      
+      // For now, just update local state
+      const updatedQuestions = {...questions};
+      updatedQuestions[activeTab] = questions[activeTab].map(q => 
+        q.id === id ? {...q, starred: !q.starred} : q
+      );
+      setQuestions(updatedQuestions);
+    } catch (error) {
+      showToastMessage("Failed to update starred status", "error");
+    }
   };
 
   // Reset all filters
@@ -305,7 +445,11 @@ const useQuestionBank = () => {
     sentence: `One Sentence (${selectedQuestions.sentence.length}/5)`,
     match: `Matching (${selectedQuestions.match.length}/5)`
   };
-  // console.log(currentTabSelections,'currentTabSelections')
+
+  // Function to refresh questions (useful for retrying after errors)
+  const refreshQuestions = () => {
+    fetchQuestions();
+  };
 
   return {
     // State
@@ -325,6 +469,8 @@ const useQuestionBank = () => {
     showSidebar,
     showOnlyStarred,
     toast,
+    loading,
+    error,
     
     // Derived state
     allTags,
@@ -363,6 +509,7 @@ const useQuestionBank = () => {
     paginate,
     showToastMessage,
     setToast,
+    refreshQuestions,
   };
 };
 

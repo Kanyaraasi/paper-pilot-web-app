@@ -217,16 +217,16 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
     // Simulate network request
     setTimeout(() => {
       // Update the array with the new exam config
-      const updatedConfigArray = [...examConfigArray, examDetails];
+      // const updatedConfigArray = [...examConfigArray, examDetails];
       
       // Store the updated array in localStorage
-      localStorage.setItem('examConfigArray', JSON.stringify(updatedConfigArray));
+      // localStorage.setItem('examConfigArray', JSON.stringify(examConfigArray));
       
       // Also store the current exam details for immediate use
       localStorage.setItem('examDetails', JSON.stringify(examDetails));
-      
+      console.log('exam detailsss', JSON.stringify(examDetails))
       // Update state
-      setExamConfigArray(updatedConfigArray);
+      // setExamConfigArray(updatedConfigArray);
       
       // Success notification
       toast.success("Exam details added successfully!");

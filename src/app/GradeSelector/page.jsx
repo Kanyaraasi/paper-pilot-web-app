@@ -502,7 +502,7 @@ const [dynamicGrades, setDynamicGrades] = useState([]);
                         type="text"
                         value={schoolName}
                         onChange={(e) => setSchoolName(e.target.value)}
-                        className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 text-sm"
+                        className="p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 text-sm"
                         placeholder="Enter school name"
                       />
                     </motion.div>

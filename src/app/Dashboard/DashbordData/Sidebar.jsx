@@ -110,7 +110,7 @@ const Sidebar = ({
               onClick={() => toggleSection('chapters')}
               className="flex items-center justify-between w-full px-2 py-1 text-xs font-semibold text-gray-500 hover:text-gray-700 uppercase"
             >
-              <span>Chapters</span>
+              <span>Chapters (English)</span>
               {expandedSections.chapters ? 
                 <ChevronDown size={14} /> : 
                 <ChevronRight size={14} />

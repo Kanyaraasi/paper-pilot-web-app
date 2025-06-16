@@ -34,34 +34,43 @@ export default function page() {
   });
 
   // Standards and subjects for dropdown
-  const standards = [
-    "1st",
-    "2nd",
-    "3rd",
-    "4th",
-    "5th",
-    "6th",
-    "7th",
-    "8th",
-    "9th",
-    "10th",
-    "11th",
-    "12th",
-  ];
-  const subjects = [
-    "Mathematics",
-    "Science",
-    "English",
-    "History",
-    "Geography",
-    "Physics",
-    "Chemistry",
-    "Biology",
-    "Computer Science",
-    "Art",
-    "Music",
-    "Physical Education",
-  ];
+  const standardSubjectsMap = {
+    "8th": [
+      "English",
+      "Mathematics",
+      "General Science",
+      "History and Civics",
+      "Geography",
+      "Hindi",
+      "Marathi",
+    ],
+    "9th": [
+      "Marathi",
+      "Hindi",
+      "English",
+      "Mathematics - 1",
+      "Mathematics - 2",
+      "Science",
+      "History and Political Science",
+      "Geography",
+    ],
+    "10th": [
+      "English",
+      "Science 1",
+      "Science 2",
+      "Hindi",
+      "Marathi",
+      "Mathematics - 1",
+      "Mathematics - 2",
+      "History and Political Science",
+      "Geography",
+    ],
+  };
+  
+  const filteredSubjects =
+  standardSubjectsMap[tempAssignment.standard] || [];
+  const standards = Object.keys(standardSubjectsMap);
+
 
   useEffect(() => {
     fetchTeachers();
@@ -617,28 +626,20 @@ export default function page() {
                               </div>
                             </div>
 
-                            <div className="w-1/2">
-                              <label htmlFor="subject" className="sr-only">
-                                Subject
-                              </label>
-                              <div className="relative">
-                                <select
-                                  name="subject"
-                                  id="subject"
-                                  value={tempAssignment.subject}
-                                  onChange={handleTempAssignmentChange}
-                                  className="block w-full pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                >
-                                  <option value="">Select Subject</option>
-                                  {subjects.map((subj) => (
-                                    <option key={subj} value={subj}>
-                                      {subj}
-                                    </option>
-                                  ))}
-                                </select>
-                                
-                              </div>
-                            </div>
+                            <select
+                              name="subject"
+                              id="subject"
+                              value={tempAssignment.subject}
+                              onChange={handleTempAssignmentChange}
+                              className="block w-full pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            >
+                              <option value="">Select Subject</option>
+                              {filteredSubjects.map((subj) => (
+                                <option key={subj} value={subj}>
+                                  {subj}
+                                </option>
+                              ))}
+                            </select>
                           </div>
 
                           <button

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Menu,
   X,
@@ -23,72 +23,177 @@ import {
   Edit,
   Trash2,
   Eye,
+  Copy,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
+import { DEV } from "../../../BASE_URL";
 
 const TestDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedTest, setSelectedTest] = useState(null);
+  const [testData, setTestData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    academicYear: '',
+    batch: '',
+    standard: '',
+    subject: '',
+    status: ''
+  });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [stats, setStats] = useState({
+    totalTests: 0,
+    activeTests: 0,
+    totalStudents: 0,
+    avgScore: 0
+  });
 
-  const testData = [
-    {
-      id: 1,
-      name: "Physics",
-      subject: "Science",
-      board: "Maharashtra State Board",
-      medium: "English",
-      standard: "XII",
-      questions: 45,
-      duration: "3h",
-      status: "active",
-      students: 156,
-      completed: 89,
-      avgScore: 78.5,
-    },
-    {
-      id: 2,
-      name: "Chemistry",
-      subject: "Science",
-      board: "Maharashtra State Board",
-      medium: "English",
-      standard: "XII",
-      questions: 40,
-      duration: "2.5h",
-      status: "draft",
-      students: 142,
-      completed: 67,
-      avgScore: 82.3,
-    },
-    {
-      id: 3,
-      name: "Biology",
-      subject: "Science",
-      board: "Maharashtra State Board",
-      medium: "English",
-      standard: "XII",
-      questions: 50,
-      duration: "3h",
-      status: "completed",
-      students: 189,
-      completed: 189,
-      avgScore: 75.8,
-    },
-    {
-      id: 4,
-      name: "Mathematics and Statistics",
-      subject: "Mathematics",
-      board: "Maharashtra State Board",
-      medium: "English",
-      standard: "XII",
-      questions: 60,
-      duration: "3.5h",
-      status: "active",
-      students: 203,
-      completed: 156,
-      avgScore: 71.2,
-    },
-  ];
+
+  // Fetch tests from backend
+  const fetchTests = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: pagination.page,
+        limit: pagination.limit,
+        ...filters
+      });
+
+      const response = await fetch(`${DEV}/api/tests?${queryParams}`);
+      if (!response.ok) throw new Error('Failed to fetch tests');
+      
+      const data = await response.json();
+      setTestData(data.tests);
+      setPagination(prev => ({
+        ...prev,
+        total: data.total,
+        totalPages: data.totalPages,
+        currentPage: data.currentPage
+      }));
+      
+      // Calculate stats
+      calculateStats(data.tests);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate dashboard stats
+  const calculateStats = (tests) => {
+    const totalTests = tests.length;
+    const activeTests = tests.filter(test => test.status === 'published').length;
+    const totalStudents = tests.reduce((sum, test) => sum + (test.totalStudents || 0), 0);
+    const avgScore = tests.reduce((sum, test) => sum + (test.avgScore || 0), 0) / tests.length || 0;
+
+    setStats({
+      totalTests,
+      activeTests,
+      totalStudents,
+      avgScore: avgScore.toFixed(1)
+    });
+  };
+
+  // Delete/Archive test
+  const handleDeleteTest = async (testId) => {
+    if (!confirm('Are you sure you want to archive this test?')) return;
+    
+    try {
+      const response = await fetch(`${BASE_URL}/api/tests/${testId}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete test');
+      
+      // Refresh tests
+      fetchTests();
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
+
+  // Clone test
+  const handleCloneTest = async (testId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/tests/${testId}/clone`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) throw new Error('Failed to clone test');
+      
+      const data = await response.json();
+      alert('Test cloned successfully');
+      fetchTests();
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
+
+  // Publish test
+  const handlePublishTest = async (testId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/tests/${testId}/publish`, {
+        method: 'PATCH'
+      });
+      
+      if (!response.ok) throw new Error('Failed to publish test');
+      
+      fetchTests();
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
+
+  // Generate questions for test
+  const handleGenerateQuestions = async (testId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/tests/${testId}/generate-questions`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) throw new Error('Failed to generate questions');
+      
+      const data = await response.json();
+      alert(`Questions generated: ${data.totalQuestions} questions, ${data.totalMarks} marks`);
+      fetchTests();
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
+
+  // Search tests
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    // Implement search functionality
+  };
+
+  // Filter tests
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // Apply filters
+  const applyFilters = () => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    fetchTests();
+  };
+
+  useEffect(() => {
+    fetchTests();
+  }, [pagination.page]);
 
   const sidebarItems = [
     { icon: Home, label: "Dashboard", key: "dashboard" },
@@ -100,12 +205,12 @@ const TestDashboard = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "active":
+      case "published":
         return "bg-green-100 text-green-800 border-green-200";
       case "draft":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "completed":
-        return "bg-sky-100 text-sky-800 border-sky-200";
+      case "archived":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -113,20 +218,62 @@ const TestDashboard = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "active":
+      case "published":
         return <Play className="h-3 w-3" />;
       case "draft":
         return <Pause className="h-3 w-3" />;
-      case "completed":
+      case "archived":
         return <CheckCircle className="h-3 w-3" />;
       default:
         return <AlertCircle className="h-3 w-3" />;
     }
   };
 
+  const formatTestData = (test) => ({
+    id: test._id,
+    name: test.name,
+    subject: test.subject?.name || 'N/A',
+    board: test.standard?.board || 'N/A',
+    medium: test.standard?.medium || 'N/A',
+    standard: test.standard?.name || 'N/A',
+    questions: test.selectedQuestions?.length || 0,
+    duration: test.duration,
+    status: test.status,
+    totalMarks: test.totalMarks,
+    batch: test.batch?.name || 'N/A',
+    academicYear: test.academicYear?.year || 'N/A',
+    createdAt: new Date(test.createdAt).toLocaleDateString()
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <RefreshCw className="h-8 w-8 animate-spin text-sky-600" />
+        <span className="ml-2 text-lg">Loading tests...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 text-lg mb-4">Error: {error}</p>
+          <button 
+            onClick={fetchTests}
+            className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
+      {/* Sidebar - Keep existing sidebar code */}
       <div
         className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
@@ -201,6 +348,8 @@ const TestDashboard = () => {
                 <input
                   type="text"
                   placeholder="Search tests..."
+                  value={searchTerm}
+                  onChange={handleSearch}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 w-64"
                 />
               </div>
@@ -221,54 +370,36 @@ const TestDashboard = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Tests
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">24</p>
+                  <p className="text-sm font-medium text-gray-600">Total Tests</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalTests}</p>
                 </div>
                 <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
                   <FileText className="h-6 w-6 text-sky-600" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-sm">
-                <span className="text-green-600 font-medium">+12%</span>
-                <span className="text-gray-500 ml-2">from last month</span>
-              </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Active Tests
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">8</p>
+                  <p className="text-sm font-medium text-gray-600">Active Tests</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.activeTests}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <Play className="h-6 w-6 text-green-600" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-sm">
-                <span className="text-green-600 font-medium">+8%</span>
-                <span className="text-gray-500 ml-2">from last week</span>
-              </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Students
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">1,247</p>
+                  <p className="text-sm font-medium text-gray-600">Total Students</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                   <Users className="h-6 w-6 text-purple-600" />
                 </div>
-              </div>
-              <div className="mt-4 flex items-center text-sm">
-                <span className="text-green-600 font-medium">+15%</span>
-                <span className="text-gray-500 ml-2">from last month</span>
               </div>
             </div>
 
@@ -276,15 +407,11 @@ const TestDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Avg Score</p>
-                  <p className="text-2xl font-bold text-gray-900">76.8%</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.avgScore}%</p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                   <CheckCircle className="h-6 w-6 text-yellow-600" />
                 </div>
-              </div>
-              <div className="mt-4 flex items-center text-sm">
-                <span className="text-red-600 font-medium">-2%</span>
-                <span className="text-gray-500 ml-2">from last month</span>
               </div>
             </div>
           </div>
@@ -293,24 +420,36 @@ const TestDashboard = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3">
               <Link href={'/TestCreationDashboard'}>
-              <button className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-                <Plus className="h-4 w-4" />
-                <span>Create Test</span>
-              </button>
+                <button className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                  <Plus className="h-4 w-4" />
+                  <span>Create Test</span>
+                </button>
               </Link>
-              <button className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-                <Upload className="h-4 w-4" />
-                <span>Import</span>
-              </button>
-              <button className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-                <Download className="h-4 w-4" />
-                <span>Export</span>
+              <button 
+                onClick={fetchTests}
+                className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh</span>
               </button>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+              <select 
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500"
+              >
+                <option value="">All Status</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="archived">Archived</option>
+              </select>
+              <button 
+                onClick={applyFilters}
+                className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+              >
                 <Filter className="h-4 w-4" />
-                <span>Filter</span>
+                <span>Apply Filters</span>
               </button>
             </div>
           </div>
@@ -318,9 +457,7 @@ const TestDashboard = () => {
           {/* Test List */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Test Details
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-900">Test Details</h2>
             </div>
 
             <div className="overflow-x-auto">
@@ -340,7 +477,7 @@ const TestDashboard = () => {
                       Duration
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Students
+                      Total Marks
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
@@ -351,73 +488,114 @@ const TestDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {testData.map((test) => (
-                    <tr key={test.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {test.name}
+                  {testData.map((test) => {
+                    const formattedTest = formatTestData(test);
+                    return (
+                      <tr key={formattedTest.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {formattedTest.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {formattedTest.board} • {formattedTest.standard} • {formattedTest.medium}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {test.board} • {test.standard} • {test.medium}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formattedTest.subject}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formattedTest.questions}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formattedTest.duration}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formattedTest.totalMarks}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                              formattedTest.status
+                            )}`}
+                          >
+                            {getStatusIcon(formattedTest.status)}
+                            <span className="ml-1 capitalize">{formattedTest.status}</span>
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <button 
+                              onClick={() => window.open(`${BASE_URL}/api/tests/${formattedTest.id}/preview`, '_blank')}
+                              className="text-sky-600 hover:text-sky-900 p-1"
+                              title="Preview"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleCloneTest(formattedTest.id)}
+                              className="text-blue-600 hover:text-blue-900 p-1"
+                              title="Clone"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </button>
+                            {formattedTest.status === 'draft' && (
+                              <button 
+                                onClick={() => handlePublishTest(formattedTest.id)}
+                                className="text-green-600 hover:text-green-900 p-1"
+                                title="Publish"
+                              >
+                                <Play className="h-4 w-4" />
+                              </button>
+                            )}
+                            <button 
+                              onClick={() => handleGenerateQuestions(formattedTest.id)}
+                              className="text-purple-600 hover:text-purple-900 p-1"
+                              title="Generate Questions"
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteTest(formattedTest.id)}
+                              className="text-red-600 hover:text-red-900 p-1"
+                              title="Archive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {test.subject}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {test.questions}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {test.duration}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {test.completed}/{test.students}
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                          <div
-                            className="bg-sky-600 h-1.5 rounded-full"
-                            style={{
-                              width: `${
-                                (test.completed / test.students) * 100
-                              }%`,
-                            }}
-                          ></div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
-                            test.status
-                          )}`}
-                        >
-                          {getStatusIcon(test.status)}
-                          <span className="ml-1 capitalize">{test.status}</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <button className="text-sky-600 hover:text-sky-900 p-1">
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button className="text-gray-600 hover:text-gray-900 p-1">
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button className="text-red-600 hover:text-red-900 p-1">
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                          <button className="text-gray-600 hover:text-gray-900 p-1">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+              <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                    disabled={pagination.page === 1}
+                    className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                    disabled={pagination.page >= pagination.totalPages}
+                    className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>

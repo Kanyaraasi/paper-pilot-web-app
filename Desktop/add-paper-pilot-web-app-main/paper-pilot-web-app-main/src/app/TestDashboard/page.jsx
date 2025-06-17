@@ -11,7 +11,6 @@ import {
   Edit,
   Trash2,
   MoreHorizontal,
- 
   User,
 } from "lucide-react";
 import Link from "next/link";
@@ -31,9 +30,7 @@ const TestDashboard = () => {
       questions: 45,
       duration: "3h",
       status: "history",
-      
       completed: 89,
- 
     },
     {
       id: 2,
@@ -45,9 +42,7 @@ const TestDashboard = () => {
       questions: 40,
       duration: "2.5h",
       status: "saved",
-      
       completed: 67,
-    
     },
     {
       id: 3,
@@ -59,11 +54,8 @@ const TestDashboard = () => {
       questions: 50,
       duration: "3h",
       status: "history",
-      
       completed: 189,
-   
     },
-   
   ];
 
   const getStatusColor = (status) => {
@@ -121,7 +113,7 @@ const TestDashboard = () => {
                 <Bell className="h-5 w-5" />
               </button>
               <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium"><User/></span>
+                <User className="text-white h-4 w-4" />
               </div>
             </div>
           </div>
@@ -183,9 +175,9 @@ const TestDashboard = () => {
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Duration
                   </th>
-                  
-                
-                  
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -210,23 +202,11 @@ const TestDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {test.duration}
                     </td>
-                   
-                   
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <button className="text-sky-600 hover:text-sky-900 p-1.5 rounded-md hover:bg-sky-50 transition-colors">
-                          <Eye className="h-4 w-4" />
-                        </button>
-                        <button className="text-gray-600 hover:text-gray-900 p-1.5 rounded-md hover:bg-gray-50 transition-colors">
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button className="text-red-600 hover:text-red-900 p-1.5 rounded-md hover:bg-red-50 transition-colors">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                        <button className="text-gray-600 hover:text-gray-900 p-1.5 rounded-md hover:bg-gray-50 transition-colors">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(test.status)}`}>
+                        {getStatusIcon(test.status)}
+                        <span className="ml-1 capitalize">{test.status}</span>
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -234,11 +214,8 @@ const TestDashboard = () => {
             </table>
           </div>
         </div>
-
-      
-       
       </main>
-       <Footer/>
+      <Footer/>
     </div>
   );
 };

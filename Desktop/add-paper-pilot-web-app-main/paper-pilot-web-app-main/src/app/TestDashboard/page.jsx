@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Bell,
   Search,
@@ -7,17 +7,15 @@ import {
   Filter,
   CheckCircle,
   Bookmark,
-  Eye,
-  Edit,
-  Trash2,
-  MoreHorizontal,
   User,
+  LogOut,
+ 
 } from "lucide-react";
 import Link from "next/link";
-import Footer from "../Footer/page";
 
-const TestDashboard = () => {
-  const [selectedTest, setSelectedTest] = useState(null);
+const page = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const testData = [
     {
@@ -58,6 +56,40 @@ const TestDashboard = () => {
     },
   ];
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    console.log('User logging out...');
+    // For example: redirect to login page, clear tokens, etc.
+    alert('Logout functionality would be implemented here');
+    setIsDropdownOpen(false);
+  };
+
+  const handleProfile = () => {
+    console.log('Navigate to profile...');
+    alert('Profile page would open here');
+    setIsDropdownOpen(false);
+  };
+
+  const handleSettings = () => {
+    console.log('Navigate to settings...');
+    alert('Settings page would open here');
+    setIsDropdownOpen(false);
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case "history":
@@ -84,8 +116,8 @@ const TestDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between py-4 px-4">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-sky-600 rounded-lg flex items-center justify-center">
@@ -112,8 +144,36 @@ const TestDashboard = () => {
               <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
                 <Bell className="h-5 w-5" />
               </button>
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center">
-                <User className="text-white h-4 w-4" />
+              
+              {/* User Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="w-8 h-8 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center hover:from-sky-500 hover:to-sky-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                >
+                  <User className="text-white h-4 w-4" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">John Doe</p>
+                      <p className="text-xs text-gray-500">john.doe@example.com</p>
+                    </div>
+                    
+                    
+                    <div className="border-t border-gray-100 mt-1 pt-1">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -121,7 +181,7 @@ const TestDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0 py-8">
         {/* Page Title */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Tests</h2>
@@ -133,12 +193,10 @@ const TestDashboard = () => {
         {/* Action Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
           <div className="flex items-center space-x-3">
-            <Link href={'/TestCreationFlow'}>
-              <button className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors shadow-sm">
-                <Plus className="h-4 w-4" />
-                <span className="font-medium">Create Test</span>
-              </button>
-            </Link>
+           <Link href='TestCreationFlow'> <button className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors shadow-sm">
+              <Plus className="h-4 w-4" />
+              <span className="font-medium">Create Test</span>
+            </button></Link>
           </div>
           <div className="flex items-center space-x-3">
             <button className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
@@ -215,9 +273,8 @@ const TestDashboard = () => {
           </div>
         </div>
       </main>
-      <Footer/>
     </div>
   );
 };
 
-export default TestDashboard;
+export default page;

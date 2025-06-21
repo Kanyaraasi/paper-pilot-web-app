@@ -34,7 +34,7 @@ const TestDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedTest, setSelectedTest] = useState(null);
   const [testData, setTestData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     academicYear: '',
@@ -261,7 +261,7 @@ const TestDashboard = () => {
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <p className="text-red-600 text-lg mb-4">Error: {error}</p>
           <button 
-            onClick={fetchTests}
+            // onClick={fetchTests}
             className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700"
           >
             Retry
@@ -426,7 +426,7 @@ const TestDashboard = () => {
                 </button>
               </Link>
               <button 
-                onClick={fetchTests}
+                // onClick={fetchTests}
                 className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
               >
                 <RefreshCw className="h-4 w-4" />

@@ -64,6 +64,7 @@ function AuthForms() {
         email: loginData.schoolName,
         password: loginData.password,
       });
+      console.log('respoooo', response)
       const token = response.data.token;
       // const slotType = response.data.user?.role;
       // Save token to localStorage or cookie

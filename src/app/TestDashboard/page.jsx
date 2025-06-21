@@ -27,7 +27,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
-import { DEV } from "../../../BASE_URL";
+import { BASE_URL } from "../../../BASE_URL";
 
 const TestDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -68,7 +68,7 @@ const TestDashboard = () => {
         ...filters
       });
 
-      const response = await fetch(`${DEV}/api/tests?${queryParams}`);
+      const response = await fetch(`${BASE_URL}/api/tests?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch tests');
       
       const data = await response.json();
@@ -116,43 +116,43 @@ const TestDashboard = () => {
       if (!response.ok) throw new Error('Failed to delete test');
       
       // Refresh tests
-      fetchTests();
+      // fetchTests();
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
   };
 
   // Clone test
-  const handleCloneTest = async (testId) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/tests/${testId}/clone`, {
-        method: 'POST'
-      });
+  // const handleCloneTest = async (testId) => {
+  //   try {
+  //     const response = await fetch(`${BASE_URL}/api/tests/${testId}/clone`, {
+  //       method: 'POST'
+  //     });
       
-      if (!response.ok) throw new Error('Failed to clone test');
+  //     if (!response.ok) throw new Error('Failed to clone test');
       
-      const data = await response.json();
-      alert('Test cloned successfully');
-      fetchTests();
-    } catch (err) {
-      alert(`Error: ${err.message}`);
-    }
-  };
+  //     const data = await response.json();
+  //     alert('Test cloned successfully');
+  //     // fetchTests();
+  //   } catch (err) {
+  //     alert(`Error: ${err.message}`);
+  //   }
+  // };
 
   // Publish test
-  const handlePublishTest = async (testId) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/tests/${testId}/publish`, {
-        method: 'PATCH'
-      });
+  // const handlePublishTest = async (testId) => {
+  //   try {
+  //     const response = await fetch(`${BASE_URL}/api/tests/${testId}/publish`, {
+  //       method: 'PATCH'
+  //     });
       
-      if (!response.ok) throw new Error('Failed to publish test');
+  //     if (!response.ok) throw new Error('Failed to publish test');
       
-      fetchTests();
-    } catch (err) {
-      alert(`Error: ${err.message}`);
-    }
-  };
+  //     // fetchTests();
+  //   } catch (err) {
+  //     alert(`Error: ${err.message}`);
+  //   }
+  // };
 
   // Generate questions for test
   const handleGenerateQuestions = async (testId) => {
@@ -165,7 +165,7 @@ const TestDashboard = () => {
       
       const data = await response.json();
       alert(`Questions generated: ${data.totalQuestions} questions, ${data.totalMarks} marks`);
-      fetchTests();
+      // fetchTests();
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
@@ -188,11 +188,11 @@ const TestDashboard = () => {
   // Apply filters
   const applyFilters = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
-    fetchTests();
+    // fetchTests();
   };
 
   useEffect(() => {
-    fetchTests();
+    // fetchTests();
   }, [pagination.page]);
 
   const sidebarItems = [
@@ -527,14 +527,14 @@ const TestDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
                             <button 
-                              onClick={() => window.open(`${BASE_URL}/api/tests/${formattedTest.id}/preview`, '_blank')}
+                              // onClick={() => window.open(`${BASE_URL}/api/tests/${formattedTest.id}/preview`, '_blank')}
                               className="text-sky-600 hover:text-sky-900 p-1"
                               title="Preview"
                             >
                               <Eye className="h-4 w-4" />
                             </button>
                             <button 
-                              onClick={() => handleCloneTest(formattedTest.id)}
+                              // onClick={() => handleCloneTest(formattedTest.id)}
                               className="text-blue-600 hover:text-blue-900 p-1"
                               title="Clone"
                             >
@@ -542,7 +542,7 @@ const TestDashboard = () => {
                             </button>
                             {formattedTest.status === 'draft' && (
                               <button 
-                                onClick={() => handlePublishTest(formattedTest.id)}
+                                // onClick={() => handlePublishTest(formattedTest.id)}
                                 className="text-green-600 hover:text-green-900 p-1"
                                 title="Publish"
                               >
@@ -550,7 +550,7 @@ const TestDashboard = () => {
                               </button>
                             )}
                             <button 
-                              onClick={() => handleGenerateQuestions(formattedTest.id)}
+                              // onClick={() => handleGenerateQuestions(formattedTest.id)}
                               className="text-purple-600 hover:text-purple-900 p-1"
                               title="Generate Questions"
                             >

@@ -60,24 +60,24 @@ function AuthForms() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/api/auth/login`, {
+      const response = await axios.post(`${BASE_URL}/api/auth/institute/login`, {
         email: loginData.schoolName,
         password: loginData.password,
       });
       const token = response.data.token;
-      const slotType = response.data.user?.role;
+      // const slotType = response.data.user?.role;
       // Save token to localStorage or cookie
       localStorage.setItem("token", token);
-      localStorage.setItem("roleType", slotType);
+      // localStorage.setItem("roleType", slotType);
       setSuccess("Login successful");
       setTimeout(() => {
-        if (slotType === "admin") {
-          window.location.href = "/CreateUser";
-        } else if (slotType === "teacher") {
+        // if (slotType === "admin") {
+          // window.location.href = "/CreateUser";
+        // } else if (slotType === "teacher") {
           window.location.href = "/TestDashboard";
-        } else {
-          setError("Unknown user type.");
-        }
+        // } else {
+          // setError("Unknown user type.");
+        // }
       }, 1000);
       console.log("JWT Token:", token);
       setLoginData({

@@ -43,7 +43,7 @@ const FinalQuestionPaperPage = () => {
       },
       {
         id: 4,
-        text: 'Find the derivative of f(x) = 3x² + 2x - 1',
+        text: 'Find thw the derivative of f(x) = 3x² + 2x - 1',
         options: null
       }
     ];

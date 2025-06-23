@@ -2,320 +2,171 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f9fafb;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.15s ease-out;
+}
 
 .animate-slideIn {
-    animation: slideIn 0.8s ease-out forwards;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Focus ring improvements */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
+}
+
+/* Button improvements */
+.btn-primary {
+  @apply bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+/* Card improvements */
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow;
+}
+
+/* Form improvements */
+.form-input {
+  @apply px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .border-gray-200 {
+    @apply border-gray-400;
   }
   
-  .animate-slideInRight {
-    animation: slideInRight 0.5s ease-out forwards;
+  .text-gray-500 {
+    @apply text-gray-700;
   }
   
-  .animate-shake {
-    animation: shake 0.5s ease-in-out;
-  }@tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-  
-  /* @import './styles/animations.css'; */
-  
-  :root {
-    --primary-color: #3366FF;
-    --primary-light: #EBF0FF;
-    --primary-dark: #1E40AF;
-    --secondary-color: #14B8A6;
-    --accent-color: #F97316;
-    --success-color: #10B981;
-    --warning-color: #F59E0B;
-    --error-color: #EF4444;
-    --black: #111827;
-    --white: #FFFFFF;
-    --gray-100: #F3F4F6;
-    --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB;
-    --gray-400: #9CA3AF;
-    --gray-500: #6B7280;
-    --gray-600: #4B5563;
-    --gray-700: #374151;
-    --gray-800: #1F2937;
-    --gray-900: #111827;
+  .text-gray-400 {
+    @apply text-gray-600;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
   }
   
-  html {
-    scroll-behavior: smooth;
+  .print-break {
+    page-break-after: always;
   }
-  
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    line-height: 1.5;
-    color: var(--gray-800);
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    line-height: 1.2;
-    font-weight: 600;
-  }
-  
-  /* Custom Focus Styles */
-  *:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-  }
-  
-  /* Custom 8px Spacing System */
-  .p-custom {
-    padding: 8px;
-  }
-  
-  .p-custom-2 {
-    padding: 16px;
-  }
-  
-  .p-custom-3 {
-    padding: 24px;
-  }
-  
-  /* Hover Animation for Links and Buttons */
-  a, button {
-    transition: all 0.3s ease;
-  }
-  
-  /* Improved button styles */
-  button {
-    position: relative;
-    overflow: hidden;
-  }
-  
-  button:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
-  }
-  
-  @keyframes ripple {
-    0% {
-      transform: scale(0, 0);
-      opacity: 0.5;
-    }
-    20% {
-      transform: scale(25, 25);
-      opacity: 0.3;
-    }
-    100% {
-      opacity: 0;
-      transform: scale(40, 40);
-    }
-  }
-  
-  button:focus:not(:active)::after {
-    animation: ripple 1s ease-out;
-  }
-
-
-  
-/* From Uiverse.io by Nawsome */ 
-.continue-application {
-  --color: #fff;
-  --background: #404660;
-  --background-hover: #3A4059;
-  --background-left: #2B3044;
-  --folder: #F3E9CB;
-  --folder-inner: #BEB393;
-  --paper: #FFFFFF;
-  --paper-lines: #BBC1E1;
-  --paper-behind: #E1E6F9;
-  --pencil-cap: #fff;
-  --pencil-top: #275EFE;
-  --pencil-middle: #fff;
-  --pencil-bottom: #5C86FF;
-  --shadow: rgba(13, 15, 25, .2);
-  border: none;
-  outline: none;
-  cursor: pointer;
-  position: relative;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 19px;
- 
-  -webkit-tap-highlight-color: transparent;
-  padding: 10px 24px 10px 60px;
-  transition: background 0.3s;
-  color: var(--color);
-  background: var(--bg, var(--background));
-}
-
-.continue-application > div {
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 53px;
-  position: absolute;
-  overflow: hidden;
-  border-radius: 5px 0 0 5px;
-  background: var(--background-left);
-}
-
-.continue-application > div .folder {
-  width: 15px;
-  height: 10px;
-  position: absolute;
-  left: 15px;
-  top: 13px;
-}
-
-.continue-application > div .folder .top {
-  left: 0;
-  top: -4px;
-  z-index: 2;
-  position: absolute;
-  transform: translateX(var(--fx, 0));
-  transition: transform 0.4s ease var(--fd, 0.3s);
-}
-
-.continue-application > div .folder .top svg {
-  
-  width: 20px;
-  height: 27px;
-  display: block;
-  fill: var(--folder);
-  transform-origin: 0 50%;
-  transition: transform 0.3s ease var(--fds, 0.45s);
-  transform: perspective(120px) rotateY(var(--fr, 0deg));
-}
-
-.continue-application > div .folder:before, .continue-application > div .folder:after,
-.continue-application > div .folder .paper {
-  content: "";
-  position: absolute;
-  left: var(--l, 0);
-  top: var(--t, 0);
-  width: var(--w, 100%);
-  height: var(--h, 100%);
-  border-radius: 1px;
-  background: var(--b, var(--folder-inner));
-}
-
-.continue-application > div .folder:before {
-  box-shadow: 0 1.5px 3px var(--shadow), 0 2.5px 5px var(--shadow), 0 3.5px 7px var(--shadow);
-  transform: translateX(var(--fx, 0));
-  transition: transform 0.4s ease var(--fd, 0.3s);
-}
-
-.continue-application > div .folder:after,
-.continue-application > div .folder .paper {
-  --l: 1px;
-  --t: 1px;
-  --w: 18px;
-  --h: 22px;
-  --b: var(--paper-behind);
-}
-
-.continue-application > div .folder:after {
-  transform: translate(var(--pbx, 0), var(--pby, 0));
-  transition: transform 0.4s ease var(--pbd, 0s);
-}
-
-.continue-application > div .folder .paper {
-  z-index: 1;
-  --b: var(--paper);
-}
-
-.continue-application > div .folder .paper:before, .continue-application > div .folder .paper:after {
-  content: "";
-  width: var(--wp, 14px);
-  height: 2px;
-  border-radius: 1px;
-  transform: scaleY(0.5);
-  left: 3px;
-  top: var(--tp, 3px);
-  position: absolute;
-  background: var(--paper-lines);
-  box-shadow: 0 12px 0 0 var(--paper-lines), 0 24px 0 0 var(--paper-lines);
-}
-
-.continue-application > div .folder .paper:after {
-  --tp: 6px;
-  --wp: 10px;
-}
-
-.continue-application > div .pencil {
-  height: 4px;
-  width: 3px;
-  border-radius: 1px 1px 0 0;
-  top: 8px;
-  left: 105%;
-  position: absolute;
-  z-index: 3;
-  transform-origin: 50% 19px;
-  background: var(--pencil-cap);
-  transform: translateX(var(--pex, 0)) rotate(35deg);
-  transition: transform 0.4s ease var(--pbd, 0s);
-}
-
-.continue-application > div .pencil:before, .continue-application > div .pencil:after {
-  content: "";
-  position: absolute;
-  display: block;
-  background: var(--b, linear-gradient(var(--pencil-top) 55%, var(--pencil-middle) 55.1%, var(--pencil-middle) 60%, var(--pencil-bottom) 60.1%));
-  width: var(--w, 15px);
-  height: var(--h, 15px);
-  border-radius: var(--br, 2px 2px 0 0);
-  top: var(--t, 2px);
-  left: var(--l, -1px);
-}
-
-.continue-application > div .pencil:before {
-  -webkit-clip-path: polygon(0 5%, 5px 5%, 5px 17px, 50% 20px, 0 17px);
-  clip-path: polygon(0 5%, 5px 5%, 5px 17px, 50% 20px, 0 17px);
-}
-
-.continue-application > div .pencil:after {
-  --b: none;
-  --w: 2px;
-  --h: 2px;
-  --br: 0 2px 1px 0;
-  --t: 3px;
-  --l: 3px;
-  border-top: 1px solid var(--pencil-top);
-  border-right: 1px solid var(--pencil-top);
-}
-
-.continue-application:before, .continue-application:after {
-  content: "";
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  border-radius: 1px;
-  background: var(--color);
-  transform-origin: 9px 1px;
-  transform: translateX(var(--cx, 0)) scale(0.5) rotate(var(--r, -45deg));
-  top: 26px;
-  right: 16px;
-  transition: transform 0.3s;
-}
-
-.continue-application:after {
-  --r: 45deg;
-}
-
-.continue-application:hover {
-  --cx: 2px;
-  --bg: var(--background-hover);
-  --fx: -40px;
-  --fr: -60deg;
-  --fd: .15s;
-  --fds: 0s;
-  --pbx: 3px;
-  --pby: -3px;
-  --pbd: .15s;
-  --pex: -24px;
 }

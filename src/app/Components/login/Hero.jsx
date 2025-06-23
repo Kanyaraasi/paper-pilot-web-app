@@ -1,5 +1,8 @@
+'use client'
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
+import HomePageImage from '../../../../public/HomepageImage.png'
 
 function Hero({ animated, onGetStarted }) {
   const [typedText, setTypedText] = useState("");
@@ -51,20 +54,20 @@ function Hero({ animated, onGetStarted }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
+    <div className="min-h-screen bg-[#FCFEFF] relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
         <div className="absolute top-40 right-20 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-1000"></div>
         <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-2000"></div>
         
-        {/* Floating geometric shapes */}
+        Floating geometric shapes
         <div className="absolute top-1/4 right-1/4 w-4 h-4 bg-blue-400 rotate-45 animate-bounce opacity-60"></div>
         <div className="absolute top-1/3 left-1/4 w-6 h-6 bg-purple-400 rounded-full animate-ping opacity-40"></div>
         <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-pink-400 rotate-45 animate-pulse opacity-50"></div>
-      </div>
+      </div> */}
 
-      <div className="relative pt-20 pb-16 px-4 max-w-7xl mx-auto">
+      <div className="relative pt-10 pb-16 px-4 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           {/* Left Container - Enhanced Text Content */}
           <div className={`w-full lg:w-7/12 text-gray-800 space-y-8 ${
@@ -143,86 +146,77 @@ function Hero({ animated, onGetStarted }) {
               </Link>
             </div>
             
-            <div className="pt-8">
-              <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-3 rounded-xl border border-green-200">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-gradient-to-r from-pink-400 to-pink-500 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-500 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold">
-                    500+
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Trusted by 500+ educators</p>
-                  <p className="text-xs text-gray-600">Join thousands of satisfied teachers</p>
-                </div>
-              </div>
-            </div>
           </div>
           
-          {/* Right Container - Product Demo */}
-          <div className={`w-full lg:w-5/12 mt-10 lg:mt-0 ${
+          {/* Right Container - Smooth Animated Image */}
+          <div className={`w-full lg:w-6/12 lg:mt-0 h-[100vh] ${
             animated ? 'animate-slideInRight' : 'opacity-0'
           }`}>
-            <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-gray-100 p-8 space-y-6">
-              <div className="text-center space-y-3">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mx-auto flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Get Started in 3 Steps</h3>
-                <p className="text-gray-600">Simple process, powerful results</p>
-              </div>
-              
-              <div className="space-y-5">
-                {[
-                  {
-                    step: "1",
-                    title: "Select Your Requirements",
-                    description: "Choose subject, class, chapter, and difficulty level",
-                    color: "from-blue-500 to-blue-600"
-                  },
-                 
-                  {
-                    step: "2",
-                    title: "saved & Download",
-                    description: "Make final edits and export as professional PDF",
-                    color: "from-green-500 to-green-600"
-                  }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-start space-x-4 p-5 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 group">
-                    <div className={`w-10 h-10 bg-gradient-to-r ${item.color} rounded-full flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform`}>
-                      {item.step}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-2">{item.title}</h4>
-                      <p className="text-sm text-gray-600">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="pt-2">
-                <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl border border-amber-200 p-2">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <h4 className="font-semibold text-gray-900">Quick Start Offer</h4>
-                  </div>
-                  <p className="text-sm text-gray-700 mb-2">🎯 <strong>First 2 Months absolutely free</strong></p>
-                  <p className="text-xs text-gray-600">No setup fees • Instant access • Full features included</p>
-                </div>
-              </div>
+            <div className="relative rounded-lg animate-floatSmooth w-[100%] mt-20">
+              <Image
+                src={HomePageImage}
+                alt="Paper Pilot Study Fest"
+                className="w-full h-full object-cover"
+                layout="responsive" 
+                width={500}
+                height={400}
+              />
             </div>
           </div>
         </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes floatSmooth {
+          0% { 
+            transform: translateY(0px) scale(1);
+          }
+          33% { 
+            transform: translateY(-15px) scale(1.02);
+          }
+          66% { 
+            transform: translateY(-8px) scale(1.01);
+          }
+          100% { 
+            transform: translateY(0px) scale(1);
+          }
+        }
+        
+        @keyframes slideInRight {
+          0% {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes fadeIn {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-floatSmooth {
+          animation: floatSmooth 6s ease-in-out infinite;
+          animation-delay: 0.5s;
+        }
+        
+        
+        .animate-fadeIn {
+          animation: fadeIn 1s ease-out forwards;
+          animation-delay: 0.3s;
+        }
+      `}</style>
     </div>
   );
 }
-export default Hero
+
+export default Hero;

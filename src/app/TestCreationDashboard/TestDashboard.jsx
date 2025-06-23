@@ -13,7 +13,6 @@ import {
   Timer,
   Award
 } from 'lucide-react';
-// import Footer from './Footer';
 
 const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
   const [subjectError, setSubjectError] = useState('');
@@ -34,34 +33,32 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
       unit: formData?.unit || '',
       academicYear: formData?.academicYear || '',
       batch: formData?.batch || '',
-      subjects: formData?.subjects || [
-        { id: 1, name: 'Physics', selected: false, icon: '⚛️' },
-        { id: 2, name: 'Chemistry', selected: false, icon: '🧪' },
-        { id: 3, name: 'Biology', selected: false, icon: '🧬' },
-        { id: 4, name: 'Mathematics and Statistics', selected: false, icon: '📊' }
+      selectedSubject: formData?.selectedSubject || '', // Changed to single subject
+      subjects: [
+        { id: 1, name: 'Physics', icon: '⚛️' },
+        { id: 2, name: 'Chemistry', icon: '🧪' },
+        { id: 3, name: 'Biology', icon: '🧬' },
+        { id: 4, name: 'Mathematics and Statistics', icon: '📊' }
       ]
     },
     mode: 'onChange'
   });
 
+  const selectedSubject = watch('selectedSubject');
   const subjects = watch('subjects');
 
-  const handleSubjectToggle = (index) => {
-    const updatedSubjects = [...subjects];
-    updatedSubjects[index].selected = !updatedSubjects[index].selected;
-    setValue('subjects', updatedSubjects);
+  const handleSubjectSelect = (subjectId) => {
+    setValue('selectedSubject', subjectId);
     
-    // Clear error when user selects at least one subject
-    const hasSelectedSubject = updatedSubjects.some(subject => subject.selected);
-    if (hasSelectedSubject && subjectError) {
+    // Clear error when user selects a subject
+    if (subjectError) {
       setSubjectError('');
     }
   };
 
-  const validateSubjects = () => {
-    const hasSelectedSubject = subjects.some(subject => subject.selected);
-    if (!hasSelectedSubject) {
-      setSubjectError('Please select at least one subject');
+  const validateSubject = () => {
+    if (!selectedSubject) {
+      setSubjectError('Please select a subject');
       return false;
     }
     setSubjectError('');
@@ -69,13 +66,20 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
   };
 
   const onSubmit = (data) => {
-    // Validate subjects before submission
-    if (!validateSubjects()) {
+    // Validate subject before submission
+    if (!validateSubject()) {
       return;
     }
     
-    console.log('Form Data:', data);
-    onNext(data);
+    // Add selected subject details to form data
+    const selectedSubjectDetails = subjects.find(s => s.id === parseInt(selectedSubject));
+    const formDataWithSubject = {
+      ...data,
+      selectedSubjectDetails
+    };
+    
+    console.log('Form Data:', formDataWithSubject);
+    onNext(formDataWithSubject);
   };
 
   const classOptions = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
@@ -83,51 +87,12 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
   const academicYears = ['2023-24', '2024-25', '2025-26'];
   const batches = ['Morning', 'Evening', 'Weekend'];
 
-  const selectedSubjects = subjects.filter(subject => subject.selected);
+  const getSelectedSubjectDetails = () => {
+    return subjects.find(s => s.id === parseInt(selectedSubject));
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 font-inter">
-      {/* Progress Bar */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Create Test</h1>
-              <p className="text-sm text-gray-600 mt-1">Step {currentStep} of 3 - Configure your test details</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-1 text-sm text-gray-600">
-                <Clock className="h-4 w-4" />
-                <span>Auto-save enabled</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">1</span>
-              </div>
-              <span className="ml-2 text-sm font-medium text-blue-600">Test Details</span>
-            </div>
-            <div className="flex-1 h-px bg-gray-200"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-gray-600 text-sm font-medium">2</span>
-              </div>
-              <span className="ml-2 text-sm text-gray-500">Question Bank</span>
-            </div>
-            <div className="flex-1 h-px bg-gray-200"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-gray-600 text-sm font-medium">3</span>
-              </div>
-              <span className="ml-2 text-sm text-gray-500">Review & Publish</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* Test Details Form */}
@@ -141,7 +106,7 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
           </div>
           
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Test Name *</label>
                 <input
@@ -287,92 +252,36 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
           </div>
         </div>
 
-        {/* Question Paper Includes */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Info className="h-5 w-5 mr-2 text-green-600" />
-              Question Paper Includes
-            </h3>
-            <p className="text-sm text-gray-600 mt-1">Features and specifications of your test paper</p>
-          </div>
-          
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">Multiple Choice Questions</p>
-                  <p className="text-xs text-gray-600">MCQ with 4 options each</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">Theory Questions</p>
-                  <p className="text-xs text-gray-600">Descriptive and analytical</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">Numerical Problems</p>
-                  <p className="text-xs text-gray-600">Step-by-step solutions</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">Board Pattern</p>
-                  <p className="text-xs text-gray-600">Follows official syllabus</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">Answer Key</p>
-                  <p className="text-xs text-gray-600">Detailed solutions included</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">Marking Scheme</p>
-                  <p className="text-xs text-gray-600">Clear evaluation criteria</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Select Subjects */}
+        {/* Select Subject */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
               <BookOpen className="h-5 w-5 mr-2 text-purple-600" />
-              Select Subjects *
+              Select Subject *
             </h3>
-            <p className="text-sm text-gray-600 mt-1">Choose subjects to include in your test</p>
+            <p className="text-sm text-gray-600 mt-1">Choose one subject for your test</p>
           </div>
           
           <div className="p-6">
             <div className={`space-y-3 ${subjectError ? 'ring-2 ring-red-200 rounded-lg p-4' : ''}`}>
-              {subjects.map((subject, index) => (
+              {subjects.map((subject) => (
                 <div 
                   key={subject.id} 
                   className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all hover:bg-gray-50 ${
-                    subject.selected 
+                    parseInt(selectedSubject) === subject.id
                       ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200' 
                       : 'border-gray-200 bg-white'
                   }`}
-                  onClick={() => handleSubjectToggle(index)}
+                  onClick={() => handleSubjectSelect(subject.id)}
                 >
                   <div className="flex items-center space-x-4 flex-1">
                     <input
-                      type="checkbox"
-                      checked={subject.selected}
-                      onChange={() => handleSubjectToggle(index)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      type="radio"
+                      name="selectedSubject"
+                      value={subject.id}
+                      checked={parseInt(selectedSubject) === subject.id}
+                      onChange={() => handleSubjectSelect(subject.id)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-lg">
                       {subject.icon}
@@ -381,7 +290,7 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
                       <p className="font-medium text-gray-900">{subject.name}</p>
                       <p className="text-sm text-gray-600">Complete syllabus coverage</p>
                     </div>
-                    {subject.selected && (
+                    {parseInt(selectedSubject) === subject.id && (
                       <CheckCircle className="h-5 w-5 text-blue-600" />
                     )}
                   </div>
@@ -398,20 +307,15 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
               </div>
             )}
 
-            {selectedSubjects.length > 0 && (
+            {selectedSubject && (
               <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm font-medium text-green-800 mb-2">
-                  Selected Subjects ({selectedSubjects.length})
+                  Selected Subject
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedSubjects.map((subject) => (
-                    <span 
-                      key={subject.id}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                    >
-                      {subject.icon} {subject.name}
-                    </span>
-                  ))}
+                <div className="flex items-center space-x-2">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    {getSelectedSubjectDetails()?.icon} {getSelectedSubjectDetails()?.name}
+                  </span>
                 </div>
               </div>
             )}
@@ -447,8 +351,6 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
           </div>
         </div>
       </div>
-      
-      {/* <Footer /> */}
     </div>
   );
 };

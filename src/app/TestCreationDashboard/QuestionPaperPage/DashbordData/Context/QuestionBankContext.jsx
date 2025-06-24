@@ -1,5 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { questionService } from '../../../../../apiServices/questionsServices';
+
 
 const QuestionBankContext = createContext();
 
@@ -11,6 +13,8 @@ export const QuestionBankProvider = ({ children }) => {
   const [showAnswers, setShowAnswers] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(false);
+
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,143 +45,201 @@ export const QuestionBankProvider = ({ children }) => {
   // Tab Configuration
   const tabTitles = {
     fill: 'Fill in the Blanks',
-    brief: 'Brief Answers',
-    sentence: 'One Word/Sentence',
+    brief: 'Short Answer',
+    sentence: 'Short Answer',
     match: 'Match the Following',
-    mcq: 'Multiple Choice',
+    mcq: 'MCQ',
     truefalse: 'True/False',
-    essay: 'Essay Type',
-    numerical: 'Numerical Problems',
-    diagram: 'Diagram Based',
-    practical: 'Practical Questions'
+    essay: 'Long Answer',
+    numerical: 'Numerical',
+    diagram: 'Long Answer',
+    practical: 'Long Answer'
   };
+
+  const getBackendType = (tab) => {
+    const typeMap = {
+      fill: 'Fill in the Blanks',
+      brief: 'Short Answer',
+      sentence: 'Short Answer',
+      match: 'Match the Following',
+      mcq: 'MCQ',
+      truefalse: 'True/False',
+      essay: 'Long Answer',
+      numerical: 'Numerical',
+      diagram: 'Long Answer',
+      practical: 'Long Answer'
+    };
+    return typeMap[tab] || 'Short Answer';
+  };
+
 
   // Sample Questions Data
   const [questions, setQuestions] = useState({
-    fill: [
-      {
-        id: 'fill-1',
-        text: 'The capital of India is _______.',
-        answer: 'New Delhi',
-        difficulty: 'Easy',
-        tags: ['Geography', 'India'],
-        starred: false,
-        createdAt: new Date('2024-01-15')
-      },
-      {
-        id: 'fill-2',
-        text: 'The largest planet in our solar system is _______.',
-        answer: 'Jupiter',
-        difficulty: 'Medium',
-        tags: ['Science', 'Astronomy'],
-        starred: true,
-        createdAt: new Date('2024-01-10')
-      }
-    ],
-    brief: [
-      {
-        id: 'brief-1',
-        text: 'Explain the process of photosynthesis.',
-        answer: 'Photosynthesis is the process by which plants convert sunlight, carbon dioxide, and water into glucose and oxygen.',
-        difficulty: 'Medium',
-        tags: ['Biology', 'Plants'],
-        starred: false,
-        createdAt: new Date('2024-01-12')
-      }
-    ],
-    sentence: [
-      {
-        id: 'sentence-1',
-        text: 'Who invented the telephone?',
-        answer: 'Alexander Graham Bell',
-        difficulty: 'Easy',
-        tags: ['History', 'Inventions'],
-        starred: false,
-        createdAt: new Date('2024-01-08')
-      }
-    ],
-    match: [
-      {
-        id: 'match-1',
-        items: [
-          { id: 'item-1', left: 'Apple', right: 'Red' },
-          { id: 'item-2', left: 'Sky', right: 'Blue' },
-          { id: 'item-3', left: 'Grass', right: 'Green' }
-        ],
-        difficulty: 'Easy',
-        tags: ['Colors', 'Basic'],
-        starred: false,
-        createdAt: new Date('2024-01-05')
-      }
-    ],
-    mcq: [
-      {
-        id: 'mcq-1',
-        text: 'What is the largest mammal in the world?',
-        options: ['Elephant', 'Blue Whale', 'Giraffe', 'Hippopotamus'],
-        answer: 'Blue Whale',
-        difficulty: 'Medium',
-        tags: ['Biology', 'Animals'],
-        starred: true,
-        createdAt: new Date('2024-01-14')
-      }
-    ],
-    truefalse: [
-      {
-        id: 'tf-1',
-        text: 'The Earth is flat.',
-        answer: 'False',
-        difficulty: 'Easy',
-        tags: ['Geography', 'Science'],
-        starred: false,
-        createdAt: new Date('2024-01-11')
-      }
-    ],
-    essay: [
-      {
-        id: 'essay-1',
-        text: 'Discuss the impact of technology on modern education.',
-        answer: 'Technology has revolutionized education by providing access to online resources, interactive learning platforms, and remote learning opportunities...',
-        difficulty: 'Hard',
-        tags: ['Technology', 'Education'],
-        starred: false,
-        createdAt: new Date('2024-01-13')
-      }
-    ],
-    numerical: [
-      {
-        id: 'num-1',
-        text: 'Calculate the area of a circle with radius 5 cm.',
-        answer: '78.54 cm²',
-        difficulty: 'Medium',
-        tags: ['Mathematics', 'Geometry'],
-        starred: false,
-        createdAt: new Date('2024-01-09')
-      }
-    ],
-    diagram: [
-      {
-        id: 'diag-1',
-        text: 'Draw and label the parts of a plant cell.',
-        answer: 'Diagram should include: cell wall, cell membrane, nucleus, cytoplasm, chloroplasts, vacuole',
-        difficulty: 'Hard',
-        tags: ['Biology', 'Cell Structure'],
-        starred: true,
-        createdAt: new Date('2024-01-07')
-      }
-    ],
-    practical: [
-      {
-        id: 'prac-1',
-        text: 'Demonstrate the procedure to test for starch in leaves.',
-        answer: 'Boil leaf in water, then in alcohol, add iodine solution. Blue-black color indicates starch presence.',
-        difficulty: 'Hard',
-        tags: ['Biology', 'Experiments'],
-        starred: false,
-        createdAt: new Date('2024-01-06')
-      }
-    ]
+    fill: [],
+    brief: [],
+    sentence: [],
+    match: [],
+    mcq: [],
+    truefalse: [],
+    essay: [],
+    numerical: [],
+    diagram: [],
+    practical: []
   });
+
+  const loadQuestions = async (filters = {}) => {
+    try {
+      setLoading(true);
+      // const params = {
+      //   page: currentPage,
+      //   limit: questionsPerPage,
+      //   type: getBackendType(activeTab),
+      //   difficulty: selectedDifficulty !== 'All' ? selectedDifficulty : undefined,
+      //   search: searchQuery || undefined,
+      //   tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
+      //   sortBy: sortBy,
+      //   ...filters
+      // };
+
+      const response = await questionService.getAllQuestions();
+      
+      if (response) {
+        // Transform backend data to frontend format
+        const transformedQuestions = response.questions.map(q => ({
+          id: q._id,
+          text: q.content,
+          answer: q.correctAnswer,
+          difficulty: q.difficulty,
+          tags: q.tags || [],
+          starred: false, // Add starred logic if needed
+          createdAt: new Date(q.createdAt),
+          // Handle MCQ specific fields
+          ...(q.type === 'MCQ' && {
+            options: q.options?.map(opt => opt.text) || [],
+            answer: q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer
+          }),
+          // Handle Match the Following
+          ...(q.type === 'Match the Following' && {
+            items: q.matchItems || []
+          })
+        }));
+
+        setQuestions(prev => ({
+          ...prev,
+          [activeTab]: transformedQuestions
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading questions:', error);
+      showToastMessage('Error loading questions', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createQuestion = async (questionData) => {
+    try {
+      setLoading(true);
+      
+      // Transform frontend data to backend format
+      const backendQuestion = {
+        content: questionData.text,
+        type: getBackendType(activeTab),
+        difficulty: questionData.difficulty,
+        marks: 1, // Default marks
+        subject: questionData.subjectId, // Add subject selection logic
+        chapter: questionData.chapterId, // Add chapter selection logic
+        chapterName: questionData.chapterName,
+        tags: questionData.tags || [],
+        correctAnswer: questionData.answer,
+        explanation: questionData.explanation || '',
+        // Handle MCQ options
+        ...(activeTab === 'mcq' && {
+          options: questionData.options?.map((opt, index) => ({
+            text: opt,
+            isCorrect: opt === questionData.answer
+          })) || []
+        })
+      };
+
+      const response = await questionService.createQuestion(backendQuestion);
+      
+      if (response.success) {
+        showToastMessage('Question created successfully');
+        loadQuestions(); // Reload questions
+        return response.data;
+      }
+    } catch (error) {
+      console.error('Error creating question:', error);
+      showToastMessage('Error creating question', 'error');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update question
+  const updateQuestion = async (questionId, questionData) => {
+    try {
+      setLoading(true);
+      
+      const backendQuestion = {
+        content: questionData.text,
+        type: getBackendType(activeTab),
+        difficulty: questionData.difficulty,
+        tags: questionData.tags || [],
+        correctAnswer: questionData.answer,
+        explanation: questionData.explanation || '',
+        ...(activeTab === 'mcq' && {
+          options: questionData.options?.map((opt) => ({
+            text: opt,
+            isCorrect: opt === questionData.answer
+          })) || []
+        })
+      };
+
+      const response = await questionService.updateQuestion(questionId, backendQuestion);
+      
+      if (response.success) {
+        showToastMessage('Question updated successfully');
+        loadQuestions(); // Reload questions
+        return response.data;
+      }
+    } catch (error) {
+      console.error('Error updating question:', error);
+      showToastMessage('Error updating question', 'error');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete question
+  const deleteQuestion = async (questionId) => {
+    try {
+      setLoading(true);
+      const response = await questionService.deleteQuestion(questionId);
+      
+      if (response.success) {
+        showToastMessage('Question deleted successfully');
+        loadQuestions(); // Reload questions
+      }
+    } catch (error) {
+      console.error('Error deleting question:', error);
+      showToastMessage('Error deleting question', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load questions when filters change
+  useEffect(() => {
+    loadQuestions();
+  }, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy]);
+
+
+
+
 
   // Get all unique tags
   const allTags = React.useMemo(() => {
@@ -192,61 +254,17 @@ export const QuestionBankProvider = ({ children }) => {
     return Array.from(tagSet).sort();
   }, [questions]);
 
+
   // Filter questions based on current filters
   const filteredQuestions = React.useMemo(() => {
-    let filtered = [...questions[activeTab]];
-
-    // Search filter
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(q => {
-        const searchLower = searchQuery.toLowerCase();
-        const textMatch = q.text && q.text.toLowerCase().includes(searchLower);
-        const answerMatch = q.answer && q.answer.toLowerCase().includes(searchLower);
-        const tagMatch = q.tags && q.tags.some(tag => tag.toLowerCase().includes(searchLower));
-        return textMatch || answerMatch || tagMatch;
-      });
-    }
-
-    // Difficulty filter
-    if (selectedDifficulty !== 'All') {
-      filtered = filtered.filter(q => q.difficulty === selectedDifficulty);
-    }
-
-    // Tags filter
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter(q => 
-        q.tags && selectedTags.some(tag => q.tags.includes(tag))
-      );
-    }
-
-    // Starred filter
-    if (showOnlyStarred) {
-      filtered = filtered.filter(q => q.starred);
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.createdAt) - new Date(a.createdAt);
-        case 'oldest':
-          return new Date(a.createdAt) - new Date(b.createdAt);
-        case 'difficulty':
-          const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
-          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [questions, activeTab, searchQuery, selectedDifficulty, selectedTags, showOnlyStarred, sortBy]);
+    return questions[activeTab] || [];
+  }, [questions, activeTab]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
   const indexOfLastQuestion = currentPage * questionsPerPage;
   const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
-  const currentQuestions = filteredQuestions.slice(indexOfFirstQuestion, indexOfLastQuestion);
+  const currentQuestions = filteredQuestions;
 
   // Helper functions
   const showToastMessage = (message, type = 'success') => {
@@ -273,6 +291,7 @@ export const QuestionBankProvider = ({ children }) => {
   };
 
   const toggleStarred = (questionId) => {
+    // Implement starred functionality with API call if needed
     setQuestions(prev => ({
       ...prev,
       [activeTab]: prev[activeTab].map(q => 
@@ -280,6 +299,7 @@ export const QuestionBankProvider = ({ children }) => {
       )
     }));
   };
+
 
   const toggleTagSelection = (tag) => {
     setSelectedTags(prev => 
@@ -321,6 +341,7 @@ export const QuestionBankProvider = ({ children }) => {
     setShowFilters,
     toast,
     setToast,
+    loading,
 
     // Filter States
     searchQuery,
@@ -354,6 +375,12 @@ export const QuestionBankProvider = ({ children }) => {
     currentQuestions,
     allTags,
     tabTitles,
+
+      // API Functions
+      loadQuestions,
+      createQuestion,
+      updateQuestion,
+      deleteQuestion,
 
     // Helper Functions
     showToastMessage,

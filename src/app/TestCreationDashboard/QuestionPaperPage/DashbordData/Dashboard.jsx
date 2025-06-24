@@ -68,7 +68,7 @@ const Dashboard = () => {
   };
 
   // Save question
-  const handleSaveQuestion = () => {
+  const handleSaveQuestion = async () => {
     // Validate
     if (questionBank.activeTab === 'match') {
       if (!editingQuestion.items || editingQuestion.items.some(item => !item.left || !item.right)) {
@@ -84,7 +84,7 @@ const Dashboard = () => {
       questionBank.showToastMessage("Question text and answer are required", "error");
       return;
     }
-
+  
     // Process tags
     let tags = [];
     if (editingQuestion.tagsInput) {
@@ -92,45 +92,47 @@ const Dashboard = () => {
         .map(tag => tag.trim())
         .filter(tag => tag !== '');
     }
-
-    const updatedQuestions = { ...questionBank.questions };
-    
-    if (editingQuestion.id && questionBank.questions[questionBank.activeTab].find(q => q.id === editingQuestion.id)) {
-      // Update existing
-      updatedQuestions[questionBank.activeTab] = questionBank.questions[questionBank.activeTab].map(q => 
-        q.id === editingQuestion.id ? { ...editingQuestion, tags } : q
-      );
-      questionBank.showToastMessage("Question updated successfully");
-    } else {
-      // Add new
-      const newId = `${questionBank.activeTab}-${Date.now()}`;
-      const questionToAdd = {
+  
+    try {
+      const questionData = {
         ...editingQuestion,
-        id: newId,
         tags,
-        createdAt: new Date()
+        // Add required fields for backend
+        subjectId: '507f1f77bcf86cd799439011', // Replace with actual subject selection
+        chapterId: '507f1f77bcf86cd799439012', // Replace with actual chapter selection
+        chapterName: 'Sample Chapter' // Replace with actual chapter name
       };
+  
+      if (editingQuestion.id && editingQuestion.id.includes('temp-')) {
+        // Create new question
+        await questionBank.createQuestion(questionData);
+      } else if (editingQuestion.id) {
+        // Update existing question
+        await questionBank.updateQuestion(editingQuestion.id, questionData);
+      } else {
+        // Create new question
+        await questionBank.createQuestion(questionData);
+      }
       
-      updatedQuestions[questionBank.activeTab] = [questionToAdd, ...questionBank.questions[questionBank.activeTab]];
-      questionBank.showToastMessage("Question added successfully");
+      setIsCreating(false);
+      setEditingQuestion(null);
+    } catch (error) {
+      // Error is handled in the context
     }
-    
-    questionBank.setQuestions(updatedQuestions);
-    setIsCreating(false);
-    setEditingQuestion(null);
   };
+  
 
   // Delete question
-  const handleDeleteQuestion = (questionId) => {
+  const handleDeleteQuestion = async (questionId) => {
     if (window.confirm('Are you sure you want to delete this question?')) {
-      const updatedQuestions = { ...questionBank.questions };
-      updatedQuestions[questionBank.activeTab] = questionBank.questions[questionBank.activeTab]
-        .filter(q => q.id !== questionId);
-      
-      questionBank.setQuestions(updatedQuestions);
-      questionBank.showToastMessage("Question deleted successfully");
+      try {
+        await questionBank.deleteQuestion(questionId);
+      } catch (error) {
+        // Error is handled in the context
+      }
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-inter">

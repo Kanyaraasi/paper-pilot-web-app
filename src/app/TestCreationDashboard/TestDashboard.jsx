@@ -14,10 +14,40 @@ import {
   Award
 } from 'lucide-react';
 // import Footer from './Footer';
+import { useEffect } from 'react';
+import { academicYearService } from '@/apiServices/academicYearServices';
+import { standardService } from '@/apiServices/standardServices';
+import { subjectService } from '@/apiServices/subjectServices';
+import { batchService } from '@/apiServices/batchServices';
 
 const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
   const [subjectError, setSubjectError] = useState('');
+  const [instituteId, setInstituteId] = useState(null);
+  const [loading, setLoading] = useState({
+    academicYears: false,
+    batches: false,
+    standards: false,
+    subjects: false
+  });
   
+  const [apiData, setApiData] = useState({
+    academicYears: [],
+    batches: [],
+    standards: [],
+    subjects: []
+  });
+  
+  const [errorss, setErrors] = useState({
+    api: null
+  });
+  
+
+  useEffect(() => {
+    // Get institute ID from your auth context or user data
+    // For example: setInstituteId(user?.institute?._id || localStorage.getItem('instituteId'));
+    const userInstituteId = '68568963dbe533623cf89b30' || localStorage.getItem('instituteId'); // Replace with your auth logic
+    setInstituteId(userInstituteId);
+  }, []);
   // React Hook Form setup
   const {
     register,
@@ -43,6 +73,137 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
     },
     mode: 'onChange'
   });
+
+  // Add these useEffect hooks after your existing state declarations
+useEffect(() => {
+  if (instituteId) {
+    fetchInitialData();
+  }
+}, [instituteId]);
+
+const fetchInitialData = async () => {
+  if (!instituteId) {
+    console.warn('Institute ID not available');
+    return;
+  }
+
+  try {
+    setLoading(prev => ({ ...prev, academicYears: true, standards: true }));
+    
+    const [academicYearsResponse, standardsResponse] = await Promise.all([
+      academicYearService.getActiveAcademicYears({ institute: instituteId }),
+      standardService.getAllStandards() // Standards might not be institute-specific
+    ]);
+    console.log('acec', academicYearsResponse);
+    console.log('standas', standardsResponse);
+    setApiData(prev => ({
+      ...prev,
+      academicYears: academicYearsResponse.academicYears || [],
+      standards: standardsResponse || []
+    }));
+  } catch (error) {
+    console.error('Error fetching initial data:', error);
+    setErrors(prev => ({ ...prev, api: 'Failed to load initial data' }));
+  } finally {
+    setLoading(prev => ({ ...prev, academicYears: false, standards: false }));
+  }
+};
+
+const fetchBatchesByAcademicYear = async (academicYearId) => {
+  if (!academicYearId || !instituteId) {
+    setApiData(prev => ({ ...prev, batches: [] }));
+    return;
+  }
+
+  try {
+    setLoading(prev => ({ ...prev, batches: true }));
+    // Pass institute filter if your API supports it
+    const response = await batchService.getActiveBatchesByAcademicYear(academicYearId, { 
+      institute: instituteId 
+    });
+    console.log('batches', response.batches)
+    setApiData(prev => ({ ...prev, batches: response.batches || [] }));
+  } catch (error) {
+    console.error('Error fetching batches:', error);
+    setApiData(prev => ({ ...prev, batches: [] }));
+  } finally {
+    setLoading(prev => ({ ...prev, batches: false }));
+  }
+};
+
+// Fetch subjects when standard changes
+const fetchSubjectsByStandard = async (standardId) => {
+  console.log('statst', standardId)
+  if (!standardId) {
+    setApiData(prev => ({ ...prev, subjects: [] }));
+    setValue('subjects', []);
+    return;
+  }
+
+  try {
+    setLoading(prev => ({ ...prev, subjects: true }));
+    const response = await subjectService.getSubjectsByStandard(standardId);
+    
+    // Transform API response to match your current subject structure
+    const transformedSubjects = (response || []).map((subject, index) => ({
+      id: subject._id || subject.id || index + 1,
+      name: subject.name,
+      selected: false,
+      icon: getSubjectIcon(subject.name) // You'll need this helper function
+    }));
+
+    setApiData(prev => ({ ...prev, subjects: transformedSubjects }));
+    setValue('subjects', transformedSubjects);
+  } catch (error) {
+    console.error('Error fetching subjects:', error);
+    setApiData(prev => ({ ...prev, subjects: [] }));
+    setValue('subjects', []);
+  } finally {
+    setLoading(prev => ({ ...prev, subjects: false }));
+  }
+};
+
+// Helper function to get subject icons
+const getSubjectIcon = (subjectName) => {
+  const iconMap = {
+    'Physics': '⚛️',
+    'Chemistry': '🧪',
+    'Biology': '🧬',
+    'Mathematics': '📊',
+    'Mathematics and Statistics': '📊',
+    'English': '📚',
+    'History': '📜',
+    'Geography': '🌍',
+    'Economics': '💰',
+    'Political Science': '🏛️',
+    'Sociology': '👥',
+    'Psychology': '🧠',
+    'Computer Science': '💻',
+    'Information Technology': '🖥️'
+  };
+  
+  return iconMap[subjectName] || '📖';
+};
+
+// Watch for academic year changes
+const watchedAcademicYear = watch('academicYear');
+const watchedClass = watch('class');
+
+useEffect(() => {
+  if (watchedAcademicYear) {
+    fetchBatchesByAcademicYear(watchedAcademicYear);
+  }
+}, [watchedAcademicYear]);
+
+useEffect(() => {
+  if (watchedClass) {
+    // watchedClass now contains the standard ID
+    fetchSubjectsByStandard(watchedClass);
+  }
+}, [watchedClass]);
+
+
+
 
   const subjects = watch('subjects');
 
@@ -78,11 +239,31 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
     onNext(data);
   };
 
-  const classOptions = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
+  const classOptions = apiData.standards.map(standard => ({
+    value: standard._id || standard.id,
+    label: standard.name, // Using 'name' field from your model
+    code: standard.code,
+    level: standard.level,
+    board: standard.board,
+    stream: standard.stream,
+    medium: standard.medium
+  }));
+    
   const unitOptions = Array.from({ length: 8 }, (_, i) => `Unit ${i + 1}`);
   const academicYears = ['2023-24', '2024-25', '2025-26'];
+  const academicYearOptions = apiData.academicYears.map(year => ({
+    value: year._id || year.id,
+    label: year.year, // Using 'year' field from your model
+    startDate: year.startDate,
+    endDate: year.endDate
+  }));
+  
   const batches = ['Morning', 'Evening', 'Weekend'];
-
+  const batchOptions = apiData.batches.map(batch => ({
+    value: batch._id || batch.id,
+    label: batch.name
+  }));
+  
   const selectedSubjects = subjects.filter(subject => subject.selected);
 
   return (
@@ -211,25 +392,28 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Class *</label>
-                <select 
-                  {...register('class', { required: 'Class is required' })}
-                  className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
-                    errors.class ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                  }`}
-                >
-                  <option value="">Select Class</option>
-                  {classOptions.map((cls) => (
-                    <option key={cls} value={cls}>{cls}</option>
-                  ))}
-                </select>
-                {errors.class && (
-                  <p className="text-xs text-red-600 flex items-center">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    {errors.class.message}
-                  </p>
-                )}
-              </div>
+  <label className="block text-sm font-medium text-gray-700">Class *</label>
+  <select 
+    {...register('class', { required: 'Class is required' })}
+    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
+      errors.class ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+    }`}
+    disabled={loading.standards}
+  >
+    <option value="">
+      {loading.standards ? 'Loading classes...' : 'Select Class'}
+    </option>
+    {classOptions.map((cls) => (
+      <option key={cls.value} value={cls.value}>{cls.label}</option>
+    ))}
+  </select>
+  {errors.class && (
+    <p className="text-xs text-red-600 flex items-center">
+      <AlertCircle className="h-3 w-3 mr-1" />
+      {errors.class.message}
+    </p>
+  )}
+</div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Unit *</label>
@@ -253,36 +437,43 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Academic Year</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <select 
-                    {...register('academicYear')}
-                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm bg-white"
-                  >
-                    <option value="">Select Academic Year</option>
-                    {academicYears.map((year) => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+  <label className="block text-sm font-medium text-gray-700">Academic Year</label>
+  <div className="relative">
+    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+    <select 
+      {...register('academicYear')}
+      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm bg-white"
+      disabled={loading.academicYears}
+    >
+      <option value="">
+        {loading.academicYears ? 'Loading...' : 'Select Academic Year'}
+      </option>
+      {academicYearOptions.map((year) => (
+        <option key={year.value} value={year.value}>{year.label}</option>
+      ))}
+    </select>
+  </div>
+</div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Batch</label>
-                <div className="relative">
-                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <select 
-                    {...register('batch')}
-                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm bg-white"
-                  >
-                    <option value="">Select Batch</option>
-                    {batches.map((batch) => (
-                      <option key={batch} value={batch}>{batch}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+<div className="space-y-2">
+  <label className="block text-sm font-medium text-gray-700">Batch</label>
+  <div className="relative">
+    <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+    <select 
+      {...register('batch')}
+      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm bg-white"
+      disabled={loading.batches || !watchedAcademicYear}
+    >
+      <option value="">
+        {loading.batches ? 'Loading batches...' : 
+         !watchedAcademicYear ? 'Select Academic Year first' : 'Select Batch'}
+      </option>
+      {batchOptions.map((batch) => (
+        <option key={batch.value} value={batch.value}>{batch.label}</option>
+      ))}
+    </select>
+  </div>
+</div>
             </div>
           </div>
         </div>
@@ -346,77 +537,50 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
         </div>
 
         {/* Select Subjects */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <BookOpen className="h-5 w-5 mr-2 text-purple-600" />
-              Select Subjects *
-            </h3>
-            <p className="text-sm text-gray-600 mt-1">Choose subjects to include in your test</p>
+        <div className={`space-y-3 ${subjectError ? 'ring-2 ring-red-200 rounded-lg p-4' : ''}`}>
+  {loading.subjects ? (
+    <div className="flex items-center justify-center py-8">
+      <div className="text-gray-500">Loading subjects...</div>
+    </div>
+  ) : subjects.length === 0 ? (
+    <div className="flex items-center justify-center py-8">
+      <div className="text-gray-500">
+        {watchedClass ? 'No subjects found for selected class' : 'Please select a class to see subjects'}
+      </div>
+    </div>
+  ) : (
+    subjects.map((subject, index) => (
+      <div 
+        key={subject.id} 
+        className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all hover:bg-gray-50 ${
+          subject.selected 
+            ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200' 
+            : 'border-gray-200 bg-white'
+        }`}
+        onClick={() => handleSubjectToggle(index)}
+      >
+        <div className="flex items-center space-x-4 flex-1">
+          <input
+            type="checkbox"
+            checked={subject.selected}
+            onChange={() => handleSubjectToggle(index)}
+            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-lg">
+            {subject.icon}
           </div>
-          
-          <div className="p-6">
-            <div className={`space-y-3 ${subjectError ? 'ring-2 ring-red-200 rounded-lg p-4' : ''}`}>
-              {subjects.map((subject, index) => (
-                <div 
-                  key={subject.id} 
-                  className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all hover:bg-gray-50 ${
-                    subject.selected 
-                      ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200' 
-                      : 'border-gray-200 bg-white'
-                  }`}
-                  onClick={() => handleSubjectToggle(index)}
-                >
-                  <div className="flex items-center space-x-4 flex-1">
-                    <input
-                      type="checkbox"
-                      checked={subject.selected}
-                      onChange={() => handleSubjectToggle(index)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-lg">
-                      {subject.icon}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{subject.name}</p>
-                      <p className="text-sm text-gray-600">Complete syllabus coverage</p>
-                    </div>
-                    {subject.selected && (
-                      <CheckCircle className="h-5 w-5 text-blue-600" />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {subjectError && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center text-red-600">
-                  <AlertCircle className="h-4 w-4 mr-2" />
-                  <p className="text-sm font-medium">{subjectError}</p>
-                </div>
-              </div>
-            )}
-
-            {selectedSubjects.length > 0 && (
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm font-medium text-green-800 mb-2">
-                  Selected Subjects ({selectedSubjects.length})
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedSubjects.map((subject) => (
-                    <span 
-                      key={subject.id}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                    >
-                      {subject.icon} {subject.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="flex-1">
+            <p className="font-medium text-gray-900">{subject.name}</p>
+            <p className="text-sm text-gray-600">Complete syllabus coverage</p>
           </div>
+          {subject.selected && (
+            <CheckCircle className="h-5 w-5 text-blue-600" />
+          )}
         </div>
+      </div>
+    ))
+  )}
+</div>
 
         {/* Action Buttons */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

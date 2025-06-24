@@ -117,12 +117,12 @@ function Header() {
                     </span>
                     <div className="absolute inset-0 bg-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                   </button>
-                  <button
+                  {/* <button
                     onClick={toggleAuthModal}
                     className="relative px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                   >
                     Sign Up
-                  </button>
+                  </button> */}
                 </div>
               ) : (
                 <div className="relative flex items-center">
@@ -243,12 +243,12 @@ function Header() {
                     <User className="w-4 h-4 mr-2" />
                     Login
                   </button>
-                  <button
+                  {/* <button
                     onClick={toggleAuthModal}
                     className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
                   >
                     Sign Up
-                  </button>
+                  </button> */}
                 </div>
               ) : (
                 <div className="space-y-3">

@@ -177,7 +177,7 @@ function AuthForms() {
         >
           Login
         </button>
-        <button
+        {/* <button
           onClick={() => setIsRegisterForm(true)}
           className={`flex-1 py-2 rounded-3xl font-medium text-sm transition-all duration-300 ${
             isRegisterForm
@@ -186,7 +186,7 @@ function AuthForms() {
           }`}
         >
           Register
-        </button>
+        </button> */}
       </div>
 
       {/* Alert Messages */}
@@ -322,7 +322,7 @@ function AuthForms() {
 
        
 
-        <div className="mt-6 text-center text-sm">
+        {/* <div className="mt-6 text-center text-sm">
           <p className="text-gray-600">
             Don't have an account?
             <button
@@ -332,7 +332,7 @@ function AuthForms() {
               Register now
             </button>
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* Register Form - Improved alignment */}
@@ -364,7 +364,7 @@ function AuthForms() {
               <input
                 id="schoolName"
                 type="text"
-                placeholder="Enter your school name"
+                placeholder="Enter your school email"
                 value={registerData.schoolName}
                 onChange={handleRegisterInputChange}
                 required

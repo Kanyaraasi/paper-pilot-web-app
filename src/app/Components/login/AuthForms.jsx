@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import axios from "axios";
+import { BASE_URL } from "../../../../BASE_URL";
 // import { toast } from 'react-toastify';
 
 function AuthForms() {

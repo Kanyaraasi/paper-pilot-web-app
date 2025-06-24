@@ -47,17 +47,17 @@ function HomePage() {
   }, [showToast]);
 
   const handleGetStarted = () => {
-    const roleType = localStorage.getItem('roleType');
-    if(!roleType) {
+    const token = localStorage.getItem('token');
+    if(!token) {
       setToastMessage("Please login to get started!");
     setShowToast(true);
     return
     }
-    if (roleType === "admin") {
-        window.location.href = "/CreateUser";
-      } else if (roleType === "teacher") {
+    // if (roleType === "admin") {
+        // window.location.href = "/CreateUser";
+      // } else if (roleType === "teacher") {
         window.location.href = "/TestDashboard";
-      }
+      // }
     // Show toast message for all users who click the button
     // setToastMessage("Please login to get started!");
     // setShowToast(true);

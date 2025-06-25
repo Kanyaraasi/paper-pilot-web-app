@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { questionService } from '../../../../../apiServices/questionsServices';
+import { subjectService } from '@/apiServices/subjectServices';
 
 
 const QuestionBankContext = createContext();
@@ -14,6 +15,10 @@ export const QuestionBankProvider = ({ children }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState('684de08916f6269c3bb8ad78');
+  const [chapters, setChapters] = useState([]);
+  const [activeChapter, setActiveChapter] = useState('');
 
 
   // Filter States
@@ -23,6 +28,28 @@ export const QuestionBankProvider = ({ children }) => {
   const [dateRange, setDateRange] = useState('all');
   const [showOnlyStarred, setShowOnlyStarred] = useState(false);
   const [sortBy, setSortBy] = useState('newest');
+
+  const loadSubjectChapters = async (subjectId) => {
+    try {
+      setLoading(true);
+      const response = await subjectService.getSubjectById(subjectId);
+      
+      if (response && response.chapters) {
+        setChapters(response.chapters.filter(chapter => chapter.isActive));
+        // Set first active chapter as default
+        const firstActiveChapter = response.chapters.find(chapter => chapter.isActive);
+        if (firstActiveChapter) {
+          setActiveChapter(firstActiveChapter.name);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading subject chapters:', error);
+      showToastMessage('Error loading chapters', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -231,7 +258,8 @@ export const QuestionBankProvider = ({ children }) => {
   // Load questions when filters change
   useEffect(() => {
     loadQuestions();
-  }, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy]);
+    loadSubjectChapters(selectedSubjectId)
+  }, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy, selectedSubjectId]);
 
 
 
@@ -338,7 +366,16 @@ export const QuestionBankProvider = ({ children }) => {
     toast,
     setToast,
     loading,
-
+    subjects,
+    setSubjects,
+    selectedSubjectId,
+    setSelectedSubjectId,
+    chapters,
+    setChapters,
+    activeChapter,
+    setActiveChapter,
+    loadSubjectChapters,
+  
     // Filter States
     searchQuery,
     setSearchQuery,

@@ -81,7 +81,7 @@ const QuestionCard = ({ question, onEdit, onDelete }) => {
           </span>
         </div>
 
-        <div className="flex items-center space-x-1">
+        {/* <div className="flex items-center space-x-1">
           <button
             onClick={() => toggleStarred(question.id)}
             className={`p-1 rounded transition-colors ${
@@ -104,7 +104,7 @@ const QuestionCard = ({ question, onEdit, onDelete }) => {
           >
             <Trash2 className="w-4 h-4" />
           </button>
-        </div>
+        </div> */}
       </div>
 
       {renderQuestionContent()}

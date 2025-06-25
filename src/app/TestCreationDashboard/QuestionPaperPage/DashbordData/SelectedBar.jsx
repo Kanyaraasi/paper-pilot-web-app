@@ -11,10 +11,10 @@ const SelectedBar = ({ selectedCount, onClearSelection }) => {
       </div>
       
       <div className="flex items-center space-x-2">
-        <button className="flex items-center space-x-2 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+        {/* <button className="flex items-center space-x-2 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
           <Trash2 className="w-4 h-4" />
           <span>Delete Selected</span>
-        </button>
+        </button> */}
         
         <button
           onClick={onClearSelection}

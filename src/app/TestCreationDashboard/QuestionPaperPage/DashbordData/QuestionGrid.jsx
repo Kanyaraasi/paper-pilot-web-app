@@ -26,13 +26,13 @@ const QuestionGrid = ({ onEditQuestion, onDeleteQuestion, onAddNew }) => {
           <Plus className="w-16 h-16 mx-auto" />
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">No questions found</h3>
-        <p className="text-gray-500 mb-4">Get started by adding your first question</p>
+        {/* <p className="text-gray-500 mb-4">Get started by adding your first question</p>
         <button
           onClick={onAddNew}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
         >
           Add Question
-        </button>
+        </button> */}
       </div>
     );
   }

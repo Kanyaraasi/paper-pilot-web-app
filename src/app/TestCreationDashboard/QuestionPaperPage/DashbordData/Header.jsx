@@ -32,13 +32,13 @@ const Header = ({ toggleSidebar, showSidebar, onAddNew, selectedCount }) => {
           />
         </div>
         
-        <button
+        {/* <button
           onClick={onAddNew}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Add Question</span>
-        </button>
+        </button> */}
 
         <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
           <Bell className="w-5 h-5 text-gray-600" />

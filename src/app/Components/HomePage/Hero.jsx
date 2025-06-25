@@ -55,17 +55,7 @@ function Hero({ animated, onGetStarted }) {
 
   return (
     <div className="min-h-screen bg-[#FCFEFF] relative overflow-hidden">
-      {/* Background decorative elements */}
-      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-2000"></div>
-        
-        Floating geometric shapes
-        <div className="absolute top-1/4 right-1/4 w-4 h-4 bg-blue-400 rotate-45 animate-bounce opacity-60"></div>
-        <div className="absolute top-1/3 left-1/4 w-6 h-6 bg-purple-400 rounded-full animate-ping opacity-40"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-pink-400 rotate-45 animate-pulse opacity-50"></div>
-      </div> */}
+    
 
       <div className="relative pt-10 pb-16 px-4 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">

@@ -1,8 +1,5 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { questionService } from '../../../../../../apiServices/questionsServices';
-import { subjectService } from '@/apiServices/subjectServices';
-
 
 const QuestionBankContext = createContext();
 
@@ -15,11 +12,7 @@ export const QuestionBankProvider = ({ children }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubjectId, setSelectedSubjectId] = useState('684de08916f6269c3bb8ad78');
-  const [chapters, setChapters] = useState([]);
-  const [activeChapter, setActiveChapter] = useState('');
-
+  const [activeChapter, setActiveChapter] = useState('Introduction to Physics');
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,28 +21,6 @@ export const QuestionBankProvider = ({ children }) => {
   const [dateRange, setDateRange] = useState('all');
   const [showOnlyStarred, setShowOnlyStarred] = useState(false);
   const [sortBy, setSortBy] = useState('newest');
-
-  const loadSubjectChapters = async (subjectId) => {
-    try {
-      setLoading(true);
-      const response = await subjectService.getSubjectById(subjectId);
-      
-      if (response && response.chapters) {
-        setChapters(response.chapters.filter(chapter => chapter.isActive));
-        // Set first active chapter as default
-        const firstActiveChapter = response.chapters.find(chapter => chapter.isActive);
-        if (firstActiveChapter) {
-          setActiveChapter(firstActiveChapter.name);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading subject chapters:', error);
-      showToastMessage('Error loading chapters', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,37 +35,125 @@ export const QuestionBankProvider = ({ children }) => {
     mcq: [],
     truefalse: [],
     essay: [],
-    numerical: [],
-    diagram: [],
-    practical: []
+    numerical: []
   });
 
   // Tab Configuration
   const tabTitles = {
     fill: 'Fill in the Blanks',
     brief: 'Short Answer',
-    sentence: 'Short Answer',
+    sentence: 'One Sentence',
     match: 'Match the Following',
-    mcq: 'MCQ',
+    mcq: 'Multiple Choice',
     truefalse: 'True/False',
     essay: 'Long Answer',
-    numerical: 'Numerical',
+    numerical: 'Numerical'
   };
 
-  const getBackendType = (tab) => {
-    const typeMap = {
-      fill: 'Fill in the Blanks',
-      brief: 'Short Answer',
-      sentence: 'Short Answer',
-      match: 'Match the Following',
-      mcq: 'MCQ',
-      truefalse: 'True/False',
-      essay: 'Long Answer',
-      numerical: 'Numerical',
-    };
-    return typeMap[tab] || 'Short Answer';
-  };
+  // Mock chapters data
+  const chapters = [
+    { _id: '1', name: 'Introduction to Physics', isActive: true },
+    { _id: '2', name: 'Motion and Force', isActive: true },
+    { _id: '3', name: 'Energy and Work', isActive: true },
+    { _id: '4', name: 'Heat and Temperature', isActive: true },
+    { _id: '5', name: 'Light and Optics', isActive: true },
+    { _id: '6', name: 'Sound and Waves', isActive: true },
+    { _id: '7', name: 'Electricity', isActive: true },
+    { _id: '8', name: 'Magnetism', isActive: true },
+    { _id: '9', name: 'Modern Physics', isActive: true },
+    { _id: '10', name: 'Nuclear Physics', isActive: true }
+  ];
 
+  // Generate mock questions for each chapter and type
+  const generateMockQuestions = (type, chapterName) => {
+    const questions = [];
+    const questionsPerChapter = 20; // 20 questions per chapter per type
+    
+    for (let i = 1; i <= questionsPerChapter; i++) {
+      const tags = ['Physics', 'Science', 'Theory', 'Practice'].slice(0, Math.floor(Math.random() * 3) + 1);
+      const difficulties = ['Easy', 'Medium', 'Hard'];
+      const randomDifficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
+      
+      const baseQuestion = {
+        id: `${type}-${chapterName.replace(/\s+/g, '-').toLowerCase()}-${i}`,
+        difficulty: randomDifficulty,
+        tags,
+        chapterName,
+        createdAt: new Date(),
+        starred: Math.random() > 0.8
+      };
+
+      switch (type) {
+        case 'fill':
+          questions.push({
+            ...baseQuestion,
+            text: `Fill in the blank for ${chapterName} - Question ${i}: The fundamental concept of _____ is essential in this chapter.`,
+            answer: 'physics principles'
+          });
+          break;
+        case 'brief':
+          questions.push({
+            ...baseQuestion,
+            text: `Brief answer question for ${chapterName} - Question ${i}: Explain the key concept covered in this chapter.`,
+            answer: `This chapter covers the fundamental principles of ${chapterName.toLowerCase()} including theoretical concepts and practical applications.`
+          });
+          break;
+        case 'sentence':
+          questions.push({
+            ...baseQuestion,
+            text: `One sentence question for ${chapterName} - Question ${i}: Define the main topic of this chapter.`,
+            answer: `${chapterName} deals with the fundamental principles and applications in physics.`
+          });
+          break;
+        case 'match':
+          questions.push({
+            ...baseQuestion,
+            items: [
+              { id: `${i}-A`, left: `Concept A from ${chapterName}`, right: `Definition A` },
+              { id: `${i}-B`, left: `Concept B from ${chapterName}`, right: `Definition B` },
+              { id: `${i}-C`, left: `Concept C from ${chapterName}`, right: `Definition C` },
+              { id: `${i}-D`, left: `Concept D from ${chapterName}`, right: `Definition D` }
+            ]
+          });
+          break;
+        case 'mcq':
+          questions.push({
+            ...baseQuestion,
+            text: `MCQ for ${chapterName} - Question ${i}: What is the primary focus of this chapter?`,
+            options: [
+              `Primary concept of ${chapterName}`,
+              'Secondary concept',
+              'Tertiary concept',
+              'None of the above'
+            ],
+            answer: `Primary concept of ${chapterName}`
+          });
+          break;
+        case 'truefalse':
+          questions.push({
+            ...baseQuestion,
+            text: `True/False for ${chapterName} - Question ${i}: This chapter covers fundamental physics principles.`,
+            answer: 'True'
+          });
+          break;
+        case 'essay':
+          questions.push({
+            ...baseQuestion,
+            text: `Essay question for ${chapterName} - Question ${i}: Discuss the importance and applications of concepts covered in this chapter.`,
+            answer: `This chapter covers essential concepts in ${chapterName.toLowerCase()} that are fundamental to understanding physics. The key principles include theoretical foundations and practical applications that are crucial for students to master.`
+          });
+          break;
+        case 'numerical':
+          questions.push({
+            ...baseQuestion,
+            text: `Numerical problem for ${chapterName} - Question ${i}: Calculate the value based on the given parameters related to this chapter's concepts.`,
+            answer: '42 units'
+          });
+          break;
+      }
+    }
+    return questions;
+  };
 
   // Sample Questions Data
   const [questions, setQuestions] = useState({
@@ -105,165 +164,63 @@ export const QuestionBankProvider = ({ children }) => {
     mcq: [],
     truefalse: [],
     essay: [],
-    numerical: [],
-    diagram: [],
-    practical: []
+    numerical: []
   });
 
-  const loadQuestions = async (filters = {}) => {
-    try {
-      setLoading(true);
-      // const params = {
-      //   page: currentPage,
-      //   limit: questionsPerPage,
-      //   type: getBackendType(activeTab),
-      //   difficulty: selectedDifficulty !== 'All' ? selectedDifficulty : undefined,
-      //   search: searchQuery || undefined,
-      //   tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
-      //   sortBy: sortBy,
-      //   ...filters
-      // };
-
-      const response = await questionService.getAllQuestions();
-      
-      if (response) {
-        // Transform backend data to frontend format
-        const transformedQuestions = response.questions.map(q => ({
-          id: q._id,
-          text: q.content,
-          answer: q.correctAnswer,
-          difficulty: q.difficulty,
-          tags: q.tags || [],
-          starred: false, // Add starred logic if needed
-          createdAt: new Date(q.createdAt),
-          // Handle MCQ specific fields
-          ...(q.type === 'MCQ' && {
-            options: q.options?.map(opt => opt.text) || [],
-            answer: q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer
-          }),
-          // Handle Match the Following
-          ...(q.type === 'Match the Following' && {
-            items: q.matchItems || []
-          })
-        }));
-
-        setQuestions(prev => ({
-          ...prev,
-          [activeTab]: transformedQuestions
-        }));
-      }
-    } catch (error) {
-      console.error('Error loading questions:', error);
-      showToastMessage('Error loading questions', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createQuestion = async (questionData) => {
-    try {
-      setLoading(true);
-      
-      // Transform frontend data to backend format
-      const backendQuestion = {
-        content: questionData.text,
-        type: getBackendType(activeTab),
-        difficulty: questionData.difficulty,
-        marks: 1, // Default marks
-        subject: questionData.subjectId, // Add subject selection logic
-        chapter: questionData.chapterId, // Add chapter selection logic
-        chapterName: questionData.chapterName,
-        tags: questionData.tags || [],
-        correctAnswer: questionData.answer,
-        explanation: questionData.explanation || '',
-        // Handle MCQ options
-        ...(activeTab === 'mcq' && {
-          options: questionData.options?.map((opt, index) => ({
-            text: opt,
-            isCorrect: opt === questionData.answer
-          })) || []
-        })
-      };
-
-      const response = await questionService.createQuestion(backendQuestion);
-      
-      if (response.success) {
-        showToastMessage('Question created successfully');
-        loadQuestions(); // Reload questions
-        return response.data;
-      }
-    } catch (error) {
-      console.error('Error creating question:', error);
-      showToastMessage('Error creating question', 'error');
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Update question
-  const updateQuestion = async (questionId, questionData) => {
-    try {
-      setLoading(true);
-      
-      const backendQuestion = {
-        content: questionData.text,
-        type: getBackendType(activeTab),
-        difficulty: questionData.difficulty,
-        tags: questionData.tags || [],
-        correctAnswer: questionData.answer,
-        explanation: questionData.explanation || '',
-        ...(activeTab === 'mcq' && {
-          options: questionData.options?.map((opt) => ({
-            text: opt,
-            isCorrect: opt === questionData.answer
-          })) || []
-        })
-      };
-
-      const response = await questionService.updateQuestion(questionId, backendQuestion);
-      
-      if (response.success) {
-        showToastMessage('Question updated successfully');
-        loadQuestions(); // Reload questions
-        return response.data;
-      }
-    } catch (error) {
-      console.error('Error updating question:', error);
-      showToastMessage('Error updating question', 'error');
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Delete question
-  const deleteQuestion = async (questionId) => {
-    try {
-      setLoading(true);
-      const response = await questionService.deleteQuestion(questionId);
-      
-      if (response.success) {
-        showToastMessage('Question deleted successfully');
-        loadQuestions(); // Reload questions
-      }
-    } catch (error) {
-      console.error('Error deleting question:', error);
-      showToastMessage('Error deleting question', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load questions when filters change
+  // Initialize questions data
   useEffect(() => {
-    loadQuestions();
-    loadSubjectChapters(selectedSubjectId)
-  }, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy, selectedSubjectId]);
+    const initialQuestions = {};
+    Object.keys(tabTitles).forEach(type => {
+      initialQuestions[type] = [];
+      chapters.forEach(chapter => {
+        initialQuestions[type].push(...generateMockQuestions(type, chapter.name));
+      });
+    });
+    setQuestions(initialQuestions);
+  }, []);
 
+  // Filter questions based on current filters and active chapter
+  const filteredQuestions = React.useMemo(() => {
+    let filtered = questions[activeTab] || [];
 
+    // Filter by active chapter
+    if (activeChapter) {
+      filtered = filtered.filter(q => q.chapterName === activeChapter);
+    }
 
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(q => 
+        (q.text && q.text.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (q.answer && q.answer.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (q.tags && q.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
+      );
+    }
 
+    // Apply difficulty filter
+    if (selectedDifficulty !== 'All') {
+      filtered = filtered.filter(q => q.difficulty === selectedDifficulty);
+    }
+
+    // Apply other filters...
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter(q => 
+        q.tags && selectedTags.every(tag => q.tags.includes(tag))
+      );
+    }
+
+    if (showOnlyStarred) {
+      filtered = filtered.filter(q => q.starred);
+    }
+
+    return filtered;
+  }, [questions, activeTab, activeChapter, searchQuery, selectedDifficulty, selectedTags, showOnlyStarred]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
+  const indexOfLastQuestion = currentPage * questionsPerPage;
+  const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+  const currentQuestions = filteredQuestions.slice(indexOfFirstQuestion, indexOfLastQuestion);
 
   // Get all unique tags
   const allTags = React.useMemo(() => {
@@ -278,18 +235,6 @@ export const QuestionBankProvider = ({ children }) => {
     return Array.from(tagSet).sort();
   }, [questions]);
 
-
-  // Filter questions based on current filters
-  const filteredQuestions = React.useMemo(() => {
-    return questions[activeTab] || [];
-  }, [questions, activeTab]);
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
-  const indexOfLastQuestion = currentPage * questionsPerPage;
-  const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
-  const currentQuestions = filteredQuestions;
-
   // Helper functions
   const showToastMessage = (message, type = 'success') => {
     setToast({ message, type });
@@ -297,25 +242,40 @@ export const QuestionBankProvider = ({ children }) => {
   };
 
   const toggleQuestionSelection = (questionId) => {
-    setSelectedQuestions(prev => ({
-      ...prev,
-      [activeTab]: prev[activeTab].includes(questionId)
-        ? prev[activeTab].filter(id => id !== questionId)
-        : [...prev[activeTab], questionId]
-    }));
-  };
+    const question = questions[activeTab].find(q => q.id === questionId);
+    if (!question) return;
 
-  const selectAllVisible = (questionIds, shouldSelect) => {
-    setSelectedQuestions(prev => ({
-      ...prev,
-      [activeTab]: shouldSelect 
-        ? [...new Set([...prev[activeTab], ...questionIds])]
-        : prev[activeTab].filter(id => !questionIds.includes(id))
-    }));
+    const currentChapterSelections = selectedQuestions[activeTab].filter(qId => {
+      const q = questions[activeTab].find(qu => qu.id === qId);
+      return q?.chapterName === question.chapterName;
+    });
+
+    setSelectedQuestions(prev => {
+      const currentSelections = prev[activeTab];
+      
+      if (currentSelections.includes(questionId)) {
+        // Remove the question if already selected
+        return {
+          ...prev,
+          [activeTab]: currentSelections.filter(id => id !== questionId)
+        };
+      } else {
+        // Check if we've reached the 5-question limit for this chapter
+        if (currentChapterSelections.length >= 5) {
+          showToastMessage(`Maximum 5 questions can be selected from ${question.chapterName}`, "error");
+          return prev;
+        } else {
+          // Add the question
+          return {
+            ...prev,
+            [activeTab]: [...currentSelections, questionId]
+          };
+        }
+      }
+    });
   };
 
   const toggleStarred = (questionId) => {
-    // Implement starred functionality with API call if needed
     setQuestions(prev => ({
       ...prev,
       [activeTab]: prev[activeTab].map(q => 
@@ -323,7 +283,6 @@ export const QuestionBankProvider = ({ children }) => {
       )
     }));
   };
-
 
   const toggleTagSelection = (tag) => {
     setSelectedTags(prev => 
@@ -349,7 +308,7 @@ export const QuestionBankProvider = ({ children }) => {
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedDifficulty, selectedTags, showOnlyStarred, activeTab]);
+  }, [searchQuery, selectedDifficulty, selectedTags, showOnlyStarred, activeTab, activeChapter]);
 
   const contextValue = {
     // UI State
@@ -366,16 +325,10 @@ export const QuestionBankProvider = ({ children }) => {
     toast,
     setToast,
     loading,
-    subjects,
-    setSubjects,
-    selectedSubjectId,
-    setSelectedSubjectId,
-    chapters,
-    setChapters,
     activeChapter,
     setActiveChapter,
-    loadSubjectChapters,
-  
+    chapters,
+
     // Filter States
     searchQuery,
     setSearchQuery,
@@ -409,16 +362,9 @@ export const QuestionBankProvider = ({ children }) => {
     allTags,
     tabTitles,
 
-      // API Functions
-      loadQuestions,
-      createQuestion,
-      updateQuestion,
-      deleteQuestion,
-
     // Helper Functions
     showToastMessage,
     toggleQuestionSelection,
-    selectAllVisible,
     toggleStarred,
     toggleTagSelection,
     resetFilters,

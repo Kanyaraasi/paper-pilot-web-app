@@ -52,8 +52,6 @@ export const QuestionBankProvider = ({ children }) => {
     truefalse: 'True/False',
     essay: 'Long Answer',
     numerical: 'Numerical',
-    diagram: 'Long Answer',
-    practical: 'Long Answer'
   };
 
   const getBackendType = (tab) => {
@@ -66,8 +64,6 @@ export const QuestionBankProvider = ({ children }) => {
       truefalse: 'True/False',
       essay: 'Long Answer',
       numerical: 'Numerical',
-      diagram: 'Long Answer',
-      practical: 'Long Answer'
     };
     return typeMap[tab] || 'Short Answer';
   };

@@ -11,19 +11,26 @@ import QuestionForm from './QuestionForm';
 import Toast from './Toast';
 import SelectedBar from './SelectedBar';
 
-const Dashboard = () => {
+const Dashboard = ({ onNext, onPrevious, formData, selectedQuestions, currentStep }) => {
   const questionBank = useQuestionBank();
   const [isCreating, setIsCreating] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
-  // Handle edit question
-  const handleEditQuestion = (question) => {
-    setEditingQuestion({
-      ...question,
-      tagsInput: question.tags ? question.tags.join(', ') : ''
-    });
-    setIsCreating(true);
+  // Handle continue to next step
+  const handleContinue = () => {
+    const totalSelected = Object.values(questionBank.selectedQuestions).reduce(
+      (total, selections) => total + selections.length, 0
+    );
+    
+    if (totalSelected === 0) {
+      questionBank.showToastMessage("Please select at least one question to continue", "error");
+      return;
+    }
+    
+    if (onNext) {
+      onNext(questionBank.selectedQuestions);
+    }
   };
 
   // Get empty question template
@@ -33,7 +40,8 @@ const Dashboard = () => {
       tags: [],
       tagsInput: '',
       createdAt: new Date(),
-      starred: false
+      starred: false,
+      chapterName: questionBank.activeChapter
     };
     
     switch (questionBank.activeTab) {
@@ -84,7 +92,7 @@ const Dashboard = () => {
       questionBank.showToastMessage("Question text and answer are required", "error");
       return;
     }
-  
+
     // Process tags
     let tags = [];
     if (editingQuestion.tagsInput) {
@@ -92,25 +100,21 @@ const Dashboard = () => {
         .map(tag => tag.trim())
         .filter(tag => tag !== '');
     }
-  
+
     try {
       const questionData = {
         ...editingQuestion,
         tags,
-        // Add required fields for backend
-        subjectId: '507f1f77bcf86cd799439011', // Replace with actual subject selection
-        chapterId: '507f1f77bcf86cd799439012', // Replace with actual chapter selection
-        chapterName: 'Sample Chapter' // Replace with actual chapter name
+        subjectId: '507f1f77bcf86cd799439011',
+        chapterId: '507f1f77bcf86cd799439012',
+        chapterName: questionBank.activeChapter
       };
-  
+
       if (editingQuestion.id && editingQuestion.id.includes('temp-')) {
-        // Create new question
         await questionBank.createQuestion(questionData);
       } else if (editingQuestion.id) {
-        // Update existing question
         await questionBank.updateQuestion(editingQuestion.id, questionData);
       } else {
-        // Create new question
         await questionBank.createQuestion(questionData);
       }
       
@@ -120,7 +124,6 @@ const Dashboard = () => {
       // Error is handled in the context
     }
   };
-  
 
   // Delete question
   const handleDeleteQuestion = async (questionId) => {
@@ -132,10 +135,18 @@ const Dashboard = () => {
       }
     }
   };
-  
+
+  // Handle edit question
+  const handleEditQuestion = (question) => {
+    setEditingQuestion({
+      ...question,
+      tagsInput: question.tags ? question.tags.join(', ') : ''
+    });
+    setIsCreating(true);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-inter">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Toast notification */}
       {questionBank.toast && (
         <Toast 
@@ -162,7 +173,7 @@ const Dashboard = () => {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-white">
           {/* Tab Navigation */}
           <TabNavigation />
 
@@ -183,7 +194,7 @@ const Dashboard = () => {
             />
           )}
 
-          <div className="p-4">
+          <div className="p-6">
             {/* Questions Grid */}
             <QuestionGrid 
               onEditQuestion={handleEditQuestion}
@@ -195,6 +206,31 @@ const Dashboard = () => {
             {questionBank.filteredQuestions.length > questionBank.questionsPerPage && (
               <Pagination />
             )}
+          </div>
+
+          {/* Continue Button */}
+          <div className="border-t border-gray-200 px-6 py-4 bg-white">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={onPrevious}
+                className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Previous
+              </button>
+              
+              <div className="text-sm text-gray-600">
+                Total selected: {Object.values(questionBank.selectedQuestions).reduce(
+                  (total, selections) => total + selections.length, 0
+                )} questions
+              </div>
+              
+              <button
+                onClick={handleContinue}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Continue to Preview
+              </button>
+            </div>
           </div>
         </main>
       </div>

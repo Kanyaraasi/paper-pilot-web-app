@@ -7,7 +7,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+    <footer className="bg-[#010308] ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="md:flex md:items-center md:justify-between">
           <div className="flex justify-center md:justify-start space-x-6">
@@ -32,13 +32,13 @@ const Footer = () => {
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex justify-center md:justify-start space-x-6">
              
-              <Link href="/Privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+              <Link href="/Privacy" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200">
                 Privacy
               </Link>
-              <Link href="/TermsAndCondition" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+              <Link href="/TermsAndCondition" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200">
                 Terms
               </Link>
-              <Link href="/HowItWork" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+              <Link href="/HowItWork" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200">
                 How It Works
               </Link>
             </div>

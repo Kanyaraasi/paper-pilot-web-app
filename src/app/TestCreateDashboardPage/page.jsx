@@ -1,10 +1,10 @@
 'use client'
 import React, { useState } from 'react';
 import ProgressBar from '../Components/ProgressBar/ProgressBar';
-import TestDashboard from './TestDashboard';
-import MainDashboard from './QuestionPaperPage/MainDashboard';
-import FinalQuestionPaperPage from './FinalQuestionPaperPage';
-import Footer from '../Footer/page';
+import TestDashboard from './ProgressBarSteps/TestDetailsPage/TestDetailsPage';
+import MainDashboard from './ProgressBarSteps/QuestionBankDashboard/MainDashboard';
+import FinalQuestionPaperPage from './ProgressBarSteps/QuestionPaper/QuestionPaperPage';
+import Footer from '../FooterPage/page';
 
 const TestCreationDashboard = () => {
   const [currentStep, setCurrentStep] = useState(1);

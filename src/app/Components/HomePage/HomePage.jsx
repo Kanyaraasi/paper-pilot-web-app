@@ -4,7 +4,7 @@ import Header from './Header';
 import Hero from './Hero';
 import Features from './Features';
 import CallToAction from './CallToAction';
-import Footer from '@/app/Footer/page';
+import Footer from '@/app/FooterPage/page';
 import ContactModal from './ContactModal';
 import Toast from './Toast';
 import { usePathname } from 'next/navigation';

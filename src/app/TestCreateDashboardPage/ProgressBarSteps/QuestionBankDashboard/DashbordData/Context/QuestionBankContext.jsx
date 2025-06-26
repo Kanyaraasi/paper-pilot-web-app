@@ -6,7 +6,14 @@ import { subjectService } from '@/apiServices/subjectServices';
 
 const QuestionBankContext = createContext();
 
-export const QuestionBankProvider = ({ children }) => {
+export const QuestionBankProvider = ({
+  children,
+  formData,
+  onNext,
+  onPrevious,
+  currentStep,
+}) => {
+
   // UI State
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState('fill');
@@ -16,7 +23,7 @@ export const QuestionBankProvider = ({ children }) => {
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
   const [subjects, setSubjects] = useState([]);
-  const [selectedSubjectId, setSelectedSubjectId] = useState('684de08916f6269c3bb8ad78');
+  const [selectedSubjectId, setSelectedSubjectId] = useState(formData?.subjects?.find((s) => s.selected)?.id);
   const [chapters, setChapters] = useState([]);
   const [activeChapter, setActiveChapter] = useState('');
 
@@ -124,7 +131,7 @@ export const QuestionBankProvider = ({ children }) => {
       //   ...filters
       // };
 
-      const response = await questionService.getAllQuestions();
+      const response = await questionService.getQuestionsBySubject(selectedSubjectId)
       
       if (response) {
         // Transform backend data to frontend format

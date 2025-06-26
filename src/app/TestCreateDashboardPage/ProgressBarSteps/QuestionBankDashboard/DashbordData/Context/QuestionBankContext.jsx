@@ -46,7 +46,7 @@ export const QuestionBankProvider = ({
         // Set first active chapter as default
         const firstActiveChapter = response.chapters.find(chapter => chapter.isActive);
         if (firstActiveChapter) {
-          setActiveChapter(firstActiveChapter.name);
+          setActiveChapter(firstActiveChapter._id);
         }
       }
     } catch (error) {
@@ -117,55 +117,73 @@ export const QuestionBankProvider = ({
     practical: []
   });
 
-  const loadQuestions = async (filters = {}) => {
-    try {
-      setLoading(true);
-      // const params = {
-      //   page: currentPage,
-      //   limit: questionsPerPage,
-      //   type: getBackendType(activeTab),
-      //   difficulty: selectedDifficulty !== 'All' ? selectedDifficulty : undefined,
-      //   search: searchQuery || undefined,
-      //   tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
-      //   sortBy: sortBy,
-      //   ...filters
-      // };
+  // Add this import at the top with other imports
 
-      const response = await questionService.getQuestionsBySubject(selectedSubjectId)
+// Modify the loadQuestions function to use the new API when activeChapter is set
+const loadQuestions = async (filters = {}) => {
+  try {
+    setLoading(true);
+    
+    let response;
+    
+    // Use chapter-specific API if activeChapter is selected
+    if (activeChapter && selectedSubjectId) {
+      const params = {
+        page: currentPage,
+        limit: questionsPerPage,
+        type: getBackendType(activeTab),
+        difficulty: selectedDifficulty !== 'All' ? selectedDifficulty : undefined,
+        search: searchQuery || undefined,
+        tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
+        sortBy: sortBy,
+        ...filters
+      };
       
-      if (response) {
-        // Transform backend data to frontend format
-        const transformedQuestions = response.questions.map(q => ({
-          id: q._id,
-          text: q.content,
-          answer: q.correctAnswer,
-          difficulty: q.difficulty,
-          tags: q.tags || [],
-          starred: false, // Add starred logic if needed
-          createdAt: new Date(q.createdAt),
-          // Handle MCQ specific fields
-          ...(q.type === 'MCQ' && {
-            options: q.options?.map(opt => opt.text) || [],
-            answer: q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer
-          }),
-          // Handle Match the Following
-          ...(q.type === 'Match the Following' && {
-            items: q.matchItems || []
-          })
-        }));
-
-        setQuestions(prev => ({
-          ...prev,
-          [activeTab]: transformedQuestions
-        }));
-      }
-    } catch (error) {
-      console.error('Error loading questions:', error);
-      showToastMessage('Error loading questions', 'error');
-    } finally {
-      setLoading(false);
+      response = await questionService.getQuestionsBySubjectAndChapter(
+        selectedSubjectId, 
+        activeChapter, 
+        params
+      );
+    } else if (selectedSubjectId) {
+      // Fall back to subject-only API
+      response = await questionService.getQuestionsBySubject(selectedSubjectId);
     }
-  };
+    
+    if (response) {
+      console.log('repopsdopdfosf', response)
+      // Transform backend data to frontend format
+      const transformedQuestions = response.map(q => ({
+        id: q._id,
+        text: q.content,
+        answer: q.correctAnswer,
+        difficulty: q.difficulty,
+        tags: q.tags || [],
+        starred: false,
+        createdAt: new Date(q.createdAt),
+        // Handle MCQ specific fields
+        ...(q.type === 'MCQ' && {
+          options: q.options?.map(opt => opt.text) || [],
+          answer: q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer
+        }),
+        // Handle Match the Following
+        ...(q.type === 'Match the Following' && {
+          items: q.matchItems || []
+        })
+      }));
+
+      setQuestions(prev => ({
+        ...prev,
+        [activeTab]: transformedQuestions
+      }));
+    }
+  } catch (error) {
+    console.error('Error loading questions:', error);
+    showToastMessage('Error loading questions', 'error');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const createQuestion = async (questionData) => {
     try {
@@ -265,8 +283,9 @@ export const QuestionBankProvider = ({
   // Load questions when filters change
   useEffect(() => {
     loadQuestions();
-    loadSubjectChapters(selectedSubjectId)
-  }, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy, selectedSubjectId]);
+    loadSubjectChapters(selectedSubjectId);
+  }, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy, selectedSubjectId, activeChapter]);
+  
 
 
 

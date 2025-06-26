@@ -48,12 +48,21 @@ function Header() {
     window.location.reload();
   };
 
-  const navigateToDashboard = () => {
-    if (userRole === "admin") {
-      window.location.href = "/CreateUser";
-    } else if (userRole === "teacher") {
-      window.location.href = "/GradeSelector";
-    }
+  // Function to close mobile menu when clicking links
+  const closeMobileMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  // Function to handle mobile auth modal
+  const handleMobileAuthModal = () => {
+    toggleAuthModal();
+    closeMobileMenu(); // Close mobile menu when opening auth modal
+  };
+
+  // Function to handle mobile logout
+  const handleMobileLogout = () => {
+    handleLogout();
+    closeMobileMenu(); // Close mobile menu after logout
   };
 
   return (
@@ -88,7 +97,7 @@ function Header() {
                 <div className="absolute inset-0 bg-blue-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 origin-center"></div>
               </a>
               <a
-                href="/HowItWork"
+                href="/HowItWorkPage"
                 className="relative px-4 py-2 text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 group"
               >
                 <span className="relative z-10">How It Works</span>
@@ -117,12 +126,6 @@ function Header() {
                     </span>
                     <div className="absolute inset-0 bg-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                   </button>
-                  {/* <button
-                    onClick={toggleAuthModal}
-                    className="relative px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                  >
-                    Sign Up
-                  </button> */}
                 </div>
               ) : (
                 <div className="relative flex items-center">
@@ -166,7 +169,6 @@ function Header() {
                               <p className="font-semibold text-gray-800 capitalize">
                                 {userRole}
                               </p>
-                              
                             </div>
                           </div>
                         </div>
@@ -215,18 +217,21 @@ function Header() {
           <div className="px-4 pt-4 pb-6 space-y-3">
             <a
               href="#"
+              onClick={closeMobileMenu}
               className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all duration-200"
             >
               Home
             </a>
             <a
-              href="/HowItWork"
+              href="/HowItWorkPage"
+              onClick={closeMobileMenu}
               className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all duration-200"
             >
               How It Works
             </a>
             <a
               href="#features"
+              onClick={closeMobileMenu}
               className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all duration-200"
             >
               Features
@@ -237,33 +242,21 @@ function Header() {
               {!isLoggedIn ? (
                 <div className="space-y-3">
                   <button
-                    onClick={toggleAuthModal}
+                    onClick={handleMobileAuthModal}
                     className="w-full px-4 py-3 text-blue-600 font-semibold border-2 border-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center"
                   >
                     <User className="w-4 h-4 mr-2" />
                     Login
                   </button>
-                  {/* <button
-                    onClick={toggleAuthModal}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  >
-                    Sign Up
-                  </button> */}
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div className="px-4 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg text-center font-medium">
                     Welcome, {userRole}!
                   </div>
+                  
                   <button
-                    onClick={navigateToDashboard}
-                    className="w-full px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-200 flex items-center justify-center"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </button>
-                  <button
-                    onClick={handleLogout}
+                    onClick={handleMobileLogout}
                     className="w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 flex items-center justify-center"
                   >
                     <LogOut className="w-4 h-4 mr-2" />

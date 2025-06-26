@@ -1,9 +1,9 @@
 'use client'
 import React, { useState } from 'react';
 import ProgressBar from '../Components/ProgressBar/ProgressBar';
-import TestDashboard from './ProgressBarSteps/TestDetailsPage/TestDetailsPage';
+import TestDetailsPage from './ProgressBarSteps/TestDetailsPage/TestDetailsPage';
 import MainDashboard from './ProgressBarSteps/QuestionBankDashboard/MainDashboard';
-import FinalQuestionPaperPage from './ProgressBarSteps/QuestionPaper/QuestionPaperPage';
+import QuestionPaperPage from './ProgressBarSteps/QuestionPaper/QuestionPaperPage';
 import Footer from '../FooterPage/page';
 
 const TestCreationDashboard = () => {
@@ -39,7 +39,7 @@ const TestCreationDashboard = () => {
     switch (currentStep) {
       case 1:
         return (
-          <TestDashboard
+          <TestDetailsPage
             onNext={handleNextStep}
             onPrevious={handlePreviousStep}
             formData={formData}
@@ -58,7 +58,7 @@ const TestCreationDashboard = () => {
         );
       case 3:
         return (
-          <FinalQuestionPaperPage
+          <QuestionPaperPage
             onPrevious={handlePreviousStep}
             formData={formData}
             selectedQuestions={selectedQuestions}

@@ -48,7 +48,7 @@ function Features({ animated }) {
   ];
 
   return (
-    <div id="features" className="bg-white py-20">
+    <div id="features" className="bg-white md:py-20 pb-7 md:pb-7">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className={`text-3xl sm:text-4xl font-bold text-gray-900 mb-4 ${animated ? 'animate-fadeIn' : 'opacity-0'}`}>

@@ -56,7 +56,7 @@ function HomePage() {
     // if (roleType === "admin") {
         // window.location.href = "/CreateUser";
       // } else if (roleType === "teacher") {
-        window.location.href = "/TestDashboard";
+        window.location.href = "/TestHistorySavedDashboard";
       // }
     // Show toast message for all users who click the button
     // setToastMessage("Please login to get started!");

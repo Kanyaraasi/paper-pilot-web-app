@@ -64,7 +64,7 @@ const Toast = ({ message, type = "error", onClose }) => {
   );
 };
 
-const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
+const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
   const [subjectError, setSubjectError] = useState("");
   const [instituteId, setInstituteId] = useState(null);
   const [toast, setToast] = useState(null);
@@ -699,4 +699,4 @@ const TestDashboard = ({ onNext, onPrevious, formData, currentStep }) => {
   );
 };
 
-export default TestDashboard;
+export default TestDetailsPage;

@@ -137,7 +137,7 @@ function Hero({ animated, onGetStarted }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
-              <Link href="/HowItWork" className="flex items-center justify-center">
+              <Link href="/HowItWorkPage" className="flex items-center justify-center">
               <button className="px-8 py-4 border-2 border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 duration-300 flex items-center justify-center">
                 Watch Demo                <svg className="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15" />

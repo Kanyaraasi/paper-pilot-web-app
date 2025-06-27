@@ -75,6 +75,7 @@ function AuthForms() {
           // window.location.href = "/CreateUser";
         // } else if (slotType === "teacher") {
           window.location.href = "/TestHistorySavedDashboard";
+//           window.location.href = "/TestCreateDashboardPage";
         // } else {
           // setError("Unknown user type.");
         // }

@@ -6,7 +6,7 @@ import MainDashboard from './ProgressBarSteps/QuestionBankDashboard/MainDashboar
 import FinalQuestionPaperPage from './ProgressBarSteps/QuestionPaper/QuestionPaperPage';
 import Footer from '../FooterPage/page';
 
-const TestCreationDashboard = () => {
+const TestCreateDashboardPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({});
   const [selectedQuestions, setSelectedQuestions] = useState([]);
@@ -79,4 +79,4 @@ const TestCreationDashboard = () => {
   );
 };
 
-export default TestCreationDashboard;
+export default TestCreateDashboardPage;

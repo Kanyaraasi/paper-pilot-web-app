@@ -4,8 +4,7 @@ import {
   EyeOff,
   User,
   Lock,
-  UserPlus,
-  Mail,
+ 
   User as UserIcon,
 } from "lucide-react";
 
@@ -34,7 +33,7 @@ function AuthForms() {
   const [hideConfirmPass, setHideConfirmPass] = useState(true);
   const [isRegisterForm, setIsRegisterForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordhide, setpasswordhide] = useState(true);
+ 
   // Success message auto-hide effect
   useEffect(() => {
     if (success) {
@@ -75,7 +74,8 @@ function AuthForms() {
         // if (slotType === "admin") {
           // window.location.href = "/CreateUser";
         // } else if (slotType === "teacher") {
-          window.location.href = "/TestCreateDashboardPage";
+          window.location.href = "/TestHistorySavedDashboard";
+//           window.location.href = "/TestCreateDashboardPage";
         // } else {
           // setError("Unknown user type.");
         // }
@@ -135,16 +135,7 @@ function AuthForms() {
         >
           Login
         </button>
-        {/* <button
-          onClick={() => setIsRegisterForm(true)}
-          className={`flex-1 py-2 rounded-3xl font-medium text-sm transition-all duration-300 ${
-            isRegisterForm
-              ? "bg-blue-600 text-white shadow-md"
-              : "text-gray-700 hover:bg-gray-200"
-          }`}
-        >
-          Register
-        </button> */}
+        
       </div>
 
       {/* Alert Messages */}

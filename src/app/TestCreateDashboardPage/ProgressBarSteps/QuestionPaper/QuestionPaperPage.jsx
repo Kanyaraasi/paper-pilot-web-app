@@ -9,7 +9,7 @@ const FinalQuestionPaperPage = () => {
   const [savedPapers, setSavedPapers] = useState([]);
   const [recentDownloads, setRecentDownloads] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isEditing, setIsEditing] = useState(false);
+
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {

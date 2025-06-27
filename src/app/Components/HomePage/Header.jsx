@@ -50,9 +50,9 @@ function Header() {
 
   const navigateToDashboard = () => {
     if (userRole === "admin") {
-      window.location.href = "/CreateUser";
+      window.location.href = "/TestHistorySavedDashboard";
     } else if (userRole === "teacher") {
-      window.location.href = "/GradeSelector";
+      window.location.href = "/TestHistorySavedDashboard";
     }
   };
 
@@ -88,7 +88,7 @@ function Header() {
                 <div className="absolute inset-0 bg-blue-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 origin-center"></div>
               </a>
               <a
-                href="/HowItWork"
+                href="/HowItWorkPage"
                 className="relative px-4 py-2 text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 group"
               >
                 <span className="relative z-10">How It Works</span>
@@ -220,7 +220,7 @@ function Header() {
               Home
             </a>
             <a
-              href="/HowItWork"
+              href="/HowItWorkPage"
               className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all duration-200"
             >
               How It Works
@@ -243,12 +243,7 @@ function Header() {
                     <User className="w-4 h-4 mr-2" />
                     Login
                   </button>
-                  {/* <button
-                    onClick={toggleAuthModal}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
-                  >
-                    Sign Up
-                  </button> */}
+                
                 </div>
               ) : (
                 <div className="space-y-3">

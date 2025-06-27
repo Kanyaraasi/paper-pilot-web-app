@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import HomePageImage from '../../../../public/HomepageImage.png'
 
-function Hero({ animated, onGetStarted }) {
+function Hero({ animated = true, onGetStarted }) {
   const [typedText, setTypedText] = useState("");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -55,19 +54,7 @@ function Hero({ animated, onGetStarted }) {
 
   return (
     <div className="min-h-screen bg-[#FCFEFF] relative overflow-hidden">
-      {/* Background decorative elements */}
-      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-2000"></div>
-        
-        Floating geometric shapes
-        <div className="absolute top-1/4 right-1/4 w-4 h-4 bg-blue-400 rotate-45 animate-bounce opacity-60"></div>
-        <div className="absolute top-1/3 left-1/4 w-6 h-6 bg-purple-400 rounded-full animate-ping opacity-40"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-pink-400 rotate-45 animate-pulse opacity-50"></div>
-      </div> */}
-
-      <div className="relative pt-10 pb-16 px-4 max-w-7xl mx-auto">
+      <div className="relative pt-20 pb-5 px-4 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           {/* Left Container - Enhanced Text Content */}
           <div className={`w-full lg:w-7/12 text-gray-800 space-y-8 ${
@@ -101,7 +88,7 @@ function Hero({ animated, onGetStarted }) {
             </p>
             
             {/* Feature highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center space-x-3 bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all">
                 <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,44 +109,45 @@ function Hero({ animated, onGetStarted }) {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Curriculum Aligned</h3>
-                  <p className="text-sm text-gray-600"> State boards supported</p>
+                  <p className="text-sm text-gray-600">State boards supported</p>
                 </div>
               </div>
             </div>
             
             <div className="pt-2 flex flex-col sm:flex-row gap-4">
-              <button 
-                onClick={onGetStarted}
-                className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 duration-300 flex items-center justify-center"
-              >
-                <span>Start Creating Papers</span>
-                <svg className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
-              <Link href="/HowItWorkPage" className="flex items-center justify-center">
-              <button className="px-8 py-4 border-2 border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 duration-300 flex items-center justify-center">
-                Watch Demo                <svg className="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15" />
-                </svg>
-              </button>
+              <a href='/TestHistorySavedDashboard'>
+                <button className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 duration-300 flex items-center justify-center">
+                  <span>Start Creating Papers</span>
+                  <svg className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+                
+              </a>
+              
+              <Link href="/HowItWorkPage">
+                <button className="px-8 py-4 border-2 border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 duration-300 flex items-center justify-center">
+                  Watch Demo
+                  <svg className="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15" />
+                  </svg>
+                </button>
               </Link>
             </div>
-            
           </div>
           
           {/* Right Container - Smooth Animated Image */}
-          <div className={`w-full lg:w-6/12 lg:mt-0 h-[100vh] ${
+          <div className={`w-full lg:w-6/12 lg:mt-0 ${
             animated ? 'animate-slideInRight' : 'opacity-0'
           }`}>
-            <div className="relative rounded-lg animate-floatSmooth w-[100%] mt-20">
+            <div className="relative rounded-lg animate-floatSmooth w-full">
               <Image
-                src={HomePageImage}
+                src="/HomepageImage.png"
                 alt="Paper Pilot Study Fest"
-                className="w-full h-full object-cover"
-                layout="responsive" 
+                className="w-full h-full object-cover rounded-lg"
                 width={500}
                 height={400}
+                priority
               />
             </div>
           </div>
@@ -209,6 +197,10 @@ function Hero({ animated, onGetStarted }) {
           animation-delay: 0.5s;
         }
         
+        .animate-slideInRight {
+          animation: slideInRight 1s ease-out forwards;
+          animation-delay: 0.6s;
+        }
         
         .animate-fadeIn {
           animation: fadeIn 1s ease-out forwards;

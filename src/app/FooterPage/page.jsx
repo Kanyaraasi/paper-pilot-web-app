@@ -32,13 +32,13 @@ const Footer = () => {
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex justify-center md:justify-start ">
              
-              <Link href="/Privacy" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200 border-r-2 px-2 border-gray-900">
+              <Link href="/PrivacyPage" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200 border-r-2 px-2 border-gray-900">
                 Privacy
               </Link>
-              <Link href="/TermsAndCondition" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200 border-r-2 px-2 border-gray-900">
+              <Link href="/TermsAndConditionPage" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200 border-r-2 px-2 border-gray-900">
                 Terms
               </Link>
-              <Link href="/HowItWork" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200 border-r-2 px-2 ">
+              <Link href="/HowItWorkPage" className="text-sm text-gray-500 dark:text-gray-900 hover:text-white dark:hover:text-gray-200 px-2 ">
                 How It Works
               </Link>
             </div>

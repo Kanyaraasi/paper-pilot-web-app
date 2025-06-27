@@ -8,7 +8,6 @@ import {
   AlertCircle,
   CheckCircle,
   Info,
- 
   X,
 } from "lucide-react";
 // import Footer from './Footer';
@@ -39,7 +38,7 @@ const Toast = ({ message, type = "error", onClose }) => {
       <div
         className={`flex-shrink-0 ${
           type === "error" ? "text-red-400" : "text-green-400"
-        }`}
+        }`} 
       >
         <AlertCircle className="h-5 w-5" />
       </div>
@@ -370,7 +369,7 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
   const labelStyles = "block text-sm text-gray-500 font-semibold text-[15px] ";
 
   return (
-    <div className="min-h-screen bg-gray-50 font-inter">
+    <div className="min-h-screen bg-gray-50 ">
       {/* Toast */}
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={hideToast} />
@@ -693,8 +692,6 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
           </div>
         </div>
       </div>
-
-      {/* <Footer /> */}
     </div>
   );
 };

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Printer, Download, ArrowLeft, CheckCircle, AlertCircle, Save, Settings, Eye, EyeOff, Loader } from 'lucide-react';
 
-const QuestionPaper = () => {
+const FinalQuestionPaperPage = () => {
   // State management
   const [examDetails, setExamDetails] = useState({});
   const [questionPaper, setQuestionPaper] = useState(null);
@@ -517,4 +517,4 @@ const QuestionPaper = () => {
   );
 };
 
-export default QuestionPaper;
+export default FinalQuestionPaperPage;

@@ -625,7 +625,7 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
                   {subjects.map((subject, index) => (
                     <div
                       key={subject.id}
-                      className={`flex  items-center p-4  w-[45%] border rounded-lg cursor-pointer transition-all hover:bg-gray-50 ${
+                      className={`flex  items-center p-4  w-[30%] border rounded-lg cursor-pointer transition-all hover:bg-gray-50 ${
                         subject.selected
                           ? "border-blue-300 bg-blue-50 ring-2 ring-blue-200"
                           : "border-gray-200 bg-white hover:border-gray-300"

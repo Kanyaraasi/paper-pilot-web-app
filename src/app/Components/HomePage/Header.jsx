@@ -117,12 +117,7 @@ function Header() {
                     </span>
                     <div className="absolute inset-0 bg-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                   </button>
-                  {/* <button
-                    onClick={toggleAuthModal}
-                    className="relative px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                  >
-                    Sign Up
-                  </button> */}
+                 
                 </div>
               ) : (
                 <div className="relative flex items-center">
@@ -156,20 +151,7 @@ function Header() {
                   {showUserMenu && (
                     <div className="absolute top-full right-0 mt-2 w-56 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
                       <div className="p-2">
-                        {/* Profile Section */}
-                        <div className="px-4 py-3 border-b border-gray-100">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center">
-                              <User className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-800 capitalize">
-                                {userRole}
-                              </p>
-                              
-                            </div>
-                          </div>
-                        </div>
+                      
                         <div className="border-t border-gray-100 pt-2">
                           <button
                             onClick={handleLogout}

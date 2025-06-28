@@ -3,18 +3,11 @@ import React, { useState, useRef, useEffect } from "react";
 
 import {
   FileText,
-  Bell,
   Search,
   Plus,
   Clock,
   AlertCircle,
-  Play,
-  Edit,
-  Trash2,
-  Eye,
-  RefreshCw,
   BookOpen,
-  Archive,
   Award,
   SortAsc,
   SortDesc,
@@ -23,9 +16,13 @@ import {
   History,
   Bookmark,
   ArrowLeft,
+  BookA,
+  BookAIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { testService } from "@/apiServices/testServices";
+import Loading from "../Components/Loader/Loading"; // Import your Loader component
+import Footer from "../FooterPage/page";
 
 const TestHistorySavedDashboard = () => {
   const [filters, setFilters] = useState({
@@ -298,16 +295,11 @@ const TestHistorySavedDashboard = () => {
 
   const filteredTests = getFilteredAndSortedTests();
 
+  // Use your Loader component when loading
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-sans flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin text-sky-600 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Loading tests...</p>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-sans">
       {/* Header */}
@@ -348,7 +340,8 @@ const TestHistorySavedDashboard = () => {
 
             <div className="flex items-center space-x-4">
               <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" /> */}
+                {/* <BookAIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"/> */}
                 <input
                   type="text"
                   placeholder="Search tests..."
@@ -382,7 +375,7 @@ const TestHistorySavedDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4 mb-32">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="bg-white/70 backdrop-blur-sm  shadow-sm border border-gray-200 p-4">
@@ -542,7 +535,6 @@ const TestHistorySavedDashboard = () => {
                           ))}
                       </div>
                     </th>
-                  
                   </tr>
                 </thead>
                 <tbody className="bg-white/30 divide-y divide-gray-200">
@@ -679,7 +671,6 @@ const TestHistorySavedDashboard = () => {
                         </div>
                       </div>
 
-                      
                       {/* </div> */}
                     </div>
                   </div>
@@ -726,6 +717,7 @@ const TestHistorySavedDashboard = () => {
           </div>
         )}
       </main>
+      <Footer/>
     </div>
   );
 };

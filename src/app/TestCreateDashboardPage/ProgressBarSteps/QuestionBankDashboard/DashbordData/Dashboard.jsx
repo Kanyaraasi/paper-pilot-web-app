@@ -192,9 +192,12 @@ const Dashboard = () => {
             />
             
             {/* Pagination */}
-            {questionBank.filteredQuestions.length > questionBank.questionsPerPage && (
-              <Pagination />
-            )}
+            {questionBank.totalPage > 1 && (
+  <Pagination />
+)}
+            {/* {questionBank.filteredQuestions.length > questionBank.questionsPerPage && ( */}
+              {/* <Pagination /> */}
+            {/* )} */}
           </div>
         </main>
       </div>

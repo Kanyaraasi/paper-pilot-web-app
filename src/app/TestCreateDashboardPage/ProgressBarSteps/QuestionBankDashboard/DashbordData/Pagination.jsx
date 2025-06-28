@@ -3,14 +3,14 @@ import { useQuestionBank } from './Context/QuestionBankContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Pagination = () => {
-  const { currentPage, totalPages, paginate } = useQuestionBank();
+  const { currentPage, totalPage, paginate } = useQuestionBank();
 
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
     
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
+    if (totalPage <= maxVisiblePages) {
+      for (let i = 1; i <= totalPage; i++) {
         pages.push(i);
       }
     } else {
@@ -19,11 +19,11 @@ const Pagination = () => {
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
+        pages.push(totalPage);
+      } else if (currentPage >= totalPage - 2) {
         pages.push(1);
         pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) {
+        for (let i = totalPage - 3; i <= totalPage; i++) {
           pages.push(i);
         }
       } else {
@@ -33,14 +33,14 @@ const Pagination = () => {
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
+        pages.push(totalPage);
       }
     }
     
     return pages;
   };
 
-  if (totalPages <= 1) return null;
+  if (totalPage <= 1) return null;
 
   return (
     <div className="flex items-center justify-center space-x-2 mt-6">
@@ -73,7 +73,7 @@ const Pagination = () => {
 
       <button
         onClick={() => paginate(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={currentPage === totalPage}
         className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
       >
         <ChevronRight className="w-4 h-4" />

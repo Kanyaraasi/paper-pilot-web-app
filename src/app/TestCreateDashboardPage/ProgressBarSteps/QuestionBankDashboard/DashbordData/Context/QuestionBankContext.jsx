@@ -26,6 +26,7 @@ export const QuestionBankProvider = ({
   const [selectedSubjectId, setSelectedSubjectId] = useState(formData?.subjects?.find((s) => s.selected)?.id);
   const [chapters, setChapters] = useState([]);
   const [activeChapter, setActiveChapter] = useState('');
+  const [totalPage, setTotalPage] = useState(1);
 
 
   // Filter States
@@ -121,9 +122,10 @@ export const QuestionBankProvider = ({
   // Add this import at the top with other imports
 
 // Modify the loadQuestions function to use the new API when activeChapter is set
+// Replace the existing loadQuestions function with this:
 const loadQuestions = async (filters = {}) => {
   if (!selectedSubjectId) {
-    console.error('No subject selected');
+    console.error('🚫 No subject selected');
     showToastMessage('Please select a subject', 'error');
     return;
   }
@@ -134,7 +136,7 @@ const loadQuestions = async (filters = {}) => {
     const params = {
       page: currentPage,
       limit: questionsPerPage,
-      type: getBackendType(activeTab),
+      type: getBackendType(activeTab), // required by backend
       ...(selectedDifficulty !== 'All' && { difficulty: selectedDifficulty }),
       ...(searchQuery && { search: searchQuery }),
       ...(selectedTags.length > 0 && { tags: selectedTags.join(',') }),
@@ -142,43 +144,70 @@ const loadQuestions = async (filters = {}) => {
       ...filters,
     };
 
+    console.log('📤 Query Params:', params);
+    console.log('📍 Selected Subject:', selectedSubjectId);
+    console.log('📍 Active Chapter:', activeChapter);
+    console.log('📍 Active Tab (type):', activeTab);
+
     const response = await (activeChapter
       ? questionService.getQuestionsBySubjectAndChapter(selectedSubjectId, activeChapter, params)
-      : questionService.getQuestionsBySubject(selectedSubjectId));
+      : questionService.getQuestionsBySubject(selectedSubjectId, params));
 
-    if (!response?.length) {
+    console.log('📥 Raw API Response:', response);
+
+    if (!response || !Array.isArray(response.questions)) {
+      console.warn('⚠️ No questions found or invalid response format');
       setQuestions(prev => ({ ...prev, [activeTab]: [] }));
+      setTotalPage(0);
       showToastMessage('No questions found', 'info');
       return;
     }
 
-    const transformedQuestions = response.map(q => ({
-      id: q._id,
-      text: q.content,
-      difficulty: q.difficulty,
-      tags: q.tags || [],
-      starred: false,
-      createdAt: new Date(q.createdAt),
-      ...(q.type === 'MCQ' && {
-        options: q.options?.map(opt => opt.text) || [],
-        answer: q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer,
-      }),
-      ...(q.type === 'Match the Following' && {
-        items: q.matchItems || [],
-      }),
-    }));
+    const transformedQuestions = response.questions.map(q => {
+      const transformed = {
+        id: q._id,
+        text: q.content,
+        difficulty: q.difficulty,
+        tags: q.tags || [],
+        starred: false,
+        createdAt: new Date(q.createdAt),
+      };
+
+      if (q.type === 'MCQ') {
+        transformed.options = q.options?.map(opt => opt.text) || [];
+        transformed.answer = q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer;
+      }
+
+      if (q.type === 'Match the Following') {
+        transformed.items = q.matchItems || [];
+      }
+
+      console.log('🔄 Transformed Question:', transformed);
+      return transformed;
+    });
+
+    console.log('✅ All Questions Transformed:', transformedQuestions);
 
     setQuestions(prev => ({
       ...prev,
       [activeTab]: transformedQuestions,
     }));
+
+    setTotalPage(response.totalPages || 1);
+    setCurrentPage(response.currentPage || 1);
+
+    console.log(`📄 Page Info => Current: ${response.currentPage}, Total: ${response.totalPages}`);
+
   } catch (error) {
-    console.error('Error loading questions:', error.message);
+    console.error('❌ Error loading questions:', error.message, error);
     showToastMessage('Failed to load questions. Please try again.', 'error');
   } finally {
+    console.log('✅ Finished loading questions.');
     setLoading(false);
   }
 };
+
+
 
 
   const createQuestion = async (questionData) => {
@@ -313,7 +342,7 @@ useEffect(() => {
   // Filter questions based on current filters
   const filteredQuestions = React.useMemo(() => {
     return questions[activeTab] || [];
-  }, [questions, activeTab]);
+  }, [questions, activeTab]);  
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
@@ -426,7 +455,9 @@ useEffect(() => {
     setCurrentPage,
     questionsPerPage,
     setQuestionsPerPage,
-    totalPages,
+    // totalPages,
+    totalPage,
+    setTotalPage,
     indexOfFirstQuestion,
     indexOfLastQuestion,
 

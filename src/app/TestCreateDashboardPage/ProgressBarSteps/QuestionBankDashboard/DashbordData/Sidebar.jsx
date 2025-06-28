@@ -29,7 +29,7 @@ const Sidebar = () => {
                 onClick={() => setActiveChapter(chapter._id)}
                 title={chapter.name} // Tooltip for full chapter name on hover
                 className={`w-full flex  px-1 py-2 text-sm rounded-lg transition-colors group ${
-                  activeChapter === chapter.name
+                  activeChapter === chapter._id
                     ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
@@ -40,9 +40,8 @@ const Sidebar = () => {
                     {chapter.name}
                   </span>
                 </div>
-                
-                <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ml-2 ${
-                  activeChapter === chapter.name
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  activeChapter === chapter._id
                     ? 'bg-blue-100 text-blue-700'
                     : 'bg-gray-100 text-gray-600'
                 }`}>

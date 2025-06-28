@@ -42,11 +42,12 @@ export const QuestionBankProvider = ({
       const response = await subjectService.getSubjectById(subjectId);
       
       if (response && response.chapters) {
-        setChapters(response.chapters.filter(chapter => chapter.isActive));
-        // Set first active chapter as default
-        const firstActiveChapter = response.chapters.find(chapter => chapter.isActive);
-        if (firstActiveChapter) {
-          setActiveChapter(firstActiveChapter._id);
+        const activeChapters = response.chapters.filter(chapter => chapter.isActive);
+        setChapters(activeChapters);
+        
+        // Only set first active chapter as default if no chapter is currently selected
+        if (!activeChapter && activeChapters.length > 0) {
+          setActiveChapter(activeChapters[0]._id);
         }
       }
     } catch (error) {
@@ -276,10 +277,19 @@ const loadQuestions = async (filters = {}) => {
   };
 
   // Load questions when filters change
-  useEffect(() => {
+// Load questions when filters change
+useEffect(() => {
+  if (selectedSubjectId) {
     loadQuestions();
+  }
+}, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy, selectedSubjectId, activeChapter]);
+
+// Load chapters when subject changes (separate effect)
+useEffect(() => {
+  if (selectedSubjectId) {
     loadSubjectChapters(selectedSubjectId);
-  }, [activeTab, currentPage, selectedDifficulty, searchQuery, selectedTags, sortBy, selectedSubjectId, activeChapter]);
+  }
+}, [selectedSubjectId]);
   
 
 

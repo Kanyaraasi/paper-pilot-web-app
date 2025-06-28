@@ -135,7 +135,7 @@ const Dashboard = () => {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-inter">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Toast notification */}
       {questionBank.toast && (
         <Toast 

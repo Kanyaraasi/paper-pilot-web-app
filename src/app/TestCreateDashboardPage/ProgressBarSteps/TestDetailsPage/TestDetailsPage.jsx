@@ -9,6 +9,7 @@ import {
   CheckCircle,
   Info,
   X,
+  ArrowLeft,
 } from "lucide-react";
 // import Footer from './Footer';
 import { useEffect } from "react";
@@ -379,7 +380,22 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6 ">
         {/* Test Details Form */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200 flex  gap-4">
+             <div className="relative group">
+                            <button
+                              onClick={() => window.history.back()}
+                              className="flex items-center justify-center w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                              aria-label="Go back"
+                            >
+                              <ArrowLeft className="h-5 w-5 text-gray-600 group-hover:text-gray-800" />
+                            </button>
+            
+                            {/* Tooltip */}
+                            <div className="absolute top-full left-1/2 mt-2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                              Go back
+                            </div>
+                          </div>  
+                          <div>
             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
               <FileText className="h-5 w-5 mr-2 text-blue-600" />
               Test Configuration
@@ -387,6 +403,7 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
             <p className="text-sm text-gray-600 mt-1">
               Define the basic parameters for your test
             </p>
+            </div>
           </div>
 
           <div className="p-4">
@@ -405,7 +422,7 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
                   className={`${inputBaseStyles} ${
                     errors.name ? inputErrorStyles : ""
                   }`}
-                  placeholder="e.g., Mid-term Physics Exam"
+                  placeholder="e.g  "
                 />
                 {errors.name && (
                   <p className="text-xs text-red-600 flex items-center">
@@ -418,14 +435,14 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
               <div className="space-y-1">
                 <label className={labelStyles}>Duration *</label>
                 <input
-                  type="text"
+                  type="number"
                   {...register("duration", {
                     required: "Duration is required",
                   })}
                   className={`${inputBaseStyles} ${
                     errors.duration ? inputErrorStyles : ""
                   }`}
-                  placeholder="e.g., 3 hours"
+                  placeholder="e.g. 3 hours"
                 />
                 {errors.duration && (
                   <p className="text-xs text-red-600 flex items-center">
@@ -449,7 +466,7 @@ const TestDetailsPage = ({ onNext, onPrevious, formData, currentStep }) => {
                   className={`${inputBaseStyles} ${
                     errors.totalMarks ? inputErrorStyles : ""
                   }`}
-                  placeholder="e.g., 100"
+                  placeholder="e.g. 100"
                 />
                 {errors.totalMarks && (
                   <p className="text-xs text-red-600 flex items-center">

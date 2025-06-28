@@ -62,62 +62,32 @@ const QuestionCard = ({ question, onEdit, onDelete }) => {
   };
 
   return (
-    <div className={`bg-white border rounded-lg p-4 hover:shadow-md transition-shadow ${
-      isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-gray-200'
-    }`}>
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => toggleQuestionSelection(question.id)}
-            className={`p-1 rounded transition-colors ${
-              isSelected ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            <CheckSquare className={`w-4 h-4 ${isSelected ? 'fill-current' : ''}`} />
-          </button>
-          
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getDifficultyColor(question.difficulty)}`}>
-            {question.difficulty}
-          </span>
+    <div 
+      onClick={() => toggleQuestionSelection(question.id)}
+      className={`bg-white border rounded p-2 hover:shadow-sm transition-shadow cursor-pointer ${
+        isSelected ? 'ring-1 ring-blue-500 border-blue-500' : 'border-gray-200'
+      }`}>
+      <div className="flex items-start gap-2">
+        <div className={`flex-shrink-0 p-0.5 rounded transition-colors ${
+            isSelected ? 'text-blue-600' : 'text-gray-400'
+          }`}>
+          <CheckSquare className={`w-3.5 h-3.5 ${isSelected ? 'fill-current' : ''}`} />
         </div>
-
-        {/* <div className="flex items-center space-x-1">
-          <button
-            onClick={() => toggleStarred(question.id)}
-            className={`p-1 rounded transition-colors ${
-              question.starred ? 'text-yellow-500' : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            <Star className={`w-4 h-4 ${question.starred ? 'fill-current' : ''}`} />
-          </button>
+        
+        <div className="flex-1 min-w-0">
+          {renderQuestionContent()}
           
-          <button
-            onClick={() => onEdit(question)}
-            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-          >
-            <Edit className="w-4 h-4" />
-          </button>
-          
-          <button
-            onClick={() => onDelete(question.id)}
-            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div> */}
+          {question.tags && question.tags.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {question.tags.map(tag => (
+                <span key={tag} className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 rounded text-nowrap">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
-      {renderQuestionContent()}
-
-      {question.tags && question.tags.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1">
-          {question.tags.map(tag => (
-            <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

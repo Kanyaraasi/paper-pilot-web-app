@@ -22,6 +22,7 @@ import {
   List,
   History,
   Bookmark,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { testService } from "@/apiServices/testServices";
@@ -314,6 +315,22 @@ const TestHistorySavedDashboard = () => {
         <div className="max-w-7xl mx-auto sm:px-6 ">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
+              {/* Back Button */}
+              <div className="relative group">
+                <button
+                  onClick={() => window.history.back()}
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                  aria-label="Go back"
+                >
+                  <ArrowLeft className="h-5 w-5 text-gray-600 group-hover:text-gray-800" />
+                </button>
+
+                {/* Tooltip */}
+                <div className="absolute top-full left-1/2 mt-2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                  Go back
+                </div>
+              </div>
+
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                   <FileText className="h-6 w-6 text-white" />
@@ -340,7 +357,7 @@ const TestHistorySavedDashboard = () => {
                   className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 w-64 bg-white/50 backdrop-blur-sm text-sm font-medium"
                 />
               </div>
-             
+
               <div className="">
                 <div className="relative inline-block" ref={dropdownRef}>
                   <div
@@ -353,17 +370,7 @@ const TestHistorySavedDashboard = () => {
                   {showDropdown && (
                     <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
                       <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
-                        <div className="font-medium">Account</div>
                         <div className="text-gray-500">user@example.com</div>
-                      </div>
-
-                      <div className="border-t border-gray-100 mt-1 pt-1">
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                        >
-                          Logout
-                        </button>
                       </div>
                     </div>
                   )}
@@ -452,8 +459,6 @@ const TestHistorySavedDashboard = () => {
                 <option value="history">History</option>
               </select>
 
-              
-
               <div className="flex items-center space-x-2 border border-gray-200 rounded-xl p-1 bg-white/50">
                 <button
                   onClick={() => setViewMode("table")}
@@ -537,9 +542,7 @@ const TestHistorySavedDashboard = () => {
                           ))}
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+                  
                   </tr>
                 </thead>
                 <tbody className="bg-white/30 divide-y divide-gray-200">
@@ -615,128 +618,74 @@ const TestHistorySavedDashboard = () => {
           </div>
         ) : (
           /* Grid View */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <tbody className="bg-white/30 divide-y divide-gray-200">
-              {tests.map((test) => (
-                <tr
-                  key={test._id}
-                  className="hover:bg-white/40 transition-colors"
-                >
-                  <td className="px-6 py-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedTests.includes(test._id)}
-                      onChange={() => handleTestSelect(test._id)}
-                      className="rounded border-gray-300 text-sky-600 focus:ring-sky-500"
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-sky-100 to-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <BookOpen className="h-6 w-6 text-sky-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 leading-5">
-                          {test.name}
-                        </div>
-                        <div className="text-sm font-medium text-gray-600 mb-2">
-                          {test.subject?.name} • {test.standard?.name} •{" "}
-                          {test.batch?.name}
-                        </div>
-                        <div className="flex items-center space-x-4 text-xs font-medium text-gray-500">
-                          <span className="flex items-center">
-                            <FileText className="h-3 w-3 mr-1" />
-                            {test.selectedQuestions?.length || 0} questions
-                          </span>
-                          <span className="flex items-center">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {test.duration}
-                          </span>
-                          <span className="flex items-center">
-                            <Award className="h-3 w-3 mr-1" />
-                            {test.totalMarks} marks
-                          </span>
-                        </div>
-                      </div>
+          <div className="grid grid-cols-3 gap-6">
+            {tests.map((test) => (
+              <div
+                key={test._id}
+                className="bg-white/30 hover:bg-white/40 transition-colors rounded-lg border border-gray-200 p-6"
+              >
+                <div className="flex items-start space-x-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedTests.includes(test._id)}
+                    onChange={() => handleTestSelect(test._id)}
+                    className="rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1"
+                  />
+
+                  <div className="w-12 h-12 bg-gradient-to-br from-sky-100 to-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="h-6 w-6 text-sky-600" />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 leading-5">
+                      {test.name}
                     </div>
-                  </td>
+                    <div className="text-sm font-medium text-gray-600 mb-2">
+                      {test.subject?.name} • {test.standard?.name} •{" "}
+                      {test.batch?.name}
+                    </div>
+                    <div className="flex items-center space-x-4 text-xs font-medium text-gray-500 mb-3">
+                      <span className="flex items-center">
+                        <FileText className="h-3 w-3 mr-1" />
+                        {test.selectedQuestions?.length || 0} questions
+                      </span>
+                      <span className="flex items-center">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {test.duration}
+                      </span>
+                      <span className="flex items-center">
+                        <Award className="h-3 w-3 mr-1" />
+                        {test.totalMarks} marks
+                      </span>
+                    </div>
 
-                  <td className="px-6 py-4">
-                    <div className="space-y-2">
-                      <div className="text-sm font-semibold text-gray-900">
-                        Created: {new Date(test.createdAt).toLocaleDateString()}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                            test.status
-                          )}`}
-                        >
-                          {getStatusIcon(test.status)}
-                          <span className="ml-1.5 capitalize">
-                            {test.status}
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <div className="text-sm font-semibold text-gray-900">
+                          Created:{" "}
+                          {new Date(test.createdAt).toLocaleDateString()}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                              test.status
+                            )}`}
+                          >
+                            {getStatusIcon(test.status)}
+                            <span className="ml-1.5 capitalize">
+                              {test.status}
+                            </span>
                           </span>
-                        </span>
+                        </div>
                       </div>
+
+                      
+                      {/* </div> */}
                     </div>
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <div className="flex items-center space-x-2">
-                      <Link href={`/tests/${test._id}/preview`}>
-                        <button
-                          className="p-2 text-sky-600 hover:text-sky-800 hover:bg-sky-50 rounded-lg transition-colors"
-                          title="Preview Test"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
-                      </Link>
-
-                      <Link href={`/tests/${test._id}/edit`}>
-                        <button
-                          className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Edit Test"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                      </Link>
-
-                      {test.status === "draft" && (
-                        <button
-                          onClick={() =>
-                            handleStatusUpdate(test._id, "published")
-                          }
-                          className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Publish Test"
-                        >
-                          <Play className="h-4 w-4" />
-                        </button>
-                      )}
-
-                      {test.status === "published" && (
-                        <button
-                          onClick={() =>
-                            handleStatusUpdate(test._id, "archived")
-                          }
-                          className="p-2 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded-lg transition-colors"
-                          title="Archive Test"
-                        >
-                          <Archive className="h-4 w-4" />
-                        </button>
-                      )}
-
-                      <button
-                        onClick={() => handleDeleteTest(test._id)}
-                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete Test"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+                  </div>
+                </div>
+              </div>
+            ))}
 
             {tests.length === 0 && (
               <div className="col-span-full text-center py-12">

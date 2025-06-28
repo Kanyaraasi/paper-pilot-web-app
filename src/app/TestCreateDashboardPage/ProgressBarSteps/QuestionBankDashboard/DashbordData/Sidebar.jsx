@@ -26,7 +26,7 @@ const Sidebar = () => {
             return (
               <button
                 key={chapter._id}
-                onClick={() => setActiveChapter(chapter.name)}
+                onClick={() => setActiveChapter(chapter._id)}
                 className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors ${
                   activeChapter === chapter.name
                     ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'

@@ -26,6 +26,7 @@ export const QuestionBankProvider = ({
   const [selectedSubjectId, setSelectedSubjectId] = useState(formData?.subjects?.find((s) => s.selected)?.id);
   const [chapters, setChapters] = useState([]);
   const [activeChapter, setActiveChapter] = useState('');
+  const [totalPage, setTotalPage] = useState(1);
 
 
   // Filter States
@@ -121,6 +122,7 @@ export const QuestionBankProvider = ({
   // Add this import at the top with other imports
 
 // Modify the loadQuestions function to use the new API when activeChapter is set
+// Replace the existing loadQuestions function with this:
 const loadQuestions = async (filters = {}) => {
   if (!selectedSubjectId) {
     console.error('No subject selected');
@@ -144,15 +146,17 @@ const loadQuestions = async (filters = {}) => {
 
     const response = await (activeChapter
       ? questionService.getQuestionsBySubjectAndChapter(selectedSubjectId, activeChapter, params)
-      : questionService.getQuestionsBySubject(selectedSubjectId));
+      : questionService.getQuestionsBySubject(selectedSubjectId, params));
 
-    if (!response?.length) {
+    // Handle the new API response format
+    if (!response?.questions?.length) {
       setQuestions(prev => ({ ...prev, [activeTab]: [] }));
+      setTotalPage(0); // Add this state
       showToastMessage('No questions found', 'info');
       return;
     }
 
-    const transformedQuestions = response.map(q => ({
+    const transformedQuestions = response.questions.map(q => ({
       id: q._id,
       text: q.content,
       difficulty: q.difficulty,
@@ -172,6 +176,11 @@ const loadQuestions = async (filters = {}) => {
       ...prev,
       [activeTab]: transformedQuestions,
     }));
+
+    // Update pagination info from API response
+    setTotalPage(response.totalPages);
+    setCurrentPage(response.currentPage);
+    
   } catch (error) {
     console.error('Error loading questions:', error.message);
     showToastMessage('Failed to load questions. Please try again.', 'error');
@@ -313,7 +322,7 @@ useEffect(() => {
   // Filter questions based on current filters
   const filteredQuestions = React.useMemo(() => {
     return questions[activeTab] || [];
-  }, [questions, activeTab]);
+  }, [questions, activeTab]);  
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
@@ -426,7 +435,9 @@ useEffect(() => {
     setCurrentPage,
     questionsPerPage,
     setQuestionsPerPage,
-    totalPages,
+    // totalPages,
+    totalPage,
+    setTotalPage,
     indexOfFirstQuestion,
     indexOfLastQuestion,
 

@@ -4,7 +4,7 @@ import { ApiConstants } from '@/constants/ApiConstants';
 // Create axios instance
 const apiClient = axios.create({
   baseURL: ApiConstants.base_url,
-//   timeout: ApiConstants.timeout,
+  timeout: ApiConstants.timeout,
   headers: {
     'Content-Type': 'application/json',
   },

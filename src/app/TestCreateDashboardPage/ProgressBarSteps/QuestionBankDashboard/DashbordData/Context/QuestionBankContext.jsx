@@ -121,64 +121,59 @@ export const QuestionBankProvider = ({
 
 // Modify the loadQuestions function to use the new API when activeChapter is set
 const loadQuestions = async (filters = {}) => {
+  if (!selectedSubjectId) {
+    console.error('No subject selected');
+    showToastMessage('Please select a subject', 'error');
+    return;
+  }
+
   try {
     setLoading(true);
-    
-    let response;
-    
-    // Use chapter-specific API if activeChapter is selected
-    if (activeChapter && selectedSubjectId) {
-      const params = {
-        page: currentPage,
-        limit: questionsPerPage,
-        type: getBackendType(activeTab),
-        difficulty: selectedDifficulty !== 'All' ? selectedDifficulty : undefined,
-        search: searchQuery || undefined,
-        tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
-        sortBy: sortBy,
-        ...filters
-      };
-      
-      response = await questionService.getQuestionsBySubjectAndChapter(
-        selectedSubjectId, 
-        activeChapter, 
-        params
-      );
-    } else if (selectedSubjectId) {
-      // Fall back to subject-only API
-      response = await questionService.getQuestionsBySubject(selectedSubjectId);
-    }
-    
-    if (response) {
-      console.log('repopsdopdfosf', response)
-      // Transform backend data to frontend format
-      const transformedQuestions = response.map(q => ({
-        id: q._id,
-        text: q.content,
-        answer: q.correctAnswer,
-        difficulty: q.difficulty,
-        tags: q.tags || [],
-        starred: false,
-        createdAt: new Date(q.createdAt),
-        // Handle MCQ specific fields
-        ...(q.type === 'MCQ' && {
-          options: q.options?.map(opt => opt.text) || [],
-          answer: q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer
-        }),
-        // Handle Match the Following
-        ...(q.type === 'Match the Following' && {
-          items: q.matchItems || []
-        })
-      }));
 
-      setQuestions(prev => ({
-        ...prev,
-        [activeTab]: transformedQuestions
-      }));
+    const params = {
+      page: currentPage,
+      limit: questionsPerPage,
+      type: getBackendType(activeTab),
+      ...(selectedDifficulty !== 'All' && { difficulty: selectedDifficulty }),
+      ...(searchQuery && { search: searchQuery }),
+      ...(selectedTags.length > 0 && { tags: selectedTags.join(',') }),
+      sortBy,
+      ...filters,
+    };
+
+    const response = await (activeChapter
+      ? questionService.getQuestionsBySubjectAndChapter(selectedSubjectId, activeChapter, params)
+      : questionService.getQuestionsBySubject(selectedSubjectId));
+
+    if (!response?.length) {
+      setQuestions(prev => ({ ...prev, [activeTab]: [] }));
+      showToastMessage('No questions found', 'info');
+      return;
     }
+
+    const transformedQuestions = response.map(q => ({
+      id: q._id,
+      text: q.content,
+      difficulty: q.difficulty,
+      tags: q.tags || [],
+      starred: false,
+      createdAt: new Date(q.createdAt),
+      ...(q.type === 'MCQ' && {
+        options: q.options?.map(opt => opt.text) || [],
+        answer: q.options?.find(opt => opt.isCorrect)?.text || q.correctAnswer,
+      }),
+      ...(q.type === 'Match the Following' && {
+        items: q.matchItems || [],
+      }),
+    }));
+
+    setQuestions(prev => ({
+      ...prev,
+      [activeTab]: transformedQuestions,
+    }));
   } catch (error) {
-    console.error('Error loading questions:', error);
-    showToastMessage('Error loading questions', 'error');
+    console.error('Error loading questions:', error.message);
+    showToastMessage('Failed to load questions. Please try again.', 'error');
   } finally {
     setLoading(false);
   }
@@ -214,7 +209,7 @@ const loadQuestions = async (filters = {}) => {
       
       if (response.success) {
         showToastMessage('Question created successfully');
-        loadQuestions(); // Reload questions
+        // loadQuestions(); // Reload questions
         return response.data;
       }
     } catch (error) {
@@ -250,7 +245,7 @@ const loadQuestions = async (filters = {}) => {
       
       if (response.success) {
         showToastMessage('Question updated successfully');
-        loadQuestions(); // Reload questions
+        // loadQuestions(); // Reload questions
         return response.data;
       }
     } catch (error) {
@@ -270,7 +265,7 @@ const loadQuestions = async (filters = {}) => {
       
       if (response.success) {
         showToastMessage('Question deleted successfully');
-        loadQuestions(); // Reload questions
+        // loadQuestions(); // Reload questions
       }
     } catch (error) {
       console.error('Error deleting question:', error);

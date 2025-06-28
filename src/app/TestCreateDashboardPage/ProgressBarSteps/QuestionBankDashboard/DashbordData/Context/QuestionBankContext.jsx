@@ -171,6 +171,7 @@ const loadQuestions = async (filters = {}) => {
         tags: q.tags || [],
         starred: false,
         createdAt: new Date(q.createdAt),
+        answer:q.correctAnswer
       };
 
       if (q.type === 'MCQ') {

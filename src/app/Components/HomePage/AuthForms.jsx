@@ -65,9 +65,11 @@ function AuthForms() {
       });
       console.log('respoooo', response)
       const token = response.data.token;
+      const roleType=response.data.institute.type;
       // const slotType = response.data.user?.role;
       // Save token to localStorage or cookie
       localStorage.setItem("token", token);
+      localStorage.setItem("roleType", roleType);
       // localStorage.setItem("roleType", slotType);
       setSuccess("Login successful");
       setTimeout(() => {

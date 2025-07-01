@@ -118,7 +118,7 @@ export const QuestionBankProvider = ({
     diagram: [],
     practical: []
   });
-
+  console.log(selectedQuestions,'selectedQuestions')
   // Add this import at the top with other imports
 
 // Modify the loadQuestions function to use the new API when activeChapter is set

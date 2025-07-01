@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Plus, Search, Bell, User } from 'lucide-react';
+import { Menu, Plus, Search, Bell, User, ChevronLeft } from 'lucide-react';
 
 const Header = ({ toggleSidebar, showSidebar, onAddNew, selectedCount }) => {
   return (
@@ -9,7 +9,7 @@ const Header = ({ toggleSidebar, showSidebar, onAddNew, selectedCount }) => {
           onClick={toggleSidebar}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <Menu className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
         
         <div className="flex items-center space-x-2">

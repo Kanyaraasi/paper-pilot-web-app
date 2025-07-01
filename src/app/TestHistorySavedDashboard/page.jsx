@@ -375,7 +375,7 @@ const TestHistorySavedDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4 mb-32">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4 mb-40">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="bg-white/70 backdrop-blur-sm  shadow-sm border border-gray-200 p-4">

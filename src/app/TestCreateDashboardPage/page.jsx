@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProgressBar from '../Components/ProgressBar/ProgressBar';
 import TestDashboard from './ProgressBarSteps/TestDetailsPage/TestDetailsPage';
 import MainDashboard from './ProgressBarSteps/QuestionBankDashboard/MainDashboard';
@@ -10,6 +10,36 @@ const TestCreateDashboardPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({});
   const [selectedQuestions, setSelectedQuestions] = useState([]);
+
+  // Load state from localStorage on component mount
+  useEffect(() => {
+    const savedStep = localStorage.getItem('testDashboard_currentStep');
+    const savedFormData = localStorage.getItem('testDashboard_formData');
+    const savedQuestions = localStorage.getItem('testDashboard_selectedQuestions');
+
+    if (savedStep) {
+      setCurrentStep(parseInt(savedStep));
+    }
+    if (savedFormData) {
+      setFormData(JSON.parse(savedFormData));
+    }
+    if (savedQuestions) {
+      setSelectedQuestions(JSON.parse(savedQuestions));
+    }
+  }, []);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('testDashboard_currentStep', currentStep.toString());
+  }, [currentStep]);
+
+  useEffect(() => {
+    localStorage.setItem('testDashboard_formData', JSON.stringify(formData));
+  }, [formData]);
+
+  useEffect(() => {
+    localStorage.setItem('testDashboard_selectedQuestions', JSON.stringify(selectedQuestions));
+  }, [selectedQuestions]);
 
   const handleStepClick = (stepNumber) => {
     if (stepNumber <= currentStep || stepNumber === currentStep - 1) {
@@ -33,6 +63,15 @@ const TestCreateDashboardPage = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const clearAllData = () => {
+    localStorage.removeItem('testDashboard_currentStep');
+    localStorage.removeItem('testDashboard_formData');
+    localStorage.removeItem('testDashboard_selectedQuestions');
+    setCurrentStep(1);
+    setFormData({});
+    setSelectedQuestions([]);
   };
 
   const renderCurrentStep = () => {
@@ -63,6 +102,7 @@ const TestCreateDashboardPage = () => {
             formData={formData}
             selectedQuestions={selectedQuestions}
             currentStep={currentStep}
+            onClearAll={clearAllData}
           />
         );
       default:
@@ -71,10 +111,12 @@ const TestCreateDashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <ProgressBar currentStep={currentStep} onStepClick={handleStepClick} />
-      {renderCurrentStep()}
-      <Footer/>
+      <div className="">
+        {renderCurrentStep()}
+      </div>
+      <Footer />
     </div>
   );
 };

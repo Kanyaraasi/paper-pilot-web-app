@@ -16,7 +16,11 @@ function HomePage() {
   const [animated, setAnimated] = useState(false);
   const [error, setError] = useState('');
   const pathname = usePathname();
-  // const [animated, setAnimated] = useState(false);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Initialize animations and check user role after page load
   useEffect(() => {
@@ -118,4 +122,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default HomePage;  

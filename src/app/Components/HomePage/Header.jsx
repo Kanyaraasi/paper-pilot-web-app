@@ -61,8 +61,8 @@ function Header() {
       <nav
         className={`fixed w-full z-50 transition-all duration-500 shadow ${
           isScrolled
-            ? "bg-white/95 backdrop-blur-md shadow-lg py-2"
-            : "bg-white/90 backdrop-blur-sm py-3"
+            ? "bg-[#FAFAFA] backdrop-blur-md shadow-lg py-2"
+            : "bg-[#FAFAFA] backdrop-blur-sm py-3"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,7 +103,6 @@ function Header() {
               </a>
             </div>
 
-            {/* Authentication Buttons / User Menu */}
             <div className="hidden md:flex items-center space-x-3">
               {!isLoggedIn ? (
                 <div className="flex items-center space-x-3">
@@ -121,7 +120,7 @@ function Header() {
                 </div>
               ) : (
                 <div className="relative flex items-center">
-                  {/* User Profile Button */}
+                 
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="flex items-center justify-center space-x-3 px-6 py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-xl hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg backdrop-blur-sm border border-white/20 group"

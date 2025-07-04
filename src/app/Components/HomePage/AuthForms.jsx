@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Eye,
-  EyeOff,
-  User,
-  Lock,
- 
-  User as UserIcon,
-} from "lucide-react";
+import { Eye, EyeOff, User, Lock, User as UserIcon } from "lucide-react";
 
 import axios from "axios";
 import { BASE_URL } from "../../../../BASE_URL";
@@ -33,7 +26,7 @@ function AuthForms() {
   const [hideConfirmPass, setHideConfirmPass] = useState(true);
   const [isRegisterForm, setIsRegisterForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
- 
+
   // Success message auto-hide effect
   useEffect(() => {
     if (success) {
@@ -59,13 +52,16 @@ function AuthForms() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/api/auth/institute/login`, {
-        email: loginData.schoolName,
-        password: loginData.password,
-      });
-      console.log('respoooo', response)
+      const response = await axios.post(
+        `${BASE_URL}/api/auth/institute/login`,
+        {
+          email: loginData.schoolName,
+          password: loginData.password,
+        }
+      );
+      console.log("respoooo", response);
       const token = response.data.token;
-      const roleType=response.data.institute.type;
+      const roleType = response.data.institute.type;
       // const slotType = response.data.user?.role;
       // Save token to localStorage or cookie
       localStorage.setItem("token", token);
@@ -74,19 +70,19 @@ function AuthForms() {
       setSuccess("Login successful");
       setTimeout(() => {
         // if (slotType === "admin") {
-          // window.location.href = "/CreateUser";
+        // window.location.href = "/CreateUser";
         // } else if (slotType === "teacher") {
-          window.location.href = "/TestHistorySavedDashboard";
-//           window.location.href = "/TestCreateDashboardPage";
+        window.location.href = "/TestHistorySavedDashboard";
+        //           window.location.href = "/TestCreateDashboardPage";
         // } else {
-          // setError("Unknown user type.");
+        // setError("Unknown user type.");
         // }
       }, 1000);
       console.log("JWT Token:", token);
       setLoginData({
-    schoolName: "",
-    password: "",
-  })
+        schoolName: "",
+        password: "",
+      });
     } catch (error) {
       console.error(error);
       setError(
@@ -94,7 +90,6 @@ function AuthForms() {
       );
     }
   };
-
 
   const togglePasswordVisibility = (field) => {
     console.log("hidepass");
@@ -124,22 +119,7 @@ function AuthForms() {
   };
 
   return (
-    <div className="bg-white p-2 rounded-xl shadow-xl w-full max-w-md mx-auto border border-gray-100 hover:shadow-2xl transition-shadow duration-500 relative overflow-hidden">
-      {/* Card Header with Toggle */}
-      <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-        <button
-          onClick={() => setIsRegisterForm(false)}
-          className={`flex-1 py-2 rounded-3xl font-medium text-sm transition-all duration-300 ${
-            !isRegisterForm
-              ? "bg-blue-600 text-white shadow-md"
-              : "text-gray-700 hover:bg-gray-200"
-          }`}
-        >
-          Login
-        </button>
-        
-      </div>
-
+    <div className="bg-white p-2 rounded-xl shadow-xl w-[100%]  mx-auto border border-gray-100 hover:shadow-2xl transition-shadow duration-500 relative overflow-hidden">
       {/* Alert Messages */}
       {error && (
         <div
@@ -270,47 +250,6 @@ function AuthForms() {
             </svg>
           </button>
         </form>
-
-       
-
-        {/* <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
-            Don't have an account?
-            <button
-              onClick={toggleFormMode}
-              className="ml-1 text-blue-600 hover:text-blue-500 font-medium"
-            >
-              Register now
-            </button>
-          </p>
-        </div> */}
-      </div>
-
-      {/* Register Form - Improved alignment */}
-      <div
-        className={`transition-all duration-500 transform ${
-          !isRegisterForm
-            ? "translate-x-full opacity-0 absolute inset-0 pointer-events-none"
-            : "translate-x-0 opacity-100"
-        }`}
-        style={{ padding: "1rem" }}
-      >
-        <h2 className="text-center text-2xl font-bold text-gray-800 mb-2">
-          Create an Account
-        </h2>
-
-     
-        <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
-            Already have an account?
-            <button
-              onClick={toggleFormMode}
-              className="ml-1 text-blue-600 hover:text-blue-500 font-medium"
-            >
-              Sign in
-            </button>
-          </p>
-        </div>
       </div>
     </div>
   );

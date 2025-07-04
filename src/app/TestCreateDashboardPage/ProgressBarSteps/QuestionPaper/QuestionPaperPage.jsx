@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Printer, Download, ArrowLeft, CheckCircle, AlertCircle, Save, Settings, Eye, EyeOff, Loader } from 'lucide-react';
 
 const QuestionPaper = () => {
@@ -10,6 +11,63 @@ const QuestionPaper = () => {
   const [showGeneralInstructions, setShowGeneralInstructions] = useState(true);
   const [showWatermark, setShowWatermark] = useState(true);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const { theme } = useTheme();
+
+  const getThemeClasses = () => {
+    const isDark = theme === 'dark';
+    
+    return {
+      pageBackground: isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50',
+      cardBackground: isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200',
+      cardHeader: isDark ? 'border-gray-700' : 'border-gray-200',
+      textPrimary: isDark ? 'text-gray-100' : 'text-gray-900',
+      textSecondary: isDark ? 'text-gray-300' : 'text-gray-600',
+      textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
+      inputBase: isDark 
+        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400' 
+        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500',
+      inputError: isDark ? 'border-red-400 bg-red-900/20' : 'border-red-300 bg-red-50',
+      buttonPrimary: isDark 
+        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+        : 'bg-blue-600 hover:bg-blue-700 text-white',
+      buttonSecondary: isDark 
+        ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+        : 'border-gray-300 text-gray-700 hover:bg-gray-50',
+      buttonBack: isDark 
+        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+        : 'bg-gray-100 hover:bg-gray-200 text-gray-600',
+      headerBg: isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200',
+      toggleButton: isDark 
+        ? 'bg-gray-700 hover:bg-gray-600' 
+        : 'bg-gray-50 hover:bg-gray-100',
+      toggleActive: isDark ? 'bg-blue-600' : 'bg-blue-600',
+      toggleInactive: isDark ? 'bg-gray-600' : 'bg-gray-300',
+      notificationSuccess: isDark ? 'bg-green-600' : 'bg-green-500',
+      notificationError: isDark ? 'bg-red-600' : 'bg-red-500',
+      // Paper-specific styling (always white for printing)
+      paperBackground: 'bg-white',
+      paperText: 'text-black',
+      paperBorder: 'border-gray-300',
+      // Action buttons
+      printButton: isDark 
+        ? 'bg-blue-600 hover:bg-blue-700' 
+        : 'bg-blue-600 hover:bg-blue-700',
+      downloadButton: isDark 
+        ? 'bg-green-600 hover:bg-green-700 disabled:bg-green-500' 
+        : 'bg-green-600 hover:bg-green-700 disabled:bg-green-400',
+      saveButton: isDark 
+        ? 'bg-purple-600 hover:bg-purple-700' 
+        : 'bg-purple-600 hover:bg-purple-700',
+      backButton: isDark 
+        ? 'hover:bg-gray-700' 
+        : 'hover:bg-gray-100',
+      shadowCard: isDark ? 'shadow-lg shadow-gray-900/20' : 'shadow-sm',
+      shadowHover: isDark ? 'hover:shadow-xl hover:shadow-gray-900/30' : 'hover:shadow-md',
+    };
+  };
+
+  const themeClasses = getThemeClasses();
 
   useEffect(() => {
     // Mock data initialization
@@ -81,7 +139,7 @@ const QuestionPaper = () => {
           <title>Question Paper</title>
           <style>
             body { 
-              font-family: Arial, sans-serif; 
+              font-family: Inter, Arial, sans-serif; 
               margin: 20px; 
               position: relative; 
               background: white;
@@ -106,7 +164,7 @@ const QuestionPaper = () => {
               transform: rotate(-45deg);
               white-space: nowrap;
               user-select: none;
-              font-family: Arial, sans-serif;
+              font-family: Inter, Arial, sans-serif;
               letter-spacing: 2px;
             }
             .content { 
@@ -196,15 +254,15 @@ const QuestionPaper = () => {
   };
 
   const ToggleButton = ({ isOn, onToggle, label, icon: Icon }) => (
-    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+    <div className={`flex items-center justify-between p-3 ${themeClasses.toggleButton} rounded-lg transition-colors font-inter`}>
       <div className="flex items-center gap-2">
-        <Icon className="w-4 h-4 text-gray-600" />
-        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <Icon className={`w-4 h-4 ${themeClasses.textSecondary}`} />
+        <span className={`text-sm font-medium ${themeClasses.textPrimary}`}>{label}</span>
       </div>
       <button
         onClick={onToggle}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-          isOn ? 'bg-blue-600' : 'bg-gray-300'
+          isOn ? themeClasses.toggleActive : themeClasses.toggleInactive
         }`}
       >
         <span
@@ -222,13 +280,13 @@ const QuestionPaper = () => {
   };
 
   const QuestionPaperPreview = () => (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className={`${themeClasses.paperBackground} rounded-lg ${themeClasses.shadowCard} overflow-hidden`}>
       {/* Print Section - Hidden from normal view */}
       <div 
         id="print-section"
         className="hidden"
       >
-        <div className="relative p-8 text-black bg-white" style={{ minHeight: '297mm' }}>
+        <div className="relative p-8 text-black bg-white font-inter" style={{ minHeight: '297mm' }}>
           {showWatermark && (
             <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
               {generateWatermarkPattern().map((pos) => (
@@ -243,7 +301,7 @@ const QuestionPaper = () => {
                     fontWeight: 'bold',
                     color: 'rgba(0, 0, 0, 0.08)',
                     whiteSpace: 'nowrap',
-                    fontFamily: 'Arial, sans-serif',
+                    fontFamily: 'Inter, Arial, sans-serif',
                     letterSpacing: '2px',
                     userSelect: 'none',
                   }}
@@ -260,7 +318,7 @@ const QuestionPaper = () => {
       {/* PDF Content - Optimized for PDF generation */}
       <div 
         id="pdf-content"
-        className="relative bg-white text-black"
+        className="relative bg-white text-black font-inter"
         style={{ width: '210mm', minHeight: '297mm', margin: '0 auto', padding: '4mm' }}
       >
         {showWatermark && (
@@ -275,7 +333,7 @@ const QuestionPaper = () => {
                 fontWeight: 'bold',
                 color: 'rgba(0, 0, 0, 0.08)',
                 whiteSpace: 'nowrap',
-                fontFamily: 'Arial, sans-serif',
+                fontFamily: 'Inter, Arial, sans-serif',
                 letterSpacing: '2px',
                 userSelect: 'none',
               }}
@@ -291,7 +349,7 @@ const QuestionPaper = () => {
 
       {/* Display Content - Visible to users */}
       <div 
-        className="relative border-2 border-gray-300 p-8 text-black bg-white h-full overflow-hidden lg:hidden"
+        className={`relative border-2 ${themeClasses.paperBorder} p-8 ${themeClasses.paperText} ${themeClasses.paperBackground} h-full overflow-hidden lg:hidden font-inter`}
         style={{ minHeight: '297mm' }}
       >
         {showWatermark && (
@@ -308,7 +366,7 @@ const QuestionPaper = () => {
                   fontWeight: 'bold',
                   color: 'rgba(0, 0, 0, 0.08)',
                   whiteSpace: 'nowrap',
-                  fontFamily: 'Arial, sans-serif',
+                  fontFamily: 'Inter, Arial, sans-serif',
                   letterSpacing: '2px',
                   userSelect: 'none',
                 }}
@@ -367,7 +425,7 @@ const QuestionPaper = () => {
       {/* Questions */}
       <div className="">
         {questionPaper?.map((question, index) => (
-          <div key={question.id} className=" border-gray-200 ">
+          <div key={question.id} className="border-gray-200">
             <div className="flex justify-between items-start mb-2">
               <p className="text-sm font-medium flex-1 pr-4">
                 <span className="">Q{index + 1}.</span> {question.text}
@@ -389,8 +447,6 @@ const QuestionPaper = () => {
                 ))}
               </div>
             )}
-            
-           
           </div>
         ))}
       </div>
@@ -404,11 +460,11 @@ const QuestionPaper = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className={`min-h-screen ${themeClasses.pageBackground} font-inter`}>
       {/* Notification */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 ${
-          notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          notification.type === 'success' ? themeClasses.notificationSuccess : themeClasses.notificationError
         }`}>
           <div className="flex items-center gap-2">
             {notification.type === 'success' ? 
@@ -421,17 +477,17 @@ const QuestionPaper = () => {
       )}
 
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className={`${themeClasses.headerBg} shadow-sm border-b`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <button
                 onClick={() => window.history.back()}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className={`p-2 ${themeClasses.backButton} rounded-lg transition-colors`}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <ArrowLeft className={`w-5 h-5 ${themeClasses.textSecondary}`} />
               </button>
-              <h1 className="ml-4 text-xl font-semibold text-gray-800">Question Paper Preview</h1>
+              <h1 className={`ml-4 text-xl font-semibold ${themeClasses.textPrimary}`}>Question Paper Preview</h1>
             </div>
           </div>
         </div>
@@ -444,15 +500,15 @@ const QuestionPaper = () => {
           <div className="w-full lg:w-80 flex-shrink-0">
             <div className="space-y-4">
               {/* Action Buttons */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <div className={`${themeClasses.cardBackground} rounded-xl ${themeClasses.shadowCard} border p-6`}>
+                <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-4 flex items-center gap-2`}>
                   <Settings className="w-5 h-5" />
                   Actions
                 </h3>
                 <div className="space-y-3">
                   <button
                     onClick={handlePrint}
-                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md w-full"
+                    className={`flex items-center justify-center gap-2 ${themeClasses.printButton} text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full`}
                   >
                     <Printer className="w-4 h-4" />
                     Print Paper
@@ -461,7 +517,7 @@ const QuestionPaper = () => {
                   <button
                     onClick={handleDownloadPDF}
                     disabled={isGeneratingPdf}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md w-full"
+                    className={`flex items-center justify-center gap-2 ${themeClasses.downloadButton} disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full`}
                   >
                     {isGeneratingPdf ? (
                       <>
@@ -478,7 +534,7 @@ const QuestionPaper = () => {
 
                   <button
                     onClick={handleSavePaper}
-                    className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md w-full"
+                    className={`flex items-center justify-center gap-2 ${themeClasses.saveButton} text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full`}
                   >
                     <Save className="w-4 h-4" />
                     Save Paper
@@ -487,8 +543,8 @@ const QuestionPaper = () => {
               </div>
 
               {/* Toggle Controls */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Display Options</h3>
+              <div className={`${themeClasses.cardBackground} rounded-xl ${themeClasses.shadowCard} border p-6`}>
+                <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-4`}>Display Options</h3>
                 <div className="space-y-3">
                   <ToggleButton
                     isOn={showGeneralInstructions}

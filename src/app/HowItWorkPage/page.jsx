@@ -5,265 +5,66 @@ import React from "react";
 const HowItWorkPage = () => {
   const { theme } = useTheme();
 
-  const styles = {
-    container: {
-      width: '100%',
-      backgroundColor: 'var(--bg-secondary)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      padding: 'var(--spacing-md)',
-    },
-    mainCard: {
-      width: '100%',
-      maxWidth: '1400px',
-      backgroundColor: 'var(--bg-elevated)',
-      borderRadius: 'var(--radius-2xl)',
-      boxShadow: 'var(--shadow-lg)',
-      overflow: 'hidden',
-      minHeight: '90vh',
-    },
-    flexContainer: {
-      display: 'flex',
-      flexDirection: 'row',
-      minHeight: '90vh',
-    },
-    leftContainer: {
-      flex: '1',
-      padding: 'var(--spacing-2xl)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative',
-      minHeight: '90vh',
-    },
-    logoContainer: {
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    logoBg: {
-      position: 'relative',
-      width: '280px',
-      height: '280px',
-      background: 'linear-gradient(135deg, var(--warning-100) 0%, var(--warning-200) 100%)',
-      borderRadius: '50%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      boxShadow: 'var(--shadow-lg)',
-    },
-    logoText: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 'var(--spacing-sm)',
-      fontSize: 'var(--font-3xl)',
-      fontWeight: '700',
-    },
-    paperText: {
-      color: 'var(--text-secondary)',
-    },
-    pilotText: {
-      color: 'var(--accent-primary)',
-    },
-    numberCard: {
-      position: 'absolute',
-      width: '64px',
-      height: '48px',
-      borderRadius: 'var(--radius-lg)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      boxShadow: 'var(--shadow-md)',
-      color: 'white',
-      fontSize: 'var(--font-2xl)',
-      fontWeight: '700',
-      transition: 'all var(--transition-normal)',
-      cursor: 'pointer',
-    },
-    numberCard1: {
-      top: '-16px',
-      left: '-32px',
-      backgroundColor: 'var(--error-500)',
-      transform: 'rotate(-12deg)',
-    },
-    numberCard2: {
-      top: '-32px',
-      left: '80px',
-      background: 'linear-gradient(135deg, var(--accent-500) 0%, var(--info-500) 100%)',
-      transform: 'rotate(6deg)',
-    },
-    numberCard3: {
-      top: '-8px',
-      right: '32px',
-      backgroundColor: 'var(--success-500)',
-      transform: 'rotate(12deg)',
-    },
-    numberCard4: {
-      top: '56px',
-      right: '-32px',
-      backgroundColor: '#8b5cf6',
-      transform: 'rotate(12deg)',
-    },
-    rightContainer: {
-      flex: '1',
-      padding: 'var(--spacing-3xl)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      minHeight: '90vh',
-    },
-    contentWrapper: {
-      maxWidth: '500px',
-      width: '100%',
-    },
-    title: {
-      fontSize: 'var(--font-4xl)',
-      fontWeight: '700',
-      color: 'var(--text-primary)',
-      marginBottom: 'var(--spacing-lg)',
-      lineHeight: '1.2',
-    },
-    subtitle: {
-      color: 'var(--text-secondary)',
-      fontSize: 'var(--font-lg)',
-      marginBottom: 'var(--spacing-2xl)',
-      lineHeight: '1.6',
-    },
-    stepsContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 'var(--spacing-xl)',
-    },
-    stepItem: {
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: 'var(--spacing-md)',
-    },
-    stepNumber: {
-      flexShrink: 0,
-      width: '40px',
-      height: '40px',
-      backgroundColor: 'var(--accent-primary)',
-      borderRadius: '50%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: 'white',
-      fontWeight: '600',
-      fontSize: 'var(--font-base)',
-      boxShadow: 'var(--shadow-sm)',
-    },
-    stepContent: {
-      flex: '1',
-    },
-    stepTitle: {
-      fontSize: 'var(--font-lg)',
-      fontWeight: '600',
-      color: 'var(--text-primary)',
-      marginBottom: 'var(--spacing-sm)',
-      lineHeight: '1.4',
-    },
-    stepDescription: {
-      color: 'var(--text-secondary)',
-      fontSize: 'var(--font-base)',
-      lineHeight: '1.6',
-    },
-    ctaButton: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 'var(--spacing-sm)',
-      padding: 'var(--spacing-lg) var(--spacing-xl)',
-      marginTop: 'var(--spacing-2xl)',
-      background: 'linear-gradient(135deg, var(--accent-600) 0%, var(--accent-700) 100%)',
-      color: 'white',
-      borderRadius: 'var(--radius-xl)',
-      fontWeight: '600',
-      fontSize: 'var(--font-base)',
-      textDecoration: 'none',
-      transition: 'all var(--transition-normal)',
-      boxShadow: 'var(--shadow-md)',
-      border: 'none',
-      cursor: 'pointer',
-    },
-    arrowIcon: {
-      width: '20px',
-      height: '20px',
-      transition: 'transform var(--transition-normal)',
-    },
-    // Responsive styles
-    '@media (max-width: 768px)': {
-      flexContainer: {
-        flexDirection: 'column',
-      },
-      leftContainer: {
-        padding: 'var(--spacing-xl)',
-        minHeight: '40vh',
-      },
-      rightContainer: {
-        padding: 'var(--spacing-xl)',
-      },
-      logoBg: {
-        width: '200px',
-        height: '200px',
-      },
-      logoText: {
-        fontSize: 'var(--font-2xl)',
-      },
-      title: {
-        fontSize: 'var(--font-3xl)',
-      },
-      numberCard: {
-        width: '48px',
-        height: '36px',
-        fontSize: 'var(--font-lg)',
-      },
-    },
+  const getThemeClasses = () => {
+    const isDark = theme === 'dark';
+    return {
+      pageBackground: isDark ? 'bg-gray-900' : 'bg-gray-50',
+      cardBackground: isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200',
+      cardHeader: isDark ? 'border-gray-700' : 'border-gray-200',
+      textPrimary: isDark ? 'text-gray-100' : 'text-gray-900',
+      textSecondary: isDark ? 'text-gray-300' : 'text-gray-600',
+      textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
+      inputBase: isDark ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500',
+      inputError: isDark ? 'border-red-400 bg-red-900/20' : 'border-red-300 bg-red-50',
+      buttonPrimary: isDark ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white',
+      buttonSecondary: isDark ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50',
+      buttonBack: isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600',
+      subjectCard: isDark ? 'border-gray-600 bg-gray-700 hover:bg-gray-600' : 'border-gray-200 bg-white hover:bg-gray-50',
+      subjectCardSelected: isDark ? 'border-blue-400 bg-blue-900/30 ring-blue-400' : 'border-blue-300 bg-blue-50 ring-blue-200',
+      subjectCardHover: isDark ? 'hover:border-gray-500' : 'hover:border-gray-300',
+      alertInfo: isDark ? 'bg-blue-900/30 border-blue-700 text-blue-200' : 'bg-blue-50 border-blue-200 text-blue-700',
+      alertError: isDark ? 'bg-red-900/30 border-red-700 text-red-200' : 'bg-red-50 border-red-200 text-red-600',
+      iconAccent: isDark ? 'text-blue-400' : 'text-blue-600',
+      iconSuccess: isDark ? 'text-green-400' : 'text-green-600',
+      iconError: isDark ? 'text-red-400' : 'text-red-600',
+      gradientBg: isDark ? 'bg-gradient-to-br from-blue-900/20 to-purple-900/20' : 'bg-gradient-to-br from-blue-100 to-purple-100',
+    };
   };
 
+  const themeClasses = getThemeClasses();
+
   return (
-    <div style={styles.container} data-theme={theme}>
-      <div style={styles.mainCard}>
-        <div style={styles.flexContainer}>
-          {/* Left Container - Image */}
-          <div style={styles.leftContainer}>
-            <div style={styles.logoContainer}>
-              <div style={styles.logoBg}>
-                <div style={styles.logoText}>
-                  <div style={styles.paperText}>Paper</div>
-                  <div style={styles.pilotText}>Pilot</div>
+    <div className={`w-full ${themeClasses.pageBackground} flex items-center justify-center min-h-screen p-4 transition-colors duration-200`}>
+      <div className={`w-full max-w-7xl ${themeClasses.cardBackground} rounded-2xl shadow-lg overflow-hidden min-h-[90vh]`}>
+        <div className="flex flex-col md:flex-row min-h-[90vh]">
+          {/* Left Container - Logo */}
+          <div className="flex-1 p-8 md:p-16 flex items-center justify-center relative min-h-[40vh] md:min-h-[90vh]">
+            <div className="relative flex items-center justify-center">
+              <div className="relative w-56 h-56 md:w-72 md:h-72 bg-gradient-to-br from-yellow-200 to-yellow-300 rounded-full flex items-center justify-center shadow-lg">
+                <div className="flex items-center gap-2 text-2xl md:text-3xl font-bold">
+                  <div className={themeClasses.textSecondary}>Paper</div>
+                  <div className={themeClasses.iconAccent}>Pilot</div>
                 </div>
               </div>
 
               {/* Number cards */}
               <div 
-                style={{...styles.numberCard, ...styles.numberCard1}}
-                onMouseEnter={(e) => e.target.style.transform = 'rotate(-12deg) scale(1.1)'}
-                onMouseLeave={(e) => e.target.style.transform = 'rotate(-12deg) scale(1)'}
+                className="absolute -top-4 -left-8 w-16 h-12 bg-red-500 rounded-lg flex items-center justify-center shadow-md text-white text-xl font-bold transform -rotate-12 hover:scale-110 transition-transform duration-200 cursor-pointer"
               >
                 1
               </div>
               <div 
-                style={{...styles.numberCard, ...styles.numberCard2}}
-                onMouseEnter={(e) => e.target.style.transform = 'rotate(6deg) scale(1.1)'}
-                onMouseLeave={(e) => e.target.style.transform = 'rotate(6deg) scale(1)'}
+                className="absolute -top-8 left-20 w-16 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-md text-white text-xl font-bold transform rotate-6 hover:scale-110 transition-transform duration-200 cursor-pointer"
               >
                 2
               </div>
               <div 
-                style={{...styles.numberCard, ...styles.numberCard3}}
-                onMouseEnter={(e) => e.target.style.transform = 'rotate(12deg) scale(1.1)'}
-                onMouseLeave={(e) => e.target.style.transform = 'rotate(12deg) scale(1)'}
+                className="absolute -top-2 right-8 w-16 h-12 bg-green-500 rounded-lg flex items-center justify-center shadow-md text-white text-xl font-bold transform rotate-12 hover:scale-110 transition-transform duration-200 cursor-pointer"
               >
                 3
               </div>
               <div 
-                style={{...styles.numberCard, ...styles.numberCard4}}
-                onMouseEnter={(e) => e.target.style.transform = 'rotate(12deg) scale(1.1)'}
-                onMouseLeave={(e) => e.target.style.transform = 'rotate(12deg) scale(1)'}
+                className="absolute top-14 -right-8 w-16 h-12 bg-purple-500 rounded-lg flex items-center justify-center shadow-md text-white text-xl font-bold transform rotate-12 hover:scale-110 transition-transform duration-200 cursor-pointer"
               >
                 4
               </div>
@@ -271,21 +72,25 @@ const HowItWorkPage = () => {
           </div>
 
           {/* Right Container - Content */}
-          <div style={styles.rightContainer}>
-            <div style={styles.contentWrapper}>
-              <h2 style={styles.title}>Four Simple Steps</h2>
-              <p style={styles.subtitle}>
+          <div className="flex-1 p-8 md:p-12 flex items-center justify-start min-h-[90vh]">
+            <div className="max-w-lg w-full">
+              <h2 className={`text-3xl md:text-4xl font-bold ${themeClasses.textPrimary} mb-6 leading-tight`}>
+                Four Simple Steps
+              </h2>
+              <p className={`${themeClasses.textSecondary} text-lg mb-8 leading-relaxed`}>
                 Follow these steps to create your papers effortlessly and efficiently.
               </p>
 
-              <div style={styles.stepsContainer}>
-                <div style={styles.stepItem}>
-                  <div style={styles.stepNumber}>1</div>
-                  <div style={styles.stepContent}>
-                    <h3 style={styles.stepTitle}>
+              <div className="flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <div className={`flex-shrink-0 w-10 h-10 ${themeClasses.iconAccent} bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shadow-sm`}>
+                    1
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-2 leading-snug`}>
                       Login is compulsory to access the system.
                     </h3>
-                    <p style={styles.stepDescription}>
+                    <p className={`${themeClasses.textSecondary} leading-relaxed`}>
                       Each user will receive a unique and secure key ID after
                       successful authentication, ensuring data privacy and
                       security.
@@ -293,26 +98,30 @@ const HowItWorkPage = () => {
                   </div>
                 </div>
 
-                <div style={styles.stepItem}>
-                  <div style={styles.stepNumber}>2</div>
-                  <div style={styles.stepContent}>
-                    <h3 style={styles.stepTitle}>
+                <div className="flex items-start gap-4">
+                  <div className={`flex-shrink-0 w-10 h-10 ${themeClasses.iconAccent} bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shadow-sm`}>
+                    2
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-2 leading-snug`}>
                       Fill Proper Details
                     </h3>
-                    <p style={styles.stepDescription}>
+                    <p className={`${themeClasses.textSecondary} leading-relaxed`}>
                       Enter all details correctly such as selecting the grade,
                       subject, and exam details to ensure accurate paper generation.
                     </p>
                   </div>
                 </div>
 
-                <div style={styles.stepItem}>
-                  <div style={styles.stepNumber}>3</div>
-                  <div style={styles.stepContent}>
-                    <h3 style={styles.stepTitle}>
+                <div className="flex items-start gap-4">
+                  <div className={`flex-shrink-0 w-10 h-10 ${themeClasses.iconAccent} bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shadow-sm`}>
+                    3
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-2 leading-snug`}>
                       Select Questions and Add New Ones
                     </h3>
-                    <p style={styles.stepDescription}>
+                    <p className={`${themeClasses.textSecondary} leading-relaxed`}>
                       Based on the selected class, subject, and exam type, you
                       can filter and choose questions like fill-ups, match the
                       pair, one-sentence answers, answer in brief, etc.
@@ -320,13 +129,15 @@ const HowItWorkPage = () => {
                   </div>
                 </div>
 
-                <div style={styles.stepItem}>
-                  <div style={styles.stepNumber}>4</div>
-                  <div style={styles.stepContent}>
-                    <h3 style={styles.stepTitle}>
+                <div className="flex items-start gap-4">
+                  <div className={`flex-shrink-0 w-10 h-10 ${themeClasses.iconAccent} bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shadow-sm`}>
+                    4
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-2 leading-snug`}>
                       Create and Download Question Paper
                     </h3>
-                    <p style={styles.stepDescription}>
+                    <p className={`${themeClasses.textSecondary} leading-relaxed`}>
                       Choose from two download options: download only the
                       questions or download the questions with their answers.
                       Printing is also available for your convenience.
@@ -335,23 +146,13 @@ const HowItWorkPage = () => {
                 </div>
               </div>
 
-              <a href='/TestHistorySavedDashboard' style={{textDecoration: 'none'}}>
+              <a href='/TestHistorySavedDashboard' className="inline-block mt-8 text-decoration-none">
                 <button 
-                  style={styles.ctaButton}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px) scale(1.02)';
-                    e.target.style.boxShadow = 'var(--shadow-xl)';
-                    e.target.querySelector('svg').style.transform = 'translateX(4px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0) scale(1)';
-                    e.target.style.boxShadow = 'var(--shadow-md)';
-                    e.target.querySelector('svg').style.transform = 'translateX(0)';
-                  }}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:scale-105 transition-all duration-200"
                 >
                   <span>Start Creating Papers</span>
                   <svg 
-                    style={styles.arrowIcon}
+                    className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"

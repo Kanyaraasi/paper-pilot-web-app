@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Printer, Download, ArrowLeft, CheckCircle, AlertCircle, Save, Settings, Eye, EyeOff, Loader } from 'lucide-react';
 
 const FinalQuestionPaperPage = () => {
-  // State management
+
   const [examDetails, setExamDetails] = useState({});
   const [questionPaper, setQuestionPaper] = useState(null);
   const [notification, setNotification] = useState(null);
@@ -12,7 +12,7 @@ const FinalQuestionPaperPage = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   useEffect(() => {
-    // Mock data initialization
+  
     const mockExamDetails = {
       schoolName: "P.E.M HIGH SCHOOL",
       subject: "Mathematics",

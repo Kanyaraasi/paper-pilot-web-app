@@ -340,8 +340,7 @@ const TestHistorySavedDashboard = () => {
 
             <div className="flex items-center space-x-4">
               <div className="relative hidden md:block">
-                {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" /> */}
-                {/* <BookAIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"/> */}
+               
                 <input
                   type="text"
                   placeholder="Search tests..."
@@ -349,6 +348,7 @@ const TestHistorySavedDashboard = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 w-64 bg-white/50 backdrop-blur-sm text-sm font-medium"
                 />
+                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               </div>
 
               <div className="">

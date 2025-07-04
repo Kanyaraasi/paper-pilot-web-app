@@ -29,15 +29,7 @@ function HomePage() {
 
     const landing = sessionStorage.getItem('landing'); // flag to prevent redirect
 
-    // if (!landing && pathname === '/') {
-    //   sessionStorage.setItem('landing', 'true');
-
-    //   if (roleType === "admin") {
-    //     window.location.href = "/CreateUser";
-    //   } else if (roleType === "teacher") {
-    //     window.location.href = "/GradeSelector";
-    //   }
-    // }
+    
   }, [pathname]);
 
   // Toast auto-hide effect

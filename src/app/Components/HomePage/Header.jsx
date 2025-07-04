@@ -112,7 +112,7 @@ function Header() {
             <div className="flex items-center group">
               <div className="flex-shrink-0 transform transition-transform duration-300">
                 <img
-                  src="/logo.jpg"
+                  src="/logo.jpeg"
                   alt="PaperPilot Logo"
                   className="h-12 w-auto rounded-lg"
                 />

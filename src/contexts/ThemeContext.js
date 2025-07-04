@@ -14,7 +14,7 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
-  const [font, setFont] = useState('default');
+  const [font, setFont] = useState('poppins');
 
   // Load theme and font from localStorage on component mount
   useEffect(() => {

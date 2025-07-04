@@ -1,5 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,9 +24,21 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
+        <ThemeProvider>
+        <header className="app-header">
+          <div className="container">
+            <nav className="navbar">
+              <div className="nav-brand">
+                <h1>PaperPilot</h1>
+              </div>
+              <div className="nav-controls">
+                <ThemeToggle />
+              </div>
+            </nav>
+          </div>
+        </header>
         {children}
-
+        </ThemeProvider>
       </body>
     </html>
   );

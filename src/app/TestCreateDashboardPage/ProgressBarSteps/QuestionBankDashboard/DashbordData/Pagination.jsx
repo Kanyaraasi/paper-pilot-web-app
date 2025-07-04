@@ -1,9 +1,31 @@
 import React from 'react';
 import { useQuestionBank } from './Context/QuestionBankContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from "@/contexts/ThemeContext";
 
 const Pagination = () => {
   const { currentPage, totalPage, paginate } = useQuestionBank();
+  const { theme } = useTheme();
+
+  const getThemeClasses = () => {
+    const isDark = theme === 'dark';
+    
+    return {
+      buttonBase: isDark 
+        ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+        : 'border-gray-300 text-gray-700 hover:bg-gray-50',
+      buttonActive: isDark 
+        ? 'bg-blue-600 text-white border-blue-600' 
+        : 'bg-blue-600 text-white border-blue-600',
+      buttonDisabled: isDark 
+        ? 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent' 
+        : 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent',
+      textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
+      iconColor: isDark ? 'text-gray-400' : 'text-gray-600',
+    };
+  };
+
+  const themeClasses = getThemeClasses();
 
   const getPageNumbers = () => {
     const pages = [];
@@ -43,26 +65,26 @@ const Pagination = () => {
   if (totalPage <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center space-x-2 mt-6">
+    <div className="flex items-center justify-center space-x-2 mt-6 font-inter">
       <button
         onClick={() => paginate(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+        className={`p-2 rounded-lg border transition-colors ${themeClasses.buttonBase} ${themeClasses.buttonDisabled}`}
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft className={`w-4 h-4 ${themeClasses.iconColor}`} />
       </button>
 
       {getPageNumbers().map((page, index) => (
         <React.Fragment key={index}>
           {page === '...' ? (
-            <span className="px-3 py-2 text-gray-500">...</span>
+            <span className={`px-3 py-2 ${themeClasses.textMuted} font-inter`}>...</span>
           ) : (
             <button
               onClick={() => paginate(page)}
-              className={`px-3 py-2 rounded-lg border transition-colors ${
+              className={`px-3 py-2 rounded-lg border transition-colors font-inter ${
                 currentPage === page
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-300 hover:bg-gray-50'
+                  ? themeClasses.buttonActive
+                  : themeClasses.buttonBase
               }`}
             >
               {page}
@@ -74,9 +96,9 @@ const Pagination = () => {
       <button
         onClick={() => paginate(currentPage + 1)}
         disabled={currentPage === totalPage}
-        className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+        className={`p-2 rounded-lg border transition-colors ${themeClasses.buttonBase} ${themeClasses.buttonDisabled}`}
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight className={`w-4 h-4 ${themeClasses.iconColor}`} />
       </button>
     </div>
   );

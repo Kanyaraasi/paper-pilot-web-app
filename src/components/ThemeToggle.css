@@ -1,0 +1,95 @@
+/* src/components/ThemeToggle.css */
+
+.theme-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+  }
+  
+  .theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .theme-toggle-btn:hover {
+    background-color: var(--border-color);
+    transform: translateY(-1px);
+  }
+  
+  .theme-icon {
+    font-size: var(--font-lg);
+    line-height: 1;
+  }
+  
+  .theme-text {
+    font-weight: 500;
+  }
+  
+  .font-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .font-label {
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  
+  .font-select {
+    padding: var(--spacing-sm);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .font-select:hover {
+    border-color: var(--accent-color);
+  }
+  
+  .font-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .theme-controls {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-sm);
+    }
+    
+    .theme-toggle-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .font-selector {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .font-select {
+      flex: 1;
+      margin-left: var(--spacing-sm);
+    }
+  }

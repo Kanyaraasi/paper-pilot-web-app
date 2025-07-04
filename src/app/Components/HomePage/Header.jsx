@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, User, LogOut, Settings } from "lucide-react";
 import AuthForms from "./AuthForms";
+import ThemeToggle from "@/components/ThemeToggle";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -104,6 +105,9 @@ function Header() {
             </div>
 
             <div className="hidden md:flex items-center space-x-3">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               {!isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   <button
@@ -168,7 +172,10 @@ function Header() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center space-x-2">
+              {/* Theme Toggle for Mobile */}
+              <ThemeToggle />
+              
               <button
                 onClick={toggleMenu}
                 className="inline-flex items-center justify-center p-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 focus:outline-none transition-all duration-300 transform hover:scale-110 shadow-lg"

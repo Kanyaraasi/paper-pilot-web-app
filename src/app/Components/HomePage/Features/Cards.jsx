@@ -1,59 +1,23 @@
-import React from 'react';
+import React from "react";
 
-// Dummy icon components
-const DummyUpload = ({ className }) => (
-  <div className={`${className} bg-gray-300 rounded-lg flex items-center justify-center`}>
-    <span className="text-xs font-bold text-gray-600">UP</span>
-  </div>
-);
-
-const DummyStar = ({ className }) => (
-  <div className={`${className} bg-gray-300 rounded-full flex items-center justify-center`}>
-    <span className="text-xs font-bold text-gray-600">★</span>
-  </div>
-);
-
-const DummyFileText = ({ className }) => (
-  <div className={`${className} bg-gray-300 rounded flex items-center justify-center`}>
-    <span className="text-xs font-bold text-gray-600">FILE</span>
-  </div>
-);
-
-const DummyMonitor = ({ className }) => (
-  <div className={`${className} bg-gray-300 rounded flex items-center justify-center`}>
-    <span className="text-xs font-bold text-gray-600">MON</span>
-  </div>
-);
-
-const DummyUsers = ({ className }) => (
-  <div className={`${className} bg-gray-300 rounded-full flex items-center justify-center`}>
-    <span className="text-xs font-bold text-gray-600">USR</span>
-  </div>
-);
-
-const DummyLock = ({ className }) => (
-  <div className={`${className} bg-gray-300 rounded flex items-center justify-center`}>
-    <span className="text-xs font-bold text-gray-600">🔒</span>
-  </div>
-);
-
-const FeatureCard = ({ icon: Icon, title, description, accent = "blue" }) => {
+// Feature card component with proper image handling
+const FeatureCard = ({ image, title, description, accent = "blue" }) => {
   const accentColors = {
     blue: "text-blue-500",
     orange: "text-orange-500",
-    yellow: "text-yellow-500"
+    yellow: "text-yellow-500",
   };
 
   return (
     <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="mb-6">
         <div className="relative">
-          <Icon className={`w-12 h-12 ${accentColors[accent]} mb-4`} />
+          <img src={image} alt={title} className="w-16 h-16 object-contain" />
           <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-300 rounded-full"></div>
           <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-300 rounded-full"></div>
         </div>
       </div>
-      
+
       <h3 className="text-xl font-bold text-gray-800 mb-4">{title}</h3>
       <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
@@ -61,76 +25,85 @@ const FeatureCard = ({ icon: Icon, title, description, accent = "blue" }) => {
 };
 
 const FileTypeIcon = ({ type, color }) => (
-  <div className={`inline-flex items-center justify-center w-8 h-6 ${color} text-white text-xs font-bold rounded mr-2 mb-2`}>
+  <div
+    className={`inline-flex items-center justify-center w-8 h-6 ${color} text-white text-xs font-bold rounded mr-2 mb-2`}
+  >
     {type}
   </div>
 );
 
 export default function FeatureShowcase() {
+  // Since we can't import actual images in this environment, I'll use placeholder URLs
+  // Replace these with your actual image paths
+  const images = {
+    saving: "/saving.png",
+    webdesign: "/web-design.png",
+    quality: "/quality.png",
+    pdf: "/pdf.png",
+    textbooks: "/textbooks.png",
+    professionaldevelopment: "/professionaldevelopment.png",
+  };
+
   return (
     <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          
-          {/* Effortless Test Creation */}
           <FeatureCard
-            icon={DummyUpload}
+            image={images.saving}
             title="Save Time"
-            description="Instantly generate questions from your PDF– no signup required. Simply upload your file and let our AI do the work."
+            description="Discover how PaperPilot reduces hours of question paper preparation into minutes, letting teachers focus more on students and less on paperwork."
             accent="blue"
           />
 
-          {/* Intuitive Interface */}
           <FeatureCard
-            icon={DummyStar}
-            title="Intuitive Interface"
-            description="Smallpdf is simple and intuitive to use. There is no learning curve, so you can focus on studying for your quiz or grading those tests."
+            image={images.webdesign}
+            title="Fully Customizable Papers"
+            description="Whether it’s marks distribution, number of questions, or layout—PaperPilot gives you complete control over every detail."
             accent="orange"
           />
 
-          {/* Start From Any Format */}
           <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div className="mb-6">
               <div className="relative">
-                <DummyFileText className="w-12 h-12 text-yellow-500 mb-4" />
-                <div className="flex flex-wrap mt-2">
-                  
-                  <FileTypeIcon type="PDF" color="bg-red-500" />
-                  
-                </div>
+                <img
+                  src={images.pdf}
+                  alt="PDF Format"
+                  className="w-16 h-16 object-contain mb-4"
+                />
               </div>
             </div>
-            
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Start From Any Format</h3>
+
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              Start From Any Format
+            </h3>
             <p className="text-gray-600 leading-relaxed">
-              Need to create questions from a Word document or an image file? No problem. Our AI test generator can also create questions from DOC, PPT, Excel, JPG, PNG, and more.
+              That’s why we built a platform that delivers fully customizable question papers, designed to match your exact teaching goals, exam formats, and curriculum standards.
             </p>
           </div>
 
           {/* Make Tests on Any Device */}
           <FeatureCard
-            icon={DummyMonitor}
-            title="Save Time"
-            description="Create comprehensive question papers in minutes instead of hours. Focus more on teaching, less on paperwork."
+            image={images.textbooks}
+            title=" All Subjects Covered"
+            description="We’re talking about complete coverage, from core academics to optional subjects, across grades and boards.  PaperPilot supports your subject, your syllabus, your way."
             accent="blue"
           />
 
-          {/* Interactive Learning */}
+          {/* High Quality */}
           <FeatureCard
-            icon={DummyUsers}
-            title="High Quality"
-            description="Generate beautifully formatted question papers with proper layout, numbering, and marking schemes."
+            image={images.quality}
+            title="Fully Customizable Papers"
+            description="Whether it’s marks distribution, number of questions, or layout—PaperPilot gives you complete control over every detail."
             accent="orange"
           />
 
-          {/* Secure & Private */}
+          {/* Professional Development */}
           <FeatureCard
-            icon={DummyLock}
-            title="Fully Customizable"
+            image={images.professionaldevelopment}
+            title="Professional Format"
             description="Tailor question papers to your specific curriculum, difficulty level, and format requirements with ease."
             accent="yellow"
           />
-
         </div>
       </div>
     </div>

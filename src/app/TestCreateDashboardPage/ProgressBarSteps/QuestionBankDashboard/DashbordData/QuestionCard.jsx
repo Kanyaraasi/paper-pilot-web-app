@@ -39,34 +39,34 @@ const QuestionCard = ({ question }) => {
       case 'match':
         return (
           <div className="space-y-2">
-            <p className={`text-sm font-medium ${themeClasses.textPrimary} font-inter`}>Match the following:</p>
+            <p className={`text-sm font-medium ${themeClasses.textPrimary} `}>Match the following:</p>
             {question.items?.slice(0, 2).map((item, index) => (
               <div key={item.id} className={`flex justify-between text-sm ${themeClasses.textSecondary}`}>
-                <span className="font-inter">{item.left}</span>
+                <span className="">{item.left}</span>
                 <span className={themeClasses.matchArrow}>→</span>
-                <span className="font-inter">{item.right}</span>
+                <span className="">{item.right}</span>
               </div>
             ))}
             {question.items?.length > 2 && (
-              <p className={`text-xs ${themeClasses.textMuted} font-inter`}>+{question.items.length - 2} more items</p>
+              <p className={`text-xs ${themeClasses.textMuted} `}>+{question.items.length - 2} more items</p>
             )}
           </div>
         );
       case 'mcq':
         return (
           <div className="space-y-2">
-            <p className={`text-sm ${themeClasses.textPrimary} font-inter`}>{question.text}</p>
+            <p className={`text-sm ${themeClasses.textPrimary} `}>{question.text}</p>
             {showAnswers && (
-              <p className={`text-sm ${themeClasses.textAnswer} font-medium font-inter`}>Answer: {question.answer}</p>
+              <p className={`text-sm ${themeClasses.textAnswer} font-medium `}>Answer: {question.answer}</p>
             )}
           </div>
         );
       default:
         return (
           <div className="space-y-2">
-            <p className={`text-sm ${themeClasses.textPrimary} font-inter`}>{question.text}</p>
+            <p className={`text-sm ${themeClasses.textPrimary} `}>{question.text}</p>
             {showAnswers && (
-              <p className={`text-sm ${themeClasses.textAnswer} font-inter`}>{question.answer}</p>
+              <p className={`text-sm ${themeClasses.textAnswer} `}>{question.answer}</p>
             )}
           </div>
         );
@@ -92,7 +92,7 @@ const QuestionCard = ({ question }) => {
           {question.tags && question.tags.length > 0 && (
             <div className="mt-1.5 flex flex-wrap gap-1">
               {question.tags.map(tag => (
-                <span key={tag} className={`px-1.5 py-0.5 text-xs ${themeClasses.tagBackground} rounded text-nowrap font-inter`}>
+                <span key={tag} className={`px-1.5 py-0.5 text-xs ${themeClasses.tagBackground} rounded text-nowrap `}>
                   {tag}
                 </span>
               ))}

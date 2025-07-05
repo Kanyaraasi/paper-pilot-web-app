@@ -33,7 +33,7 @@ const Sidebar = () => {
   return (
     <aside className={`w-64 ${themeClasses.sidebarBackground} border-r overflow-y-auto`}>
       <div className="p-4">
-        <h2 className={`text-sm font-medium ${themeClasses.headerText} uppercase tracking-wide mb-4 font-inter`}>
+        <h2 className={`text-sm font-medium ${themeClasses.headerText} uppercase tracking-wide mb-4 `}>
           Chapters Names
         </h2>
 
@@ -55,11 +55,11 @@ const Sidebar = () => {
                   <BookOpen className={`w-4 h-4 flex-shrink-0 ${
                     isActive ? themeClasses.iconActiveColor : themeClasses.iconColor
                   }`} />
-                  <span className="truncate text-left font-inter">
+                  <span className="truncate text-left ">
                     {chapter.name}
                   </span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-inter ${
+                <span className={`text-xs px-2 py-1 rounded-full  ${
                   isActive ? themeClasses.badgeActive : themeClasses.badgeBase
                 }`}>
                   {count}

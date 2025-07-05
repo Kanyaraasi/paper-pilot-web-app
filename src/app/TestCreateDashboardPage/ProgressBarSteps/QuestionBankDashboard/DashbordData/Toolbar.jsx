@@ -101,7 +101,7 @@ const Toolbar = ({ showSortDropdown, setShowSortDropdown }) => {
   ];
 
   return (
-    <div className={`${themeClasses.toolbarBg} border-b ${themeClasses.toolbarBorder} px-4 py-3 font-inter`}>
+    <div className={`${themeClasses.toolbarBg} border-b ${themeClasses.toolbarBorder} px-4 py-3 `}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <span className={`text-sm ${themeClasses.textSecondary} font-medium`}>

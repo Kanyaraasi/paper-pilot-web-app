@@ -34,8 +34,8 @@ const HowItWorkPage = () => {
   const themeClasses = getThemeClasses();
 
   return (
-    <div className={`w-full ${themeClasses.pageBackground} flex items-center justify-center min-h-screen p-4 transition-colors duration-200`}>
-      <div className={`w-full max-w-7xl ${themeClasses.cardBackground} rounded-2xl shadow-lg overflow-hidden min-h-[90vh]`}>
+<div className={`w-full ${themeClasses.pageBackground} flex items-center justify-center min-h-screen pt-[160px] p-4 transition-colors duration-200`}>
+        <div className={`w-full max-w-7xl ${themeClasses.cardBackground} rounded-2xl shadow-lg overflow-hidden min-h-[90vh]`}>
         <div className="flex flex-col md:flex-row min-h-[90vh]">
           {/* Left Container - Logo */}
           <div className="flex-1 p-8 md:p-16 flex items-center justify-center relative min-h-[40vh] md:min-h-[90vh]">

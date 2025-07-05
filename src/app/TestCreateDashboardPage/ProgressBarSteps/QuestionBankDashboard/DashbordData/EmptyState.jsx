@@ -27,16 +27,16 @@ const EmptyState = ({ hasSearchQuery, resetFilters, initNewQuestion }) => {
   const themeClasses = getThemeClasses();
 
   return (
-    <div className={`${themeClasses.cardBackground} rounded-lg shadow-sm border p-8 text-center font-inter`}>
+    <div className={`${themeClasses.cardBackground} rounded-lg shadow-sm border p-8 text-center`}>
       <div className="mb-4">
         <div className={`${themeClasses.iconBackground} h-16 w-16 rounded-full flex items-center justify-center mx-auto`}>
           <Search size={32} className={themeClasses.iconColor} />
         </div>
       </div>
-      <h3 className={`text-xl font-semibold ${themeClasses.iconBackground} mb-2 font-inter`}>
+      <h3 className={`text-xl font-semibold ${themeClasses.iconBackground} mb-2`}>
         No questions found
       </h3>
-      <p className={`${themeClasses.textMuted} mb-6 font-inter`}>
+      <p className={`${themeClasses.textMuted} mb-6 `}>
         {hasSearchQuery
           ? "Try adjusting your filters or search query to find questions"
           : "Start by adding your first question to the bank"}
@@ -44,14 +44,14 @@ const EmptyState = ({ hasSearchQuery, resetFilters, initNewQuestion }) => {
       {hasSearchQuery ? (
         <button
           onClick={resetFilters}
-          className={`${themeClasses.buttonSecondary} font-medium transition-colors underline underline-offset-2 font-inter`}
+          className={`${themeClasses.buttonSecondary} font-medium transition-colors underline underline-offset-2`}
         >
           Clear all filters
         </button>
       ) : (
         <button
           onClick={initNewQuestion}
-          className={`${themeClasses.buttonPrimary} flex items-center gap-2 px-6 py-3 rounded-md transition-all font-medium mx-auto font-inter`}
+          className={`${themeClasses.buttonPrimary} flex items-center gap-2 px-6 py-3 rounded-md transition-all font-medium mx-auto`}
         >
           <PlusCircle size={20} />
           Add Your First Question

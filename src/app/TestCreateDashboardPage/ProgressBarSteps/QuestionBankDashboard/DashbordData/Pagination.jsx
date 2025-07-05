@@ -65,7 +65,7 @@ const Pagination = () => {
   if (totalPage <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center space-x-2 mt-6 font-inter">
+    <div className="flex items-center justify-center space-x-2 mt-6 ">
       <button
         onClick={() => paginate(currentPage - 1)}
         disabled={currentPage === 1}
@@ -77,11 +77,11 @@ const Pagination = () => {
       {getPageNumbers().map((page, index) => (
         <React.Fragment key={index}>
           {page === '...' ? (
-            <span className={`px-3 py-2 ${themeClasses.textMuted} font-inter`}>...</span>
+            <span className={`px-3 py-2 ${themeClasses.textMuted} `}>...</span>
           ) : (
             <button
               onClick={() => paginate(page)}
-              className={`px-3 py-2 rounded-lg border transition-colors font-inter ${
+              className={`px-3 py-2 rounded-lg border transition-colors  ${
                 currentPage === page
                   ? themeClasses.buttonActive
                   : themeClasses.buttonBase

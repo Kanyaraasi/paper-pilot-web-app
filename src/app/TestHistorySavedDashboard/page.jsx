@@ -367,9 +367,9 @@ const TestHistorySavedDashboard = () => {
   }
 
   return (
-    <div className={`min-h-screen ${themeClasses.pageBackground} font-sans`}>
+    <div className={`min-h-screen ${themeClasses.pageBackground}`}>
       {/* Header */}
-      <header className={`${themeClasses.headerBackground} backdrop-blur-sm shadow-sm border-b sticky top-0 z-30`}>
+      <header className={`${themeClasses.headerBackground} backdrop-blur-sm shadow-sm border-b sticky top-[80px] z-30`}>
         <div className="max-w-7xl mx-auto sm:px-6 ">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
@@ -440,7 +440,7 @@ const TestHistorySavedDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4 mb-40">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4 pt-[160px] mb-40">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className={`${themeClasses.statsCard} backdrop-blur-sm shadow-sm border p-4`}>

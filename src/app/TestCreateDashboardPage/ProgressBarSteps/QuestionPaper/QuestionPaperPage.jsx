@@ -254,7 +254,7 @@ const QuestionPaper = () => {
   };
 
   const ToggleButton = ({ isOn, onToggle, label, icon: Icon }) => (
-    <div className={`flex items-center justify-between p-3 ${themeClasses.toggleButton} rounded-lg transition-colors font-inter`}>
+    <div className={`flex items-center justify-between p-3 ${themeClasses.toggleButton} rounded-lg transition-colors `}>
       <div className="flex items-center gap-2">
         <Icon className={`w-4 h-4 ${themeClasses.textSecondary}`} />
         <span className={`text-sm font-medium ${themeClasses.textPrimary}`}>{label}</span>
@@ -286,7 +286,7 @@ const QuestionPaper = () => {
         id="print-section"
         className="hidden"
       >
-        <div className="relative p-8 text-black bg-white font-inter" style={{ minHeight: '297mm' }}>
+        <div className="relative p-8 text-black bg-white " style={{ minHeight: '297mm' }}>
           {showWatermark && (
             <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
               {generateWatermarkPattern().map((pos) => (
@@ -318,7 +318,7 @@ const QuestionPaper = () => {
       {/* PDF Content - Optimized for PDF generation */}
       <div 
         id="pdf-content"
-        className="relative bg-white text-black font-inter"
+        className="relative bg-white text-black "
         style={{ width: '210mm', minHeight: '297mm', margin: '0 auto', padding: '4mm' }}
       >
         {showWatermark && (
@@ -349,7 +349,7 @@ const QuestionPaper = () => {
 
       {/* Display Content - Visible to users */}
       <div 
-        className={`relative border-2 ${themeClasses.paperBorder} p-8 ${themeClasses.paperText} ${themeClasses.paperBackground} h-full overflow-hidden lg:hidden font-inter`}
+        className={`relative border-2 ${themeClasses.paperBorder} p-8 ${themeClasses.paperText} ${themeClasses.paperBackground} h-full overflow-hidden lg:hidden `}
         style={{ minHeight: '297mm' }}
       >
         {showWatermark && (
@@ -460,7 +460,7 @@ const QuestionPaper = () => {
   );
 
   return (
-    <div className={`min-h-screen ${themeClasses.pageBackground} font-inter`}>
+    <div className={`min-h-screen ${themeClasses.pageBackground} `}>
       {/* Notification */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 ${

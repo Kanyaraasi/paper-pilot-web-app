@@ -87,7 +87,7 @@ function HomePage() {
       )}
 
       {/* Navigation */}
-      <Header />
+      {/* <Header /> */}
 
       {/* Main Content */}
       <main>

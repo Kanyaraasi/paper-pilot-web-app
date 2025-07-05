@@ -21,7 +21,7 @@ const SelectedBar = ({ selectedCount, onClearSelection }) => {
   return (
     <div className={`${themeClasses.barBackground} border-b px-4 py-3 flex items-center justify-between`}>
       <div className="flex items-center space-x-3">
-        <span className={`text-sm font-medium ${themeClasses.textPrimary} font-inter`}>
+        <span className={`text-sm font-medium ${themeClasses.textPrimary}`}>
           {selectedCount} question{selectedCount !== 1 ? 's' : ''} selected
         </span>
       </div>
@@ -29,7 +29,7 @@ const SelectedBar = ({ selectedCount, onClearSelection }) => {
       <div className="flex items-center space-x-2">
         <button
           onClick={onClearSelection}
-          className={`flex items-center space-x-2 px-3 py-1.5 text-sm ${themeClasses.buttonText} rounded-lg transition-colors font-inter`}
+          className={`flex items-center space-x-2 px-3 py-1.5 text-sm ${themeClasses.buttonText} rounded-lg transition-colors`}
         >
           <X className={`w-4 h-4 ${themeClasses.iconColor}`} />
           <span>Clear Selection</span>

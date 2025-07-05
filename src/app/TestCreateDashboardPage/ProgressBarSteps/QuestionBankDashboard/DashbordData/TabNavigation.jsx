@@ -32,7 +32,7 @@ const TabNavigation = () => {
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors font-inter ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors  ${
                   isActive ? themeClasses.tabActive : themeClasses.tabInactive
                 }`}
               >

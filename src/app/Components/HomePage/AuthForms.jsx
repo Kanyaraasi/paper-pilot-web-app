@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, User, Lock, User as UserIcon } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 import axios from "axios";
 import { BASE_URL } from "../../../../BASE_URL";
 // import { toast } from 'react-toastify';
 
 function AuthForms() {
+  const { theme } = useTheme();
+
   const [loginData, setLoginData] = useState({
     schoolName: "",
     password: "",
@@ -26,6 +29,39 @@ function AuthForms() {
   const [hideConfirmPass, setHideConfirmPass] = useState(true);
   const [isRegisterForm, setIsRegisterForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Theme classes
+  const getThemeClasses = () => {
+    const isDark = theme === 'dark';
+    
+    return {
+      pageBackground: isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50',
+      cardBackground: isDark ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-gray-200',
+      cardHover: isDark ? 'hover:bg-gray-700/90' : 'hover:bg-white/95',
+      textPrimary: isDark ? 'text-gray-100' : 'text-gray-900',
+      textSecondary: isDark ? 'text-gray-300' : 'text-gray-600',
+      textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
+      inputBase: isDark 
+        ? 'bg-gray-700/50 border-gray-600 text-gray-100 placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400' 
+        : 'bg-white/70 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-sky-500 focus:ring-sky-500',
+      buttonPrimary: isDark 
+        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+        : 'bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white',
+      linkPrimary: isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500',
+      iconColor: isDark ? 'text-gray-400' : 'text-gray-400',
+      iconHover: isDark ? 'hover:text-blue-400' : 'hover:text-blue-600',
+      errorBg: isDark ? 'bg-red-900/50 border-red-700 text-red-300' : 'bg-red-100 border-red-500 text-red-700',
+      successBg: isDark ? 'bg-green-900/50 border-green-700 text-green-300' : 'bg-green-100 border-green-500 text-green-700',
+      checkboxBase: isDark 
+        ? 'text-blue-400 focus:ring-blue-400 border-gray-600 bg-gray-700' 
+        : 'text-blue-600 focus:ring-blue-500 border-gray-300 bg-white',
+      gradientText: isDark 
+        ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400' 
+        : 'text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-indigo-600',
+    };
+  };
+
+  const themeClasses = getThemeClasses();
 
   // Success message auto-hide effect
   useEffect(() => {
@@ -62,22 +98,16 @@ function AuthForms() {
       console.log("respoooo", response);
       const token = response.data.token;
       const roleType = response.data.institute.type;
-      // const slotType = response.data.user?.role;
+      
       // Save token to localStorage or cookie
       localStorage.setItem("token", token);
       localStorage.setItem("roleType", roleType);
-      // localStorage.setItem("roleType", slotType);
+      
       setSuccess("Login successful");
       setTimeout(() => {
-        // if (slotType === "admin") {
-        // window.location.href = "/CreateUser";
-        // } else if (slotType === "teacher") {
         window.location.href = "/TestHistorySavedDashboard";
-        //           window.location.href = "/TestCreateDashboardPage";
-        // } else {
-        // setError("Unknown user type.");
-        // }
       }, 1000);
+      
       console.log("JWT Token:", token);
       setLoginData({
         schoolName: "",
@@ -88,6 +118,8 @@ function AuthForms() {
       setError(
         error.response?.data?.message || "Login failed. Please try again."
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,23 +151,23 @@ function AuthForms() {
   };
 
   return (
-    <div className="bg-white p-2 rounded-xl shadow-xl w-[100%]  mx-auto border border-gray-100 hover:shadow-2xl transition-shadow duration-500 relative overflow-hidden">
+    <div className={`${themeClasses.cardBackground} ${themeClasses.cardHover} p-6 rounded-xl shadow-xl w-full max-w-md mx-auto border backdrop-blur-sm transition-all duration-500 relative overflow-hidden`}>
       {/* Alert Messages */}
       {error && (
         <div
-          className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative animate-shake mb-4"
+          className={`${themeClasses.errorBg} border-l-4 px-4 py-3 rounded relative animate-pulse mb-4 font-medium`}
           role="alert"
         >
-          <span className="font-medium">Error:</span> {error}
+          <span className="font-semibold">Error:</span> {error}
         </div>
       )}
 
       {success && (
         <div
-          className="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded relative mb-4"
+          className={`${themeClasses.successBg} border-l-4 px-4 py-3 rounded relative mb-4 font-medium`}
           role="alert"
         >
-          <span className="font-medium">Success:</span> {success}
+          <span className="font-semibold">Success:</span> {success}
         </div>
       )}
 
@@ -148,44 +180,49 @@ function AuthForms() {
         }`}
         style={{ padding: "1rem" }}
       >
-        <h2 className="text-center text-2xl font-bold text-gray-800 mb-6">
-          Log in to PaperPilot
-        </h2>
+        <div className="text-center mb-8">
+          <h2 className={`text-3xl font-bold ${themeClasses.gradientText} mb-2`}>
+            Welcome Back
+          </h2>
+          <p className={`${themeClasses.textSecondary} text-sm font-medium`}>
+            Sign in to your PaperPilot account
+          </p>
+        </div>
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div className="space-y-1">
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
             <label
               htmlFor="schoolName"
-              className="block text-sm font-medium text-gray-700"
+              className={`block text-sm font-semibold ${themeClasses.textPrimary}`}
             >
-              School Name
+              Institute Email
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
+                <User className={`h-5 w-5 ${themeClasses.iconColor}`} />
               </div>
               <input
                 id="schoolName"
-                type="text"
-                placeholder="Enter your school name"
+                type="email"
+                placeholder="Enter your institute email"
                 value={loginData.schoolName}
                 onChange={handleLoginInputChange}
                 required
-                className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg font-medium ${themeClasses.inputBase} focus:outline-none focus:ring-2 transition-all duration-300 backdrop-blur-sm`}
               />
             </div>
           </div>
 
-          <div className="space-y-1 relative">
+          <div className="space-y-2">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className={`block text-sm font-semibold ${themeClasses.textPrimary}`}
             >
               Password
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+                <Lock className={`h-5 w-5 ${themeClasses.iconColor}`} />
               </div>
               <input
                 id="password"
@@ -194,12 +231,12 @@ function AuthForms() {
                 value={loginData.password}
                 onChange={handleLoginInputChange}
                 required
-                className="w-full pl-10 p-3 border border-gray-300 rounded-lg text-gray-800 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                className={`w-full pl-10 pr-12 py-3 border rounded-lg font-medium ${themeClasses.inputBase} focus:outline-none focus:ring-2 transition-all duration-300 backdrop-blur-sm`}
               />
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility("login")}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-blue-600 transition-colors duration-300"
+                className={`absolute inset-y-0 right-0 flex items-center px-3 ${themeClasses.iconColor} ${themeClasses.iconHover} transition-colors duration-300`}
               >
                 {hidePass ? (
                   <Eye className="h-5 w-5" />
@@ -215,15 +252,15 @@ function AuthForms() {
               <input
                 type="checkbox"
                 id="remember"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className={`h-4 w-4 rounded ${themeClasses.checkboxBase} focus:ring-2 transition-colors duration-300`}
               />
-              <label htmlFor="remember" className="ml-2 block text-gray-700">
+              <label htmlFor="remember" className={`ml-2 font-medium ${themeClasses.textSecondary}`}>
                 Remember me
               </label>
             </div>
             <a
               href="#"
-              className="text-blue-600 hover:text-blue-500 font-medium"
+              className={`${themeClasses.linkPrimary} font-semibold transition-colors duration-300`}
             >
               Forgot password?
             </a>
@@ -231,25 +268,46 @@ function AuthForms() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-all duration-300 font-medium transform hover:scale-105 flex items-center justify-center"
+            disabled={isLoading}
+            className={`w-full ${themeClasses.buttonPrimary} py-3 rounded-lg transition-all duration-300 font-semibold transform hover:scale-[1.02] active:scale-95 flex items-center justify-center shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <span>Sign In</span>
-            <svg
-              className="w-5 h-5 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M14 5l7 7m0 0l-7 7m7-7H3"
-              ></path>
-            </svg>
+            {isLoading ? (
+              <div className="flex items-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                <span>Signing In...</span>
+              </div>
+            ) : (
+              <>
+                <span>Sign In</span>
+                <svg
+                  className="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </>
+            )}
           </button>
         </form>
+
+        {/* <div className="mt-6 text-center">
+          <p className={`text-sm ${themeClasses.textSecondary} font-medium`}>
+            Don't have an account?{" "}
+            <button
+              onClick={toggleFormMode}
+              className={`${themeClasses.linkPrimary} font-semibold transition-colors duration-300`}
+            >
+              Sign up here
+            </button>
+          </p>
+        </div> */}
       </div>
     </div>
   );

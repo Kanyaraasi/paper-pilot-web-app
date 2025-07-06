@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from "@/contexts/ThemeContext";
+import { ArrowBigLeft, ArrowBigLeftDash, ArrowBigRightDash, Play, PlayIcon } from 'lucide-react';
 
 function Hero({ animated = true, onGetStarted }) {
   const [typedText, setTypedText] = useState("");
@@ -85,8 +86,8 @@ function Hero({ animated = true, onGetStarted }) {
 
   return (
     <div className={`min-h-screen ${themeClasses.pageBackground} relative overflow-hidden`}>
-      <div className="relative pt-20 pb-5 px-4 max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+      <div className="relative pt-10 pb-5 px-4 max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
           {/* Left Container - Enhanced Text Content */}
           <div className={`w-full lg:w-7/12 ${themeClasses.textPrimary} space-y-8 ${
             animated ? 'animate-fadeIn' : 'opacity-0'
@@ -109,7 +110,7 @@ function Hero({ animated = true, onGetStarted }) {
               </h1>
             </div>
             
-            <div className="h-10 md:h-10 mt-1">
+            <div className="h-10 md:h-6 mt-1">
               <h2 className={`text-2xl md:text-3xl font-semibold ${
                 theme === 'dark'
                   ? 'bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent'
@@ -127,7 +128,7 @@ function Hero({ animated = true, onGetStarted }) {
             </p>
             
             {/* Feature highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className={`flex items-center space-x-3 ${themeClasses.subjectCard} p-4 rounded-lg border shadow-sm hover:shadow-md transition-all`}>
                 <div className={`w-10 h-10 ${
                   theme === 'dark' 
@@ -174,9 +175,7 @@ function Hero({ animated = true, onGetStarted }) {
               <Link href="/HowItWorkPage">
                 <button className={`px-8 py-4 border-2 ${themeClasses.buttonSecondary} rounded-xl font-semibold transition-all transform hover:scale-105 duration-300 flex items-center justify-center`}>
                   Watch Demo
-                  <svg className="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15" />
-                  </svg>
+                 <ArrowBigRightDash/>
                 </button>
               </Link>
             </div>
@@ -186,9 +185,7 @@ function Hero({ animated = true, onGetStarted }) {
           <div className={`w-full lg:w-6/12 lg:mt-0 ${
             animated ? 'animate-slideInRight' : 'opacity-0'
           }`}>
-            <div className={`relative rounded-lg animate-floatSmooth w-full ${
-              theme === 'dark' ? 'shadow-2xl shadow-blue-900/20' : 'shadow-xl'
-            }`}>
+            <div className={`relative rounded-lg animate-floatSmooth w-full `}>
               <Image
                 src="/HomepageImage.png"
                 alt="Paper Pilot Study Fest"

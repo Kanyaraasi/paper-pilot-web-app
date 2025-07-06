@@ -101,7 +101,7 @@ function Header() {
   return (
     <>
       <nav
-        className={`fixed w-full z-50 transition-all duration-500 ${
+        className={` w-full z-50 transition-all duration-500 ${
           isScrolled
             ? `${themeClasses.headerBackground} shadow-lg ${themeClasses.headerShadow} py-2`
             : `${themeClasses.headerBackground} shadow ${themeClasses.headerShadow} py-3`

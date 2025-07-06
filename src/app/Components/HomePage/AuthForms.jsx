@@ -3,7 +3,6 @@ import { Eye, EyeOff, User, Lock, User as UserIcon } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 import axios from "axios";
-import { BASE_URL } from "../../../../BASE_URL";
 // import { toast } from 'react-toastify';
 
 function AuthForms() {
@@ -88,8 +87,7 @@ function AuthForms() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}/api/auth/institute/login`,
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/institute/login`,
         {
           email: loginData.schoolName,
           password: loginData.password,

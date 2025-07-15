@@ -179,6 +179,8 @@ const Dashboard = () => {
 
   const handleContinueToQuestionPaper = () => {
     const allSelected = questionBank.getAllSelectedQuestions();
+    console.log('Selected questions for paper:', allSelected);
+    
     if (allSelected.length === 0) {
       questionBank.showToastMessage('Please select at least one question to continue', 'error');
       return;
@@ -186,6 +188,7 @@ const Dashboard = () => {
     
     // Save selected questions data to session storage
     sessionStorage.setItem('selectedQuestionsData', JSON.stringify(allSelected));
+    console.log('Saved to session storage:', allSelected);
     
     // Continue to next step (question paper)
     if (questionBank.onNext) {

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// import { useTheme } from '../contexts/ThemeContext';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSessionStorage } from '../../../TestCreateDashboardPage/ProgressBarSteps/QuestionBankDashboard/hooks/useSessionStorage';
 import { 
@@ -51,10 +50,12 @@ const QuestionPaper = ({ formData, onPrevious }) => {
   useEffect(() => {
     // Get selected questions data from session storage
     const selectedQuestionsData = sessionStorage.getItem('selectedQuestionsData');
+    console.log('Reading from session storage:', selectedQuestionsData);
     
     if (selectedQuestionsData) {
       try {
         const questionsData = JSON.parse(selectedQuestionsData);
+        console.log('Parsed questions data:', questionsData);
         
         // Transform questions for paper display
         const transformedQuestions = questionsData.map((question, index) => {
@@ -100,7 +101,7 @@ const QuestionPaper = ({ formData, onPrevious }) => {
   }, []);
 
   // Get default marks based on question type
-  const getDefaultMarks = (type) => {
+  const getDefaultMarks = useCallback((type) => {
     const marksMap = {
       'fill': 2,
       'brief': 3,
@@ -112,12 +113,15 @@ const QuestionPaper = ({ formData, onPrevious }) => {
       'numerical': 4
     };
     return marksMap[type] || 2;
-  };
+  }, []);
 
   // Calculate total marks
-  const totalMarks = questionPaper.reduce((sum, question) => sum + (question.marks || 0), 0);
+  const totalMarks = useMemo(() => 
+    questionPaper.reduce((sum, question) => sum + (question.marks || 0), 0), 
+    [questionPaper]
+  );
 
-  const getThemeClasses = () => {
+  const getThemeClasses = useMemo(() => {
     const isDark = theme === 'dark';
     
     return {
@@ -162,88 +166,114 @@ const QuestionPaper = ({ formData, onPrevious }) => {
       shadowCard: isDark ? 'shadow-lg shadow-gray-900/20' : 'shadow-sm',
       shadowHover: isDark ? 'hover:shadow-xl hover:shadow-gray-900/30' : 'hover:shadow-md',
     };
-  };
+  }, [theme]);
 
-  const themeClasses = getThemeClasses();
+  const themeClasses = getThemeClasses;
 
-  const showNotification = (message, type = 'success') => {
+  const showNotification = useCallback((message, type = 'success') => {
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
-  };
+    const timer = setTimeout(() => setNotification(null), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const handlePrint = () => {
-    const printContent = document.getElementById('print-section');
-    const WinPrint = window.open('', '', 'width=900,height=650');
-    WinPrint.document.write(`
-      <html>
-        <head>
-          <title>Question Paper - ${examDetails.subject}</title>
-          <style>
-            body { 
-              font-family: Inter, Arial, sans-serif; 
-              margin: 20px; 
-              position: relative; 
-              background: white;
-            }
-            .question { margin-bottom: 20px; page-break-inside: avoid; }
-            .options { margin-left: 20px; margin-top: 8px; }
-            .match-items { margin-left: 20px; margin-top: 8px; }
-            .watermark-container {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              pointer-events: none;
-              z-index: 0;
-              overflow: hidden;
-            }
-            .watermark-text {
-              position: absolute;
-              font-size: 28px;
-              font-weight: bold;
-              color: rgba(0, 0, 0, 0.08);
-              transform: rotate(-45deg);
-              white-space: nowrap;
-              user-select: none;
-              font-family: Inter, Arial, sans-serif;
-              letter-spacing: 2px;
-            }
-            .content { 
-              position: relative; 
-              z-index: 1; 
-              background: transparent;
-            }
-            .question-header {
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-start;
-              margin-bottom: 8px;
-            }
-            .question-text {
-              flex: 1;
-              padding-right: 10px;
-            }
-            .question-marks {
-              font-size: 12px;
-              background: #f0f0f0;
-              padding: 2px 8px;
-              border-radius: 12px;
-              white-space: nowrap;
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
-    showNotification('Question paper sent to printer!');
-  };
+
+  const handlePrint = useCallback(() => {
+    try {
+      const printContent = document.getElementById('print-section');
+      if (!printContent) {
+        showNotification('Print content not found', 'error');
+        return;
+      }
+
+      const WinPrint = window.open('', '', 'width=900,height=650');
+      if (!WinPrint) {
+        showNotification('Unable to open print window. Please check popup blockers.', 'error');
+        return;
+      }
+
+      WinPrint.document.write(`
+        <html>
+          <head>
+            <title>Question Paper - ${examDetails.subject || 'Subject'}</title>
+            <style>
+              body { 
+                font-family: Inter, Arial, sans-serif; 
+                margin: 20px; 
+                position: relative; 
+                background: white;
+              }
+              .question { margin-bottom: 20px; page-break-inside: avoid; }
+              .options { margin-left: 20px; margin-top: 8px; }
+              .match-items { margin-left: 20px; margin-top: 8px; }
+              .watermark-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                overflow: hidden;
+              }
+              .watermark-text {
+                position: absolute;
+                font-size: 28px;
+                font-weight: bold;
+                color: rgba(0, 0, 0, 0.08);
+                transform: rotate(-45deg);
+                white-space: nowrap;
+                user-select: none;
+                font-family: Inter, Arial, sans-serif;
+                letter-spacing: 2px;
+              }
+              .content { 
+                position: relative; 
+                z-index: 1; 
+                background: transparent;
+              }
+              .question-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 8px;
+              }
+              .question-text {
+                flex: 1;
+                padding-right: 10px;
+              }
+              .question-marks {
+                font-size: 12px;
+                background: #f0f0f0;
+                padding: 2px 8px;
+                border-radius: 12px;
+                white-space: nowrap;
+              }
+              @media print {
+                body { margin: 0; }
+                .question { page-break-inside: avoid; }
+              }
+            </style>
+          </head>
+          <body>
+            ${printContent.innerHTML}
+          </body>
+        </html>
+      `);
+      WinPrint.document.close();
+      WinPrint.focus();
+      
+      // Add slight delay for better browser compatibility
+      setTimeout(() => {
+        WinPrint.print();
+        WinPrint.close();
+      }, 100);
+      
+      showNotification('Question paper sent to printer!');
+    } catch (error) {
+      console.error('Print error:', error);
+      showNotification('Error printing document. Please try again.', 'error');
+    }
+  }, [examDetails.subject, showNotification]);
 
   const handleDownloadPDF = async () => {
     try {
@@ -549,38 +579,7 @@ const QuestionPaper = ({ formData, onPrevious }) => {
       </div>
 
       {/* Display Content - Visible to users */}
-      <div 
-        className={`relative border-2 ${themeClasses.paperBorder} p-8 ${themeClasses.paperText} ${themeClasses.paperBackground} h-full overflow-hidden lg:block`}
-        style={{ minHeight: '297mm' }}
-      >
-        {showWatermark && (
-          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-            {generateWatermarkPattern().map((pos) => (
-              <div
-                key={pos.id}
-                className="absolute select-none"
-                style={{
-                  left: `${pos.x}px`,
-                  top: `${pos.y}px`,
-                  transform: 'rotate(-45deg)',
-                  fontSize: '48px',
-                  fontWeight: 'bold',
-                  color: 'rgba(0, 0, 0, 0.08)',
-                  whiteSpace: 'nowrap',
-                  fontFamily: 'Inter, Arial, sans-serif',
-                  letterSpacing: '2px',
-                  userSelect: 'none',
-                }}
-              >
-                P.E.M HIGH SCHOOL
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="relative z-10">
-          <QuestionPaperContent />
-        </div>
-      </div>
+      
     </div>
   );
 

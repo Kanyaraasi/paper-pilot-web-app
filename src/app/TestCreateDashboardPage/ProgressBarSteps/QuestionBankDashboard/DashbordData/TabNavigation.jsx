@@ -3,7 +3,7 @@ import { useQuestionBank } from './Context/QuestionBankContext';
 import { useTheme } from "@/contexts/ThemeContext";
 
 const TabNavigation = () => {
-  const { activeTab, setActiveTab, tabTitles, questions, selectedQuestions } = useQuestionBank();
+  const { activeTab, setActiveTab, tabTitles, questions } = useQuestionBank();
   const { theme } = useTheme();
 
   const getThemeClasses = () => {
@@ -26,23 +26,17 @@ const TabNavigation = () => {
         <div className="flex space-x-8 overflow-x-auto">
           {Object.entries(tabTitles).map(([key, title]) => {
             const count = questions[key]?.length || 0;
-            const selectedCount = selectedQuestions[key]?.length || 0;
             const isActive = activeTab === key;
             
             return (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors flex items-center gap-2 ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors  ${
                   isActive ? themeClasses.tabActive : themeClasses.tabInactive
                 }`}
               >
-                <span>{title} ({count})</span>
-                {selectedCount > 0 && (
-                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                    {selectedCount} selected
-                  </span>
-                )}
+                {title} ({count})
               </button>
             );
           })}

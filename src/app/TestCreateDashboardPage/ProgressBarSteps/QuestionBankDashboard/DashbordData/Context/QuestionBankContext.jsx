@@ -407,25 +407,6 @@ useEffect(() => {
     setCurrentPage(pageNumber);
   };
 
-  const getAllSelectedQuestions = () => {
-    const allSelected = [];
-    Object.keys(selectedQuestions).forEach(questionType => {
-      const questionIds = selectedQuestions[questionType];
-      const typeQuestions = questions[questionType] || [];
-      
-      questionIds.forEach(questionId => {
-        const question = typeQuestions.find(q => q.id === questionId);
-        if (question) {
-          allSelected.push({
-            ...question,
-            type: questionType
-          });
-        }
-      });
-    });
-    return allSelected;
-  };
-
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -455,11 +436,6 @@ useEffect(() => {
     activeChapter,
     setActiveChapter,
     loadSubjectChapters,
-
-    // Navigation Props
-    onNext,
-    onPrevious,
-    currentStep,
   
     // Filter States
     searchQuery,
@@ -509,8 +485,7 @@ useEffect(() => {
     toggleStarred,
     toggleTagSelection,
     resetFilters,
-    paginate,
-    getAllSelectedQuestions
+    paginate
   };
 
   return (

@@ -1,85 +1,53 @@
 'use client'
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProgressBar from '../Components/ProgressBar/ProgressBar';
-import Loading from '../Components/Loader/Loading';
+import TestDashboard from './ProgressBarSteps/TestDetailsPage/TestDetailsPage';
+import MainDashboard from './ProgressBarSteps/QuestionBankDashboard/MainDashboard';
+import FinalQuestionPaperPage from './ProgressBarSteps/QuestionPaper/QuestionPaperPage';
 import Footer from '../FooterPage/page';
-
-// Lazy load components for better performance
-const TestDashboard = lazy(() => import('./ProgressBarSteps/TestDetailsPage/TestDetailsPage'));
-const MainDashboard = lazy(() => import('./ProgressBarSteps/QuestionBankDashboard/MainDashboard'));
-const FinalQuestionPaperPage = lazy(() => import('./ProgressBarSteps/QuestionPaper/QuestionPaperPage'));
 
 const TestCreateDashboardPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({});
   const [selectedQuestions, setSelectedQuestions] = useState([]);
 
-  // Load state from localStorage on component mount with error handling
+  // Load state from localStorage on component mount
   useEffect(() => {
-    try {
-      const savedStep = localStorage.getItem('testDashboard_currentStep');
-      const savedFormData = localStorage.getItem('testDashboard_formData');
-      const savedQuestions = localStorage.getItem('testDashboard_selectedQuestions');
+    const savedStep = localStorage.getItem('testDashboard_currentStep');
+    const savedFormData = localStorage.getItem('testDashboard_formData');
+    const savedQuestions = localStorage.getItem('testDashboard_selectedQuestions');
 
-      if (savedStep) {
-        const step = parseInt(savedStep, 10);
-        if (step >= 1 && step <= 3) {
-          setCurrentStep(step);
-        }
-      }
-      if (savedFormData) {
-        try {
-          setFormData(JSON.parse(savedFormData));
-        } catch (parseError) {
-          console.warn('Failed to parse saved form data:', parseError);
-          localStorage.removeItem('testDashboard_formData');
-        }
-      }
-      if (savedQuestions) {
-        try {
-          setSelectedQuestions(JSON.parse(savedQuestions));
-        } catch (parseError) {
-          console.warn('Failed to parse saved questions:', parseError);
-          localStorage.removeItem('testDashboard_selectedQuestions');
-        }
-      }
-    } catch (error) {
-      console.error('Error loading saved state:', error);
+    if (savedStep) {
+      setCurrentStep(parseInt(savedStep));
+    }
+    if (savedFormData) {
+      setFormData(JSON.parse(savedFormData));
+    }
+    if (savedQuestions) {
+      setSelectedQuestions(JSON.parse(savedQuestions));
     }
   }, []);
 
-  // Save state to localStorage whenever it changes with error handling
+  // Save state to localStorage whenever it changes
   useEffect(() => {
-    try {
-      localStorage.setItem('testDashboard_currentStep', currentStep.toString());
-    } catch (error) {
-      console.error('Failed to save current step:', error);
-    }
+    localStorage.setItem('testDashboard_currentStep', currentStep.toString());
   }, [currentStep]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('testDashboard_formData', JSON.stringify(formData));
-    } catch (error) {
-      console.error('Failed to save form data:', error);
-    }
+    localStorage.setItem('testDashboard_formData', JSON.stringify(formData));
   }, [formData]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('testDashboard_selectedQuestions', JSON.stringify(selectedQuestions));
-    } catch (error) {
-      console.error('Failed to save selected questions:', error);
-    }
+    localStorage.setItem('testDashboard_selectedQuestions', JSON.stringify(selectedQuestions));
   }, [selectedQuestions]);
 
-  const handleStepClick = useCallback((stepNumber) => {
-    if (stepNumber >= 1 && stepNumber <= 3 && (stepNumber <= currentStep || stepNumber === currentStep - 1)) {
+  const handleStepClick = (stepNumber) => {
+    if (stepNumber <= currentStep || stepNumber === currentStep - 1) {
       setCurrentStep(stepNumber);
     }
-  }, [currentStep]);
+  };
 
-  const handleNextStep = useCallback((data) => {
+  const handleNextStep = (data) => {
     if (currentStep === 1) {
       setFormData(data);
     } else if (currentStep === 2) {
@@ -89,84 +57,61 @@ const TestCreateDashboardPage = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
-  }, [currentStep]);
+  };
 
-  const handlePreviousStep = useCallback(() => {
+  const handlePreviousStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
-  }, [currentStep]);
+  };
 
-  const clearAllData = useCallback(() => {
-    try {
-      localStorage.removeItem('testDashboard_currentStep');
-      localStorage.removeItem('testDashboard_formData');
-      localStorage.removeItem('testDashboard_selectedQuestions');
-      setCurrentStep(1);
-      setFormData({});
-      setSelectedQuestions([]);
-    } catch (error) {
-      console.error('Error clearing data:', error);
-    }
-  }, []);
+  const clearAllData = () => {
+    localStorage.removeItem('testDashboard_currentStep');
+    localStorage.removeItem('testDashboard_formData');
+    localStorage.removeItem('testDashboard_selectedQuestions');
+    setCurrentStep(1);
+    setFormData({});
+    setSelectedQuestions([]);
+  };
 
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
         return (
-          <Suspense fallback={<Loading />}>
-            <TestDashboard
-              onNext={handleNextStep}
-              onPrevious={handlePreviousStep}
-              formData={formData}
-              currentStep={currentStep}
-            />
-          </Suspense>
+          <TestDashboard
+            onNext={handleNextStep}
+            onPrevious={handlePreviousStep}
+            formData={formData}
+            currentStep={currentStep}
+          />
         );
       case 2:
         return (
-          <Suspense fallback={<Loading />}>
-            <MainDashboard
-              onNext={handleNextStep}
-              onPrevious={handlePreviousStep}
-              formData={formData}
-              selectedQuestions={selectedQuestions}
-              currentStep={currentStep}
-            />
-          </Suspense>
+          <MainDashboard
+            onNext={handleNextStep}
+            onPrevious={handlePreviousStep}
+            formData={formData}
+            selectedQuestions={selectedQuestions}
+            currentStep={currentStep}
+          />
         );
       case 3:
         return (
-          <Suspense fallback={<Loading />}>
-            <FinalQuestionPaperPage
-              onPrevious={handlePreviousStep}
-              formData={formData}
-              selectedQuestions={selectedQuestions}
-              currentStep={currentStep}
-              onClearAll={clearAllData}
-            />
-          </Suspense>
+          <FinalQuestionPaperPage
+            onPrevious={handlePreviousStep}
+            formData={formData}
+            selectedQuestions={selectedQuestions}
+            currentStep={currentStep}
+            onClearAll={clearAllData}
+          />
         );
       default:
-        return (
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-gray-700">Invalid Step</h2>
-              <p className="text-gray-500 mt-2">Please start from step 1.</p>
-              <button 
-                onClick={() => setCurrentStep(1)}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Step 1
-              </button>
-            </div>
-          </div>
-        );
+        return null;
     }
   };
 
   return (
-<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 ">      <ProgressBar currentStep={currentStep} onStepClick={handleStepClick} />
+<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-[85px]">      <ProgressBar currentStep={currentStep} onStepClick={handleStepClick} />
       <div className="">
         {renderCurrentStep()}
       </div>

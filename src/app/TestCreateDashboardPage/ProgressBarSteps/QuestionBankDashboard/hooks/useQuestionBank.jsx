@@ -1,196 +1,68 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useSessionStorage } from '../../hooks/useSessionStorage';
+import { useState, useEffect, useMemo } from 'react';
+import { generateMockQuestions } from './generateMockQuestions';
 
-const QuestionBankContext = createContext();
-
-export const QuestionBankProvider = ({
-  children,
-  formData,
-  onNext,
-  onPrevious,
-  currentStep,
-  onQuestionsUpdate
-}) => {
-  // Session storage for selected questions
-  const [selectedQuestions, setSelectedQuestions] = useSessionStorage('selectedQuestions', {
+const useQuestionBank = () => {
+  // State for tabs and questions
+  const [activeTab, setActiveTab] = useState('fill');
+  const [questions, setQuestions] = useState({
     fill: [],
     brief: [],
     sentence: [],
-    match: [],
-    mcq: [],
-    truefalse: [],
-    essay: [],
-    numerical: [],
-    diagram: [],
-    practical: []
+    match: []
   });
 
-  // UI State
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [activeTab, setActiveTab] = useState('fill');
-  const [viewMode, setViewMode] = useState('grid');
-  const [showAnswers, setShowAnswers] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [toast, setToast] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubjectId, setSelectedSubjectId] = useState(
-    formData?.subjects?.find((s) => s.selected)?.id
-  );
-  const [chapters, setChapters] = useState([]);
-  const [activeChapter, setActiveChapter] = useState('');
-  const [totalPage, setTotalPage] = useState(1);
+  // State for selected questions
+  const [selectedQuestions, setSelectedQuestions] = useState({
+    fill: [],
+    brief: [],
+    sentence: [],
+    match: []
+  });
 
-  // Filter States
+  // State for filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
   const [selectedTags, setSelectedTags] = useState([]);
   const [dateRange, setDateRange] = useState('all');
   const [showOnlyStarred, setShowOnlyStarred] = useState(false);
+  
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [questionsPerPage, setQuestionsPerPage] = useState(20);
+  
+  // State for sorting
   const [sortBy, setSortBy] = useState('newest');
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const [questionsPerPage, setQuestionsPerPage] = useState(12);
+  // State for view options
+  const [viewMode, setViewMode] = useState('grid');
+  const [showAnswers, setShowAnswers] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
+  
+  // Toast state
+  const [toast, setToast] = useState(null);
+  
+  // Initialize mock data
+  useEffect(() => {
+    setQuestions({
+      fill: generateMockQuestions('fill', 500),
+      brief: generateMockQuestions('brief', 500),
+      sentence: generateMockQuestions('sentence', 500),
+      match: generateMockQuestions('match', 500)
+    });
+  }, []);
 
-  // Question Management
-  const [questions, setQuestions] = useState({
-    fill: [
-      {
-        id: 1,
-        text: 'The capital of France is _______.',
-        answer: 'Paris',
-        difficulty: 'Easy',
-        tags: ['Geography', 'Europe'],
-        starred: false,
-        createdAt: new Date('2024-01-15'),
-        marks: 2,
-      },
-      {
-        id: 2,
-        text: 'The largest planet in our solar system is _______.',
-        answer: 'Jupiter',
-        difficulty: 'Medium',
-        tags: ['Astronomy', 'Science'],
-        starred: true,
-        createdAt: new Date('2024-01-16'),
-        marks: 3,
-      }
-    ],
-    brief: [
-      {
-        id: 3,
-        text: 'Explain the process of photosynthesis.',
-        answer: 'Photosynthesis is the process by which plants convert light energy into chemical energy.',
-        difficulty: 'Medium',
-        tags: ['Biology', 'Plants'],
-        starred: false,
-        createdAt: new Date('2024-01-17'),
-        marks: 5,
-      }
-    ],
-    mcq: [
-      {
-        id: 4,
-        text: 'What is the chemical symbol for gold?',
-        options: ['Au', 'Ag', 'Cu', 'Fe'],
-        answer: 'Au',
-        difficulty: 'Easy',
-        tags: ['Chemistry', 'Elements'],
-        starred: false,
-        createdAt: new Date('2024-01-18'),
-        marks: 1,
-      },
-      {
-        id: 5,
-        text: 'Which of the following is a prime number?',
-        options: ['15', '21', '23', '27'],
-        answer: '23',
-        difficulty: 'Medium',
-        tags: ['Mathematics', 'Numbers'],
-        starred: true,
-        createdAt: new Date('2024-01-19'),
-        marks: 2,
-      }
-    ],
-    match: [
-      {
-        id: 6,
-        text: 'Match the following countries with their capitals:',
-        items: [
-          { id: 'item-1', left: 'India', right: 'New Delhi' },
-          { id: 'item-2', left: 'Japan', right: 'Tokyo' },
-          { id: 'item-3', left: 'Brazil', right: 'Brasília' }
-        ],
-        difficulty: 'Medium',
-        tags: ['Geography', 'Capitals'],
-        starred: false,
-        createdAt: new Date('2024-01-20'),
-        marks: 3,
-      }
-    ],
-    truefalse: [
-      {
-        id: 7,
-        text: 'The Earth is flat.',
-        answer: 'False',
-        difficulty: 'Easy',
-        tags: ['Geography', 'Science'],
-        starred: false,
-        createdAt: new Date('2024-01-21'),
-        marks: 1,
-      }
-    ],
-    essay: [
-      {
-        id: 8,
-        text: 'Discuss the impact of climate change on global ecosystems.',
-        answer: 'Climate change significantly affects global ecosystems through various mechanisms...',
-        difficulty: 'Hard',
-        tags: ['Environment', 'Climate'],
-        starred: true,
-        createdAt: new Date('2024-01-22'),
-        marks: 10,
-      }
-    ],
-    numerical: [
-      {
-        id: 9,
-        text: 'Calculate the area of a circle with radius 5 cm.',
-        answer: '78.54 cm²',
-        difficulty: 'Medium',
-        tags: ['Mathematics', 'Geometry'],
-        starred: false,
-        createdAt: new Date('2024-01-23'),
-        marks: 4,
-      }
-    ]
-  });
-
-  // Tab Configuration
-  const tabTitles = {
-    fill: 'Fill in the Blanks',
-    brief: 'Short Answer',
-    sentence: 'Short Answer',
-    match: 'Match the Following',
-    mcq: 'MCQ',
-    truefalse: 'True/False',
-    essay: 'Long Answer',
-    numerical: 'Numerical',
+  // Toast message helper function
+  const showToastMessage = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
   };
 
-  // Update parent component when selected questions change
-  useEffect(() => {
-    if (onQuestionsUpdate) {
-      onQuestionsUpdate(selectedQuestions);
-    }
-  }, [selectedQuestions, onQuestionsUpdate]);
-
-  // Get all unique tags
-  const allTags = React.useMemo(() => {
+  // Extract all unique tags for filter dropdown
+  const allTags = useMemo(() => {
     const tagSet = new Set();
-    Object.values(questions).forEach(questionList => {
-      questionList.forEach(question => {
+    Object.values(questions).forEach(categoryQuestions => {
+      categoryQuestions.forEach(question => {
         if (question.tags) {
           question.tags.forEach(tag => tagSet.add(tag));
         }
@@ -199,241 +71,299 @@ export const QuestionBankProvider = ({
     return Array.from(tagSet).sort();
   }, [questions]);
 
-  // Filter questions based on current filters
-  const filteredQuestions = React.useMemo(() => {
-    let filtered = questions[activeTab] || [];
+  // Filter questions based on all filters
+  const filteredQuestions = useMemo(() => {
+    return questions[activeTab].filter(q => {
+      // Apply search
+      const matchesSearch = searchQuery === '' || 
+        (q.text && q.text.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (q.answer && q.answer.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (q.items && q.items.some(item => 
+          item.left.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          item.right.toLowerCase().includes(searchQuery.toLowerCase())
+        )) ||
+        (q.tags && q.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+      
+      // Apply difficulty filter
+      const matchesDifficulty = selectedDifficulty === 'All' || q.difficulty === selectedDifficulty;
+      
+      // Apply tag filter
+      const matchesTags = selectedTags.length === 0 || 
+        (q.tags && selectedTags.every(tag => q.tags.includes(tag)));
+      
+      // Apply date range filter
+      let matchesDateRange = true;
+      if (dateRange !== 'all' && q.createdAt) {
+        const today = new Date();
+        const questionDate = new Date(q.createdAt);
+        const daysDiff = Math.floor((today - questionDate) / (1000 * 60 * 60 * 24));
+        
+        switch (dateRange) {
+          case 'today':
+            matchesDateRange = daysDiff < 1;
+            break;
+          case 'week':
+            matchesDateRange = daysDiff < 7;
+            break;
+          case 'month':
+            matchesDateRange = daysDiff < 30;
+            break;
+          default:
+            matchesDateRange = true;
+        }
+      }
+      
+      // Apply starred filter
+      const matchesStarred = !showOnlyStarred || q.starred;
+      
+      return matchesSearch && matchesDifficulty && matchesTags && matchesDateRange && matchesStarred;
+    });
+  }, [
+    questions, 
+    activeTab, 
+    searchQuery, 
+    selectedDifficulty, 
+    selectedTags, 
+    dateRange,
+    showOnlyStarred
+  ]);
 
-    // Apply search filter
-    if (searchQuery) {
-      filtered = filtered.filter(q => 
-        q.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (q.answer && q.answer.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    }
+  // Sort the filtered questions
+  const sortedQuestions = useMemo(() => {
+    return [...filteredQuestions].sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        case 'newest':
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        case 'a-z':
+          return (a.text || '').localeCompare(b.text || '');
+        case 'z-a':
+          return (b.text || '').localeCompare(a.text || '');
+        case 'difficulty-asc':
+          const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+        case 'difficulty-desc':
+          const difficultyOrderDesc = { 'Easy': 3, 'Medium': 2, 'Hard': 1 };
+          return difficultyOrderDesc[a.difficulty] - difficultyOrderDesc[b.difficulty];
+        case 'most-used':
+          return (b.timesUsed || 0) - (a.timesUsed || 0);
+        default:
+          return 0;
+      }
+    });
+  }, [filteredQuestions, sortBy]);
 
-    // Apply difficulty filter
-    if (selectedDifficulty !== 'All') {
-      filtered = filtered.filter(q => q.difficulty === selectedDifficulty);
-    }
-
-    // Apply tags filter
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter(q => 
-        q.tags && q.tags.some(tag => selectedTags.includes(tag))
-      );
-    }
-
-    // Apply starred filter
-    if (showOnlyStarred) {
-      filtered = filtered.filter(q => q.starred);
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case 'oldest':
-        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-        break;
-      case 'difficulty':
-        const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
-        filtered.sort((a, b) => difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]);
-        break;
-      default:
-        break;
-    }
-
-    return filtered;
-  }, [questions, activeTab, searchQuery, selectedDifficulty, selectedTags, showOnlyStarred, sortBy]);
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
+  // Pagination
   const indexOfLastQuestion = currentPage * questionsPerPage;
   const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
-  const currentQuestions = filteredQuestions.slice(indexOfFirstQuestion, indexOfLastQuestion);
+  const currentQuestions = sortedQuestions.slice(indexOfFirstQuestion, indexOfLastQuestion);
+  const totalPages = Math.ceil(sortedQuestions.length / questionsPerPage);
 
-  // Helper functions
-  const showToastMessage = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+  // Calculate questions stats
+  const questionStats = useMemo(() => {
+    const stats = {
+      total: questions[activeTab].length,
+      easy: questions[activeTab].filter(q => q.difficulty === 'Easy').length,
+      medium: questions[activeTab].filter(q => q.difficulty === 'Medium').length,
+      hard: questions[activeTab].filter(q => q.difficulty === 'Hard').length,
+      starred: questions[activeTab].filter(q => q.starred).length,
+    };
+    return stats;
+  }, [questions, activeTab]);
+
+  // Handle page change
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Toggle question selection
+  const toggleQuestionSelection = (id) => {
+    setSelectedQuestions(prev => {
+      const currentTabSelections = [...prev[activeTab]];
+      
+      if (currentTabSelections.includes(id)) {
+        // Remove the question if already selected
+        return {
+          ...prev,
+          [activeTab]: currentTabSelections.filter(qId => qId !== id)
+        };
+      } else {
+        // Check if we've reached the 5-question limit
+        if (currentTabSelections.length >= 5) {
+          // Show error toast
+          console.log(currentTabSelections,'currentTabSelections')
+          showToastMessage("upto 5 questions are not allowed.", "error");
+          return prev;
+        } else {
+          // Add the question if under the limit
+          return {
+            ...prev,
+            [activeTab]: [...currentTabSelections, id]
+          };
+        }
+      }
+    });
   };
 
-  const toggleQuestionSelection = (questionId) => {
-    setSelectedQuestions(prev => ({
-      ...prev,
-      [activeTab]: prev[activeTab].includes(questionId)
-        ? prev[activeTab].filter(id => id !== questionId)
-        : [...prev[activeTab], questionId]
-    }));
+  // Select all visible, with 5-question limit
+  const selectAllVisible = () => {
+    const visibleIds = currentQuestions.map(q => q.id);
+    const currentTabSelections = [...selectedQuestions[activeTab]];
+    
+    if (currentTabSelections.length === visibleIds.length) {
+      // If all visible questions are already selected, deselect them all
+      setSelectedQuestions({
+        ...selectedQuestions,
+        [activeTab]: []
+      });
+    } else {
+      // Select visible questions up to the 5-question limit
+      if (visibleIds.length > 5) {
+        showToastMessage("upto 5 questions are not allowed.", "error");
+        
+        // Select only the first 5 visible questions
+        setSelectedQuestions({
+          ...selectedQuestions,
+          [activeTab]: visibleIds.slice(0, 5)
+        });
+      } else {
+        // Select all visible questions if under the limit
+        setSelectedQuestions({
+          ...selectedQuestions,
+          [activeTab]: visibleIds
+        });
+      }
+    }
   };
 
-  const selectAllVisible = (questionIds, shouldSelect) => {
-    setSelectedQuestions(prev => ({
-      ...prev,
-      [activeTab]: shouldSelect 
-        ? [...new Set([...prev[activeTab], ...questionIds])]
-        : prev[activeTab].filter(id => !questionIds.includes(id))
-    }));
+  // Handle bulk delete
+  const handleBulkDelete = () => {
+    const currentTabSelections = selectedQuestions[activeTab];
+    if (currentTabSelections.length === 0) return;
+    
+    // In production, this would make an API call to delete from MongoDB
+    const updatedQuestions = {...questions};
+    updatedQuestions[activeTab] = questions[activeTab].filter(q => !currentTabSelections.includes(q.id));
+    setQuestions(updatedQuestions);
+    
+    // Clear selections for this tab
+    setSelectedQuestions({
+      ...selectedQuestions,
+      [activeTab]: []
+    });
+    
+    showToastMessage(`${currentTabSelections.length} questions deleted successfully`);
   };
 
-  const toggleStarred = (questionId) => {
-    setQuestions(prev => ({
-      ...prev,
-      [activeTab]: prev[activeTab].map(q => 
-        q.id === questionId ? { ...q, starred: !q.starred } : q
-      )
-    }));
+  // Handle single question delete
+  const handleDeleteQuestion = (id) => {
+    const updatedQuestions = {...questions};
+    updatedQuestions[activeTab] = questions[activeTab].filter(q => q.id !== id);
+    setQuestions(updatedQuestions);
+    
+    // Remove from selection if selected
+    if (selectedQuestions[activeTab].includes(id)) {
+      setSelectedQuestions({
+        ...selectedQuestions,
+        [activeTab]: selectedQuestions[activeTab].filter(qId => qId !== id)
+      });
+    }
+    
+    showToastMessage("Question deleted successfully");
   };
 
-  const toggleTagSelection = (tag) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+  // Toggle starred status for a question
+  const toggleStarred = (id) => {
+    const updatedQuestions = {...questions};
+    updatedQuestions[activeTab] = questions[activeTab].map(q => 
+      q.id === id ? {...q, starred: !q.starred} : q
     );
+    setQuestions(updatedQuestions);
   };
 
+  // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedDifficulty('All');
     setSelectedTags([]);
     setDateRange('all');
     setShowOnlyStarred(false);
-    setCurrentPage(1);
   };
 
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  // Toggle tag selection in filters
+  const toggleTagSelection = (tag) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag) 
+        : [...prev, tag]
+    );
   };
 
-  // Get selected questions for current tab
-  const getSelectedQuestionsForTab = (tab) => {
-    const selectedIds = selectedQuestions[tab] || [];
-    return questions[tab]?.filter(q => selectedIds.includes(q.id)) || [];
+  // Tab titles with counts
+  const tabTitles = {
+    fill: `Fill in Blanks (${selectedQuestions.fill.length}/5)`,
+    brief: `Brief Answers (${selectedQuestions.brief.length}/5)`,
+    sentence: `One Sentence (${selectedQuestions.sentence.length}/5)`,
+    match: `Matching (${selectedQuestions.match.length}/5)`
   };
+  // console.log(currentTabSelections,'currentTabSelections')
 
-  // Get all selected questions across all tabs
-  const getAllSelectedQuestions = () => {
-    const allSelected = [];
-    Object.keys(questions).forEach(tab => {
-      const tabQuestions = getSelectedQuestionsForTab(tab);
-      allSelected.push(...tabQuestions.map(q => ({ ...q, type: tab })));
-    });
-    return allSelected;
-  };
-
-  // Clear all selected questions
-  const clearAllSelectedQuestions = () => {
-    const emptySelection = {
-      fill: [],
-      brief: [],
-      sentence: [],
-      match: [],
-      mcq: [],
-      truefalse: [],
-      essay: [],
-      numerical: [],
-      diagram: [],
-      practical: []
-    };
-    setSelectedQuestions(emptySelection);
-  };
-
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedDifficulty, selectedTags, showOnlyStarred, activeTab]);
-
-  const contextValue = {
-    // UI State
-    showSidebar,
-    setShowSidebar,
+  return {
+    // State
     activeTab,
-    setActiveTab,
-    viewMode,
-    setViewMode,
-    showAnswers,
-    setShowAnswers,
-    showFilters,
-    setShowFilters,
-    toast,
-    setToast,
-    loading,
-    subjects,
-    setSubjects,
-    selectedSubjectId,
-    setSelectedSubjectId,
-    chapters,
-    setChapters,
-    activeChapter,
-    setActiveChapter,
-    totalPage,
-    setTotalPage,
-
-    // Filter States
+    questions,
+    selectedQuestions,
     searchQuery,
-    setSearchQuery,
     selectedDifficulty,
-    setSelectedDifficulty,
     selectedTags,
-    setSelectedTags,
     dateRange,
-    setDateRange,
-    showOnlyStarred,
-    setShowOnlyStarred,
-    sortBy,
-    setSortBy,
-
-    // Pagination
     currentPage,
-    setCurrentPage,
     questionsPerPage,
-    setQuestionsPerPage,
+    sortBy,
+    viewMode,
+    showAnswers,
+    showFilters,
+    showSidebar,
+    showOnlyStarred,
+    toast,
+    
+    // Derived state
+    allTags,
+    filteredQuestions,
+    sortedQuestions,
+    currentQuestions,
     totalPages,
+    questionStats,
     indexOfFirstQuestion,
     indexOfLastQuestion,
-
-    // Questions and Data
-    questions,
-    setQuestions,
-    selectedQuestions,
-    setSelectedQuestions,
-    filteredQuestions,
-    currentQuestions,
-    allTags,
     tabTitles,
-
-    // Helper Functions
-    showToastMessage,
+    
+    // Actions
+    setActiveTab,
+    setQuestions,
+    setSelectedQuestions,
+    setSearchQuery,
+    setSelectedDifficulty,
+    setSelectedTags,
+    setDateRange,
+    setCurrentPage,
+    setQuestionsPerPage,
+    setSortBy,
+    setViewMode,
+    setShowAnswers,
+    setShowFilters,
+    setShowSidebar,
+    setShowOnlyStarred,
     toggleQuestionSelection,
     selectAllVisible,
+    handleBulkDelete,
+    handleDeleteQuestion,
     toggleStarred,
-    toggleTagSelection,
     resetFilters,
+    toggleTagSelection,
     paginate,
-    getSelectedQuestionsForTab,
-    getAllSelectedQuestions,
-    clearAllSelectedQuestions,
-
-    // Navigation props
-    onNext,
-    onPrevious,
-    currentStep,
-    formData
+    showToastMessage,
+    setToast,
   };
-
-  return (
-    <QuestionBankContext.Provider value={contextValue}>
-      {children}
-    </QuestionBankContext.Provider>
-  );
 };
 
-export const useQuestionBank = () => {
-  const context = useContext(QuestionBankContext);
-  if (!context) {
-    throw new Error('useQuestionBank must be used within a QuestionBankProvider');
-  }
-  return context;
-};
+export default useQuestionBank;

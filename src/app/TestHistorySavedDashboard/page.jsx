@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 import {
@@ -117,16 +117,11 @@ const TestHistorySavedDashboard = () => {
     };
   }, []);
 
-  const handleLogout = useCallback(() => {
-    try {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+  const handleLogout = () => {
+    // Add logout logic here
+    console.log("Logging out...");
     setShowDropdown(false);
-  }, []);
+  };
 
   // Dummy data for tests
   const [tests, setTests] = useState([]);
@@ -143,7 +138,7 @@ const TestHistorySavedDashboard = () => {
     limit: 10,
   });
 
-  const fetchTests = useCallback(async () => {
+  const fetchTests = async () => {
     try {
       setLoading(true);
       const params = {
@@ -184,9 +179,9 @@ const TestHistorySavedDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.currentPage, pagination.limit, filters, searchTerm, sortBy, sortOrder]);
+  };
 
-  const handleDeleteTest = useCallback(async (testId) => {
+  const handleDeleteTest = async (testId) => {
     if (!confirm("Are you sure you want to delete this test?")) return;
 
     try {
@@ -197,9 +192,9 @@ const TestHistorySavedDashboard = () => {
       console.error("Error deleting test:", error);
       // toast.error('Failed to delete test');
     }
-  }, []);
+  };
 
-  const handleStatusUpdate = useCallback(async (testId, newStatus) => {
+  const handleStatusUpdate = async (testId, newStatus) => {
     try {
       await testService.updateTestStatus(testId, newStatus);
       // toast.success(`Test ${newStatus} successfully`);
@@ -208,9 +203,9 @@ const TestHistorySavedDashboard = () => {
       console.error("Error updating test status:", error);
       // toast.error('Failed to update test status');
     }
-  }, [fetchTests]);
+  };
 
-  const handleBulkStatusUpdate = useCallback(async (status) => {
+  const handleBulkStatusUpdate = async (status) => {
     if (selectedTests.length === 0) return;
 
     try {
@@ -222,9 +217,9 @@ const TestHistorySavedDashboard = () => {
       console.error("Error updating tests:", error);
       // toast.error('Failed to update tests');
     }
-  }, [selectedTests, fetchTests]);
+  };
 
-  const handleBulkDelete = useCallback(async () => {
+  const handleBulkDelete = async () => {
     if (selectedTests.length === 0) return;
     if (
       !confirm(`Are you sure you want to delete ${selectedTests.length} tests?`)
@@ -240,11 +235,11 @@ const TestHistorySavedDashboard = () => {
       console.error("Error deleting tests:", error);
       // toast.error('Failed to delete tests');
     }
-  }, [selectedTests, fetchTests]);
+  };
 
-  const handlePageChange = useCallback((newPage) => {
+  const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, currentPage: newPage }));
-  }, []);
+  };
 
   // Add useEffect to fetch data
   useEffect(() => {
@@ -252,7 +247,7 @@ const TestHistorySavedDashboard = () => {
   }, [pagination.currentPage, filters, searchTerm, sortBy, sortOrder]);
 
   // Filter and sort tests
-  const getFilteredAndSortedTests = useMemo(() => {
+  const getFilteredAndSortedTests = () => {
     let filtered = tests.filter((test) => {
       const matchesSearch =
         test.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -294,33 +289,33 @@ const TestHistorySavedDashboard = () => {
     });
 
     return filtered;
-  }, [tests, searchTerm, filters, sortBy, sortOrder]);
+  };
 
-  const handleSort = useCallback((field) => {
+  const handleSort = (field) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(field);
       setSortOrder("desc");
     }
-  }, [sortBy, sortOrder]);
+  };
 
-  const handleTestSelect = useCallback((testId) => {
+  const handleTestSelect = (testId) => {
     setSelectedTests((prev) =>
       prev.includes(testId)
         ? prev.filter((id) => id !== testId)
         : [...prev, testId]
     );
-  }, []);
+  };
 
-  const handleSelectAll = useCallback(() => {
-    const allTests = getFilteredAndSortedTests;
-    if (selectedTests.length === allTests.length) {
+  const handleSelectAll = () => {
+    const filteredTests = getFilteredAndSortedTests();
+    if (selectedTests.length === filteredTests.length) {
       setSelectedTests([]);
     } else {
-      setSelectedTests(allTests.map((test) => test._id));
+      setSelectedTests(filteredTests.map((test) => test._id));
     }
-  }, [selectedTests.length, getFilteredAndSortedTests]);
+  };
 
   const getStatusColor = (status) => {
     const themeClasses = getThemeClasses();
@@ -363,7 +358,7 @@ const TestHistorySavedDashboard = () => {
     lastModified: new Date(test.lastModified).toLocaleDateString(),
   });
 
-  const filteredTests = getFilteredAndSortedTests;
+  const filteredTests = getFilteredAndSortedTests();
   const themeClasses = getThemeClasses();
 
   // Use your Loader component when loading
@@ -445,7 +440,7 @@ const TestHistorySavedDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4 pt-[10px] mb-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-4 pt-[160px] mb-40">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className={`${themeClasses.statsCard} backdrop-blur-sm shadow-sm border p-4`}>

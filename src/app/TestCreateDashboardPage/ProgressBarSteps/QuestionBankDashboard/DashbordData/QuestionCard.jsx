@@ -48,7 +48,8 @@ const QuestionCard = ({ question }) => {
               </div>
             ))}
             {question.items?.length > 2 && (
-              <p className={`text-xs ${themeClasses.textMuted} `}>+{question.items.length - 2} more items</p>    )}
+              <p className={`text-xs ${themeClasses.textMuted} `}>+{question.items.length - 2} more items</p>
+            )}
           </div>
         );
       case 'mcq':
@@ -75,18 +76,14 @@ const QuestionCard = ({ question }) => {
   return (
     <div 
       onClick={() => toggleQuestionSelection(question.id)}
-      className={`${themeClasses.cardBackground} border-2 rounded-lg p-3 ${themeClasses.cardHover} transition-all cursor-pointer transform hover:scale-105 ${
-        isSelected 
-          ? `ring-2 ${themeClasses.cardBorderSelected} bg-blue-50 dark:bg-blue-900/20 shadow-lg` 
-          : `${themeClasses.cardBorder} hover:shadow-md`
+      className={`${themeClasses.cardBackground} border rounded p-2 ${themeClasses.cardHover} transition-all cursor-pointer ${
+        isSelected ? `ring-1 ${themeClasses.cardBorderSelected}` : themeClasses.cardBorder
       }`}>
-      <div className="flex items-start gap-3">
-        <div className={`flex-shrink-0 p-1 rounded-full transition-all ${
-            isSelected 
-              ? `${themeClasses.checkboxSelected} bg-blue-100 dark:bg-blue-800` 
-              : `${themeClasses.checkboxUnselected} hover:bg-gray-100 dark:hover:bg-gray-700`
+      <div className="flex items-start gap-2">
+        <div className={`flex-shrink-0 p-0.5 rounded transition-colors ${
+            isSelected ? themeClasses.checkboxSelected : themeClasses.checkboxUnselected
           }`}>
-          <CheckSquare className={`w-4 h-4 ${isSelected ? 'fill-current' : ''}`} />
+          <CheckSquare className={`w-3.5 h-3.5 ${isSelected ? 'fill-current' : ''}`} />
         </div>
         
         <div className="flex-1 min-w-0">

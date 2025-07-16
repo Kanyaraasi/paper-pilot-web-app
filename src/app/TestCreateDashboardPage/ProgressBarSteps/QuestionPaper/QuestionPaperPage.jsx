@@ -1,12 +1,25 @@
-'use client'
-import React, { useState, useEffect } from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
-import { Printer, Download, ArrowLeft, CheckCircle, AlertCircle, Save, Settings, Eye, EyeOff, Loader } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTheme } from "@/contexts/ThemeContext";
+import { useSessionStorage } from '../../../TestCreateDashboardPage/ProgressBarSteps/QuestionBankDashboard/hooks/useSessionStorage';
+import { 
+  Printer, 
+  Download, 
+  ArrowLeft, 
+  CheckCircle, 
+  AlertCircle, 
+  Save, 
+  Settings, 
+  Eye, 
+  EyeOff, 
+  Loader,
+  FileText,
+  
+} from 'lucide-react';
 
-const QuestionPaper = () => {
-  // State management
+const QuestionPaper = ({ formData, onPrevious }) => {
+  // Get selected questions from session storage
+  const [selectedQuestions] = useSessionStorage('selectedQuestions', {});
   const [examDetails, setExamDetails] = useState({});
-  const [questionPaper, setQuestionPaper] = useState(null);
   const [notification, setNotification] = useState(null);
   const [showGeneralInstructions, setShowGeneralInstructions] = useState(true);
   const [showWatermark, setShowWatermark] = useState(true);
@@ -14,7 +27,101 @@ const QuestionPaper = () => {
 
   const { theme } = useTheme();
 
-  const getThemeClasses = () => {
+  // Transform selected questions into paper format
+  const [questionPaper, setQuestionPaper] = useState([]);
+
+  useEffect(() => {
+    // Transform form data to exam details
+    if (formData) {
+      setExamDetails({
+        schoolName: "P.E.M HIGH SCHOOL",
+        subject: formData.subjects?.find(s => s.selected)?.name || "Subject",
+        grade: formData.class || "Grade",
+        date: new Date().toLocaleDateString(),
+        startTime: "10:00 AM",
+        endTime: "12:00 PM",
+        totalMarks: formData.totalMarks || "50",
+        duration: formData.duration ? `${formData.duration} Hours` : "2 Hours",
+        testName: formData.name || "Unit Test"
+      });
+    }
+  }, [formData]);
+
+  useEffect(() => {
+    // Get selected questions data from session storage
+    const selectedQuestionsData = sessionStorage.getItem('selectedQuestionsData');
+    console.log('Reading from session storage:', selectedQuestionsData);
+    
+    if (selectedQuestionsData) {
+      try {
+        const questionsData = JSON.parse(selectedQuestionsData);
+        console.log('Parsed questions data:', questionsData);
+        
+        // Transform questions for paper display
+        const transformedQuestions = questionsData.map((question, index) => {
+          const baseQuestion = {
+            id: question.id,
+            text: question.text,
+            marks: question.marks || getDefaultMarks(question.type),
+            type: question.type,
+            difficulty: question.difficulty
+          };
+
+          // Handle different question types
+          switch (question.type) {
+            case 'mcq':
+              return {
+                ...baseQuestion,
+                options: question.options || []
+              };
+            case 'match':
+              return {
+                ...baseQuestion,
+                items: question.items || []
+              };
+            case 'truefalse':
+              return {
+                ...baseQuestion,
+                options: ['True', 'False']
+              };
+            default:
+              return baseQuestion;
+          }
+        });
+
+        setQuestionPaper(transformedQuestions);
+      } catch (error) {
+        console.error('Error parsing selected questions:', error);
+        setQuestionPaper([]);
+      }
+    } else {
+      // Fallback to empty array if no questions found
+      setQuestionPaper([]);
+    }
+  }, []);
+
+  // Get default marks based on question type
+  const getDefaultMarks = useCallback((type) => {
+    const marksMap = {
+      'fill': 2,
+      'brief': 3,
+      'sentence': 3,
+      'mcq': 1,
+      'truefalse': 1,
+      'match': 3,
+      'essay': 10,
+      'numerical': 4
+    };
+    return marksMap[type] || 2;
+  }, []);
+
+  // Calculate total marks
+  const totalMarks = useMemo(() => 
+    questionPaper.reduce((sum, question) => sum + (question.marks || 0), 0), 
+    [questionPaper]
+  );
+
+  const getThemeClasses = useMemo(() => {
     const isDark = theme === 'dark';
     
     return {
@@ -24,10 +131,6 @@ const QuestionPaper = () => {
       textPrimary: isDark ? 'text-gray-100' : 'text-gray-900',
       textSecondary: isDark ? 'text-gray-300' : 'text-gray-600',
       textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
-      inputBase: isDark 
-        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400' 
-        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500',
-      inputError: isDark ? 'border-red-400 bg-red-900/20' : 'border-red-300 bg-red-50',
       buttonPrimary: isDark 
         ? 'bg-blue-600 hover:bg-blue-700 text-white' 
         : 'bg-blue-600 hover:bg-blue-700 text-white',
@@ -45,11 +148,9 @@ const QuestionPaper = () => {
       toggleInactive: isDark ? 'bg-gray-600' : 'bg-gray-300',
       notificationSuccess: isDark ? 'bg-green-600' : 'bg-green-500',
       notificationError: isDark ? 'bg-red-600' : 'bg-red-500',
-      // Paper-specific styling (always white for printing)
       paperBackground: 'bg-white',
       paperText: 'text-black',
       paperBorder: 'border-gray-300',
-      // Action buttons
       printButton: isDark 
         ? 'bg-blue-600 hover:bg-blue-700' 
         : 'bg-blue-600 hover:bg-blue-700',
@@ -65,132 +166,119 @@ const QuestionPaper = () => {
       shadowCard: isDark ? 'shadow-lg shadow-gray-900/20' : 'shadow-sm',
       shadowHover: isDark ? 'hover:shadow-xl hover:shadow-gray-900/30' : 'hover:shadow-md',
     };
-  };
+  }, [theme]);
 
-  const themeClasses = getThemeClasses();
+  const themeClasses = getThemeClasses;
 
-  useEffect(() => {
-    // Mock data initialization
-    const mockExamDetails = {
-      schoolName: "P.E.M HIGH SCHOOL",
-      subject: "Mathematics",
-      grade: "10th Grade",
-      date: "June 15, 2025",
-      startTime: "10:00 AM",
-      endTime: "12:00 PM",
-      totalMarks: 50,
-      duration: "2 Hours"
-    };
-
-    const mockQuestionPaper = [
-      {
-        id: 1,
-        text: 'Let A = {2,4,6,8,10,12} and B = {6,8,10}. Find the value of A∩B and show that A∩B = B.',
-        options: null,
-        marks: 5
-      },
-      {
-        id: 2,
-        text: 'Solve the quadratic equation: 2x² - 7x + 3 = 0',
-        options: null,
-        marks: 4
-      },
-      {
-        id: 3,
-        text: 'Which of the following is a prime number?',
-        options: ['15', '21', '23', '27'],
-        marks: 2
-      },
-      {
-        id: 4,
-        text: 'Find the derivative of f(x) = 3x² + 2x - 1',
-        options: null,
-        marks: 3
-      },
-      {
-        id: 5,
-        text: 'Calculate the area of a triangle with base 12 cm and height 8 cm.',
-        options: null,
-        marks: 3
-      },
-      {
-        id: 6,
-        text: 'What is the value of π (pi) approximately?',
-        options: ['3.14', '2.71', '1.41', '1.73'],
-        marks: 2
-      }
-    ];
-
-    setExamDetails(mockExamDetails);
-    setQuestionPaper(mockQuestionPaper);
+  const showNotification = useCallback((message, type = 'success') => {
+    setNotification({ message, type });
+    const timer = setTimeout(() => setNotification(null), 3000);
+    return () => clearTimeout(timer);
   }, []);
 
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
-  };
 
-  const handlePrint = () => {
-    const printContent = document.getElementById('print-section');
-    const WinPrint = window.open('', '', 'width=900,height=650');
-    WinPrint.document.write(`
-      <html>
-        <head>
-          <title>Question Paper</title>
-          <style>
-            body { 
-              font-family: Inter, Arial, sans-serif; 
-              margin: 20px; 
-              position: relative; 
-              background: white;
-            }
-            .question { margin-bottom: 15px; }
-            .options { margin-left: 20px; margin-top: 5px; }
-            .watermark-container {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              pointer-events: none;
-              z-index: 0;
-              overflow: hidden;
-            }
-            .watermark-text {
-              position: absolute;
-              font-size: 28px;
-              font-weight: bold;
-              color: rgba(0, 0, 0, 0.08);
-              transform: rotate(-45deg);
-              white-space: nowrap;
-              user-select: none;
-              font-family: Inter, Arial, sans-serif;
-              letter-spacing: 2px;
-            }
-            .content { 
-              position: relative; 
-              z-index: 1; 
-              background: transparent;
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
-    showNotification('Question paper sent to printer!');
-  };
+  const handlePrint = useCallback(() => {
+    try {
+      const printContent = document.getElementById('print-section');
+      if (!printContent) {
+        showNotification('Print content not found', 'error');
+        return;
+      }
+
+      const WinPrint = window.open('', '', 'width=900,height=650');
+      if (!WinPrint) {
+        showNotification('Unable to open print window. Please check popup blockers.', 'error');
+        return;
+      }
+
+      WinPrint.document.write(`
+        <html>
+          <head>
+            <title>Question Paper - ${examDetails.subject || 'Subject'}</title>
+            <style>
+              body { 
+                font-family: Inter, Arial, sans-serif; 
+                margin: 20px; 
+                position: relative; 
+                background: white;
+              }
+              .question { margin-bottom: 20px; page-break-inside: avoid; }
+              .options { margin-left: 20px; margin-top: 8px; }
+              .match-items { margin-left: 20px; margin-top: 8px; }
+              .watermark-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                overflow: hidden;
+              }
+              .watermark-text {
+                position: absolute;
+                font-size: 28px;
+                font-weight: bold;
+                color: rgba(0, 0, 0, 0.08);
+                transform: rotate(-45deg);
+                white-space: nowrap;
+                user-select: none;
+                font-family: Inter, Arial, sans-serif;
+                letter-spacing: 2px;
+              }
+              .content { 
+                position: relative; 
+                z-index: 1; 
+                background: transparent;
+              }
+              .question-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 8px;
+              }
+              .question-text {
+                flex: 1;
+                padding-right: 10px;
+              }
+              .question-marks {
+                font-size: 12px;
+                background: #f0f0f0;
+                padding: 2px 8px;
+                border-radius: 12px;
+                white-space: nowrap;
+              }
+              @media print {
+                body { margin: 0; }
+                .question { page-break-inside: avoid; }
+              }
+            </style>
+          </head>
+          <body>
+            ${printContent.innerHTML}
+          </body>
+        </html>
+      `);
+      WinPrint.document.close();
+      WinPrint.focus();
+      
+      // Add slight delay for better browser compatibility
+      setTimeout(() => {
+        WinPrint.print();
+        WinPrint.close();
+      }, 100);
+      
+      showNotification('Question paper sent to printer!');
+    } catch (error) {
+      console.error('Print error:', error);
+      showNotification('Error printing document. Please try again.', 'error');
+    }
+  }, [examDetails.subject, showNotification]);
 
   const handleDownloadPDF = async () => {
     try {
       setIsGeneratingPdf(true);
       
-      // Load html2pdf.js from CDN as fallback
       if (!window.html2pdf) {
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
@@ -206,14 +294,12 @@ const QuestionPaper = () => {
       }
 
       function generatePDF() {
-        // Get the element to convert
         const element = document.getElementById('pdf-content');
         
         if (!element) {
           throw new Error('Content element not found');
         }
 
-        // PDF options
         const options = {
           margin: [10, 10, 10, 10],
           filename: `QuestionPaper_${examDetails.subject || 'Subject'}_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
@@ -231,7 +317,6 @@ const QuestionPaper = () => {
           }
         };
 
-        // Generate and download PDF
         window.html2pdf().set(options).from(element).save().then(() => {
           showNotification('PDF downloaded successfully!');
           setIsGeneratingPdf(false);
@@ -250,11 +335,19 @@ const QuestionPaper = () => {
   };
 
   const handleSavePaper = () => {
+    // Save the question paper data
+    const paperData = {
+      examDetails,
+      questionPaper,
+      generatedAt: new Date().toISOString()
+    };
+    
+    sessionStorage.setItem('savedQuestionPaper', JSON.stringify(paperData));
     showNotification('Question paper saved successfully!');
   };
 
   const ToggleButton = ({ isOn, onToggle, label, icon: Icon }) => (
-    <div className={`flex items-center justify-between p-3 ${themeClasses.toggleButton} rounded-lg transition-colors `}>
+    <div className={`flex items-center justify-between p-3 ${themeClasses.toggleButton} rounded-lg transition-colors`}>
       <div className="flex items-center gap-2">
         <Icon className={`w-4 h-4 ${themeClasses.textSecondary}`} />
         <span className={`text-sm font-medium ${themeClasses.textPrimary}`}>{label}</span>
@@ -274,10 +367,148 @@ const QuestionPaper = () => {
     </div>
   );
 
-  // Generate single centered watermark
   const generateWatermarkPattern = () => {
     return [{ x: 200, y: 400, id: 'single-watermark' }];
   };
+
+  const QuestionPaperContent = () => (
+    <>
+      {/* School Header */}
+      <div className="text-center mb-6 border-b-2 border-gray-800 pb-4">
+        <h1 className="text-2xl font-bold uppercase tracking-wider mb-2">
+          {examDetails.schoolName || "P.E.M HIGH SCHOOL"}
+        </h1>
+        <h2 className="text-lg font-semibold">{examDetails.testName || "UNIT TEST - 1"}</h2>
+      </div>
+
+      {/* Exam Details Grid */}
+      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+        <div className="space-y-2">
+          <div><strong>SUBJECT:</strong> {examDetails.subject || "Subject"}</div>
+          <div><strong>DATE:</strong> {examDetails.date || new Date().toLocaleDateString()}</div>
+          <div><strong>DURATION:</strong> {examDetails.duration || "2 Hours"}</div>
+        </div>
+        <div className="space-y-2">
+          <div><strong>CLASS:</strong> {examDetails.grade || "Grade"}</div>
+          <div><strong>TIME:</strong> {examDetails.startTime || "10:00 AM"} - {examDetails.endTime || "12:00 PM"}</div>
+          <div><strong>TOTAL MARKS:</strong> {totalMarks || examDetails.totalMarks || "50"}</div>
+        </div>
+      </div>
+
+      {/* General Instructions */}
+      {showGeneralInstructions && (
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <h3 className="font-semibold text-sm mb-2">General Instructions:</h3>
+          <ul className="text-xs space-y-1 list-disc list-inside text-gray-700">
+            <li>All questions are compulsory.</li>
+            <li>Write answers clearly and legibly.</li>
+            <li>Use of calculator is not allowed unless specified.</li>
+            <li>Read the questions carefully before answering.</li>
+            <li>Attempt all questions in the order given.</li>
+          </ul>
+        </div>
+      )}
+      
+      <div className="border-t-2 border-gray-300 my-4"></div>
+      
+      {/* Questions */}
+      <div className="space-y-6">
+        {questionPaper.length === 0 ? (
+          <div className="text-center py-8">
+            <FileText className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+            <p className="text-gray-500">No questions selected. Please go back and select questions.</p>
+          </div>
+        ) : (
+          questionPaper.map((question, index) => (
+            <div key={question.id} className="question border-b border-gray-200 pb-4">
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1 pr-4">
+                  <p className="text-sm font-medium">
+                    <span className="font-bold">Q{index + 1}.</span> {question.text}
+                  </p>
+                </div>
+                <span className="text-xs px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium whitespace-nowrap">
+                  [{question.marks} Mark{question.marks > 1 ? 's' : ''}]
+                </span>
+              </div>
+              
+              {/* MCQ Options */}
+              {question.options && question.type !== 'truefalse' && (
+                <div className="ml-6 mt-2 space-y-2">
+                  {question.options.map((option, optIndex) => (
+                    <div key={optIndex} className="text-sm flex items-center">
+                      <span className="mr-3 font-medium w-6">
+                        {String.fromCharCode(97 + optIndex)})
+                      </span>
+                      <span>{option}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* True/False Options */}
+              {question.type === 'truefalse' && (
+                <div className="ml-6 mt-2 space-y-2">
+                  <div className="text-sm flex items-center">
+                    <span className="mr-3 font-medium w-6">a)</span>
+                    <span>True</span>
+                  </div>
+                  <div className="text-sm flex items-center">
+                    <span className="mr-3 font-medium w-6">b)</span>
+                    <span>False</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Match the Following */}
+              {question.type === 'match' && question.items && (
+                <div className="ml-6 mt-2">
+                  <div className="grid grid-cols-2 gap-8">
+                    <div>
+                      <h5 className="font-semibold text-sm mb-2">Column A</h5>
+                      {question.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className="text-sm mb-1">
+                          {itemIndex + 1}. {item.left}
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-sm mb-2">Column B</h5>
+                      {question.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className="text-sm mb-1">
+                          {String.fromCharCode(97 + itemIndex)}. {item.right}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Answer space for written answers */}
+              {!question.options && question.type !== 'match' && (
+                <div className="ml-6 mt-3">
+                  <div className="border-t border-gray-200 pt-2">
+                    <p className="text-xs text-gray-500 mb-2">Answer:</p>
+                    <div className="space-y-2">
+                      {Array.from({ length: Math.max(2, Math.floor(question.marks / 2)) }, (_, i) => (
+                        <div key={i} className="border-b border-gray-300 h-6"></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 pt-6 border-t-2 border-gray-300 text-center">
+        <p className="font-bold text-sm">*** END OF THE QUESTION PAPER ***</p>
+        <p className="text-xs text-gray-600 mt-2">Best of Luck!</p>
+      </div>
+    </>
+  );
 
   const QuestionPaperPreview = () => (
     <div className={`${themeClasses.paperBackground} rounded-lg ${themeClasses.shadowCard} overflow-hidden`}>
@@ -286,7 +517,7 @@ const QuestionPaper = () => {
         id="print-section"
         className="hidden"
       >
-        <div className="relative p-8 text-black bg-white " style={{ minHeight: '297mm' }}>
+        <div className="relative p-8 text-black bg-white" style={{ minHeight: '297mm' }}>
           {showWatermark && (
             <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
               {generateWatermarkPattern().map((pos) => (
@@ -318,7 +549,7 @@ const QuestionPaper = () => {
       {/* PDF Content - Optimized for PDF generation */}
       <div 
         id="pdf-content"
-        className="relative bg-white text-black "
+        className="relative bg-white text-black"
         style={{ width: '210mm', minHeight: '297mm', margin: '0 auto', padding: '4mm' }}
       >
         {showWatermark && (
@@ -348,119 +579,12 @@ const QuestionPaper = () => {
       </div>
 
       {/* Display Content - Visible to users */}
-      <div 
-        className={`relative border-2 ${themeClasses.paperBorder} p-8 ${themeClasses.paperText} ${themeClasses.paperBackground} h-full overflow-hidden lg:hidden `}
-        style={{ minHeight: '297mm' }}
-      >
-        {showWatermark && (
-          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-            {generateWatermarkPattern().map((pos) => (
-              <div
-                key={pos.id}
-                className="absolute select-none"
-                style={{
-                  left: `${pos.x}px`,
-                  top: `${pos.y}px`,
-                  transform: 'rotate(-45deg)',
-                  fontSize: '48px',
-                  fontWeight: 'bold',
-                  color: 'rgba(0, 0, 0, 0.08)',
-                  whiteSpace: 'nowrap',
-                  fontFamily: 'Inter, Arial, sans-serif',
-                  letterSpacing: '2px',
-                  userSelect: 'none',
-                }}
-              >
-                P.E.M HIGH SCHOOL
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="relative z-10">
-          <QuestionPaperContent />
-        </div>
-      </div>
+      
     </div>
   );
 
-  const QuestionPaperContent = () => (
-    <>
-      {/* School Header */}
-      <div className="text-center mb-6 border-b-2 border-gray-800 pb-4">
-        <h1 className="text-2xl font-bold uppercase tracking-wider mb-2">
-          {examDetails.schoolName || "P.E.M HIGH SCHOOL"}
-        </h1>
-        <h2 className="text-lg font-semibold">UNIT TEST - 1</h2>
-      </div>
-
-      {/* Exam Details Grid */}
-      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-        <div className="space-y-2">
-          <div><strong>SUBJECT:</strong> {examDetails.subject || "Subject"}</div>
-          <div><strong>DATE:</strong> {new Date().toLocaleDateString()}</div>
-          <div><strong>DURATION:</strong> {examDetails.duration || "2 Hours"}</div>
-        </div>
-        <div className="space-y-2">
-          <div><strong>CLASS:</strong> {examDetails.grade || "Grade"}</div>
-          <div><strong>TIME:</strong> {examDetails.startTime || "10:00 AM"} - {examDetails.endTime || "12:00 PM"}</div>
-          <div><strong>TOTAL MARKS:</strong> {examDetails.totalMarks || "50"}</div>
-        </div>
-      </div>
-
-      {/* General Instructions */}
-      {showGeneralInstructions && (
-        <div className="mb-2 p-2">
-          <h3 className="font-semibold text-sm mb-2">General Instructions:</h3>
-          <ul className="text-xs space-y-1 list-disc list-inside text-gray-700">
-            <li>All questions are compulsory.</li>
-            <li>Write answers clearly and legibly.</li>
-            <li>Use of calculator is not allowed.</li>
-            <li>Read the questions carefully before answering.</li>
-          </ul>
-        </div>
-      )}
-      
-      <div className="border-t-2 border-gray-300 my-4"></div>
-      
-      {/* Questions */}
-      <div className="">
-        {questionPaper?.map((question, index) => (
-          <div key={question.id} className="border-gray-200">
-            <div className="flex justify-between items-start mb-2">
-              <p className="text-sm font-medium flex-1 pr-4">
-                <span className="">Q{index + 1}.</span> {question.text}
-              </p>
-              <span className="text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap">
-                [{question.marks} Marks]
-              </span>
-            </div>
-            
-            {question.options && (
-              <div className="ml-6 mt-1 space-y-2">
-                {question.options.map((option, optIndex) => (
-                  <div key={optIndex} className="text-sm flex items-center">
-                    <span className="mr-3 font-medium w-6">
-                      {String.fromCharCode(97 + optIndex)})
-                    </span>
-                    <span>{option}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-8 pt-6 border-t-2 border-gray-300 text-center">
-        <p className="font-bold text-sm">*** END OF THE QUESTION PAPER ***</p>
-        <p className="text-xs text-gray-600 mt-2">Best of Luck!</p>
-      </div>
-    </>
-  );
-
   return (
-    <div className={`min-h-screen ${themeClasses.pageBackground} `}>
+    <div className={`min-h-screen ${themeClasses.pageBackground}`}>
       {/* Notification */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 ${
@@ -482,12 +606,19 @@ const QuestionPaper = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <button
-                onClick={() => window.history.back()}
+                onClick={() => onPrevious && onPrevious()}
                 className={`p-2 ${themeClasses.backButton} rounded-lg transition-colors`}
               >
                 <ArrowLeft className={`w-5 h-5 ${themeClasses.textSecondary}`} />
               </button>
-              <h1 className={`ml-4 text-xl font-semibold ${themeClasses.textPrimary}`}>Question Paper Preview</h1>
+              <h1 className={`ml-4 text-xl font-semibold ${themeClasses.textPrimary}`}>
+                Question Paper Preview
+              </h1>
+              {questionPaper.length > 0 && (
+                <span className={`ml-4 text-sm ${themeClasses.textSecondary}`}>
+                  ({questionPaper.length} question{questionPaper.length > 1 ? 's' : ''}, {totalMarks} marks)
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -508,7 +639,8 @@ const QuestionPaper = () => {
                 <div className="space-y-3">
                   <button
                     onClick={handlePrint}
-                    className={`flex items-center justify-center gap-2 ${themeClasses.printButton} text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full`}
+                    disabled={questionPaper.length === 0}
+                    className={`flex items-center justify-center gap-2 ${themeClasses.printButton} text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <Printer className="w-4 h-4" />
                     Print Paper
@@ -516,7 +648,7 @@ const QuestionPaper = () => {
                   
                   <button
                     onClick={handleDownloadPDF}
-                    disabled={isGeneratingPdf}
+                    disabled={isGeneratingPdf || questionPaper.length === 0}
                     className={`flex items-center justify-center gap-2 ${themeClasses.downloadButton} disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full`}
                   >
                     {isGeneratingPdf ? (
@@ -534,7 +666,8 @@ const QuestionPaper = () => {
 
                   <button
                     onClick={handleSavePaper}
-                    className={`flex items-center justify-center gap-2 ${themeClasses.saveButton} text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full`}
+                    disabled={questionPaper.length === 0}
+                    className={`flex items-center justify-center gap-2 ${themeClasses.saveButton} text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 ${themeClasses.shadowCard} ${themeClasses.shadowHover} w-full disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <Save className="w-4 h-4" />
                     Save Paper
@@ -560,6 +693,27 @@ const QuestionPaper = () => {
                   />
                 </div>
               </div>
+
+              {/* Question Summary */}
+              {questionPaper.length > 0 && (
+                <div className={`${themeClasses.cardBackground} rounded-xl ${themeClasses.shadowCard} border p-6`}>
+                  <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-4`}>Question Summary</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className={`flex justify-between ${themeClasses.textSecondary}`}>
+                      <span>Total Questions:</span>
+                      <span className="font-medium">{questionPaper.length}</span>
+                    </div>
+                    <div className={`flex justify-between ${themeClasses.textSecondary}`}>
+                      <span>Total Marks:</span>
+                      <span className="font-medium">{totalMarks}</span>
+                    </div>
+                    <div className={`flex justify-between ${themeClasses.textSecondary}`}>
+                      <span>Duration:</span>
+                      <span className="font-medium">{examDetails.duration}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

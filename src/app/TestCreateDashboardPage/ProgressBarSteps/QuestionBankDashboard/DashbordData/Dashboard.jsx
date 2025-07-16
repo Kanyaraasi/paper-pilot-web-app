@@ -1,6 +1,6 @@
-"use client";
 import React, { useState } from "react";
 import { useQuestionBank } from "./Context/QuestionBankContext";
+// import { useTheme } from "../contexts/ThemeContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -11,7 +11,7 @@ import Pagination from "./Pagination";
 import QuestionForm from "./QuestionForm";
 import Toast from "./Toast";
 import SelectedBar from "./SelectedBar";
-import { Play } from "lucide-react";
+import { Play, FileText } from "lucide-react";
 
 const Dashboard = () => {
   const questionBank = useQuestionBank();
@@ -56,6 +56,7 @@ const Dashboard = () => {
       tagsInput: "",
       createdAt: new Date(),
       starred: false,
+      marks: 2,
     };
 
     switch (questionBank.activeTab) {
@@ -132,31 +133,74 @@ const Dashboard = () => {
       const questionData = {
         ...editingQuestion,
         tags,
-        subjectId: "507f1f77bcf86cd799439011",
-        chapterId: "507f1f77bcf86cd799439012",
-        chapterName: "Sample Chapter",
+        id: editingQuestion.id || Date.now(),
+        marks: editingQuestion.marks || 2,
       };
 
-      if (editingQuestion.id && editingQuestion.id.includes("temp-")) {
-        await questionBank.createQuestion(questionData);
-      } else if (editingQuestion.id) {
-        await questionBank.updateQuestion(editingQuestion.id, questionData);
-      } else {
-        await questionBank.createQuestion(questionData);
-      }
+      // Add question to the current tab
+      questionBank.setQuestions(prev => ({
+        ...prev,
+        [questionBank.activeTab]: editingQuestion.id
+          ? prev[questionBank.activeTab].map(q => q.id === editingQuestion.id ? questionData : q)
+          : [...prev[questionBank.activeTab], questionData]
+      }));
+
+      questionBank.showToastMessage(
+        editingQuestion.id ? 'Question updated successfully' : 'Question created successfully'
+      );
 
       setIsCreating(false);
       setEditingQuestion(null);
-    } catch (error) {}
+    } catch (error) {
+      questionBank.showToastMessage('Error saving question', 'error');
+    }
   };
 
   const handleDeleteQuestion = async (questionId) => {
     if (window.confirm("Are you sure you want to delete this question?")) {
       try {
-        await questionBank.deleteQuestion(questionId);
-      } catch (error) {}
+        questionBank.setQuestions(prev => ({
+          ...prev,
+          [questionBank.activeTab]: prev[questionBank.activeTab].filter(q => q.id !== questionId)
+        }));
+        
+        // Remove from selected questions if it was selected
+        questionBank.setSelectedQuestions(prev => ({
+          ...prev,
+          [questionBank.activeTab]: prev[questionBank.activeTab].filter(id => id !== questionId)
+        }));
+
+        questionBank.showToastMessage('Question deleted successfully');
+      } catch (error) {
+        questionBank.showToastMessage('Error deleting question', 'error');
+      }
     }
   };
+
+  const handleContinueToQuestionPaper = () => {
+    const allSelected = questionBank.getAllSelectedQuestions();
+    console.log('Selected questions for paper:', allSelected);
+    
+    if (allSelected.length === 0) {
+      questionBank.showToastMessage('Please select at least one question to continue', 'error');
+      return;
+    }
+    
+    // Save selected questions data to session storage
+    sessionStorage.setItem('selectedQuestionsData', JSON.stringify(allSelected));
+    console.log('Saved to session storage:', allSelected);
+    
+    // Continue to next step (question paper)
+    if (questionBank.onNext) {
+      questionBank.onNext({ selectedQuestions: questionBank.selectedQuestions });
+    }
+  };
+
+  // Get total selected questions count
+  const totalSelectedCount = Object.values(questionBank.selectedQuestions).reduce(
+    (total, selections) => total + selections.length,
+    0
+  );
 
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses.pageBackground}`}>
@@ -174,10 +218,7 @@ const Dashboard = () => {
         }
         showSidebar={questionBank.showSidebar}
         onAddNew={initNewQuestion}
-        selectedCount={Object.values(questionBank.selectedQuestions).reduce(
-          (total, selections) => total + selections.length,
-          0
-        )}
+        selectedCount={totalSelectedCount}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -212,7 +253,7 @@ const Dashboard = () => {
               onAddNew={initNewQuestion}
             />
 
-            {questionBank.totalPage > 1 && <Pagination />}
+            {questionBank.totalPages > 1 && <Pagination />}
           </div>
         </main>
       </div>
@@ -229,23 +270,44 @@ const Dashboard = () => {
         />
       )}
 
+      {/* Bottom Action Bar */}
       <div
         className={`flex items-center justify-between gap-4 w-full p-4 border-t ${themeClasses.cardBackground}`}
       >
-        <button
-          type="button"
-          className={`inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-lg shadow-sm transition-all duration-200 ${themeClasses.buttonSecondary}`}
-          aria-label="Cancel current action"
-        >
-          Cancel
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => questionBank.onPrevious && questionBank.onPrevious()}
+            className={`inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-lg shadow-sm transition-all duration-200 ${themeClasses.buttonSecondary}`}
+            aria-label="Go back to test details"
+          >
+            Back
+          </button>
+
+          <div className={`text-sm ${themeClasses.textSecondary}`}>
+            {totalSelectedCount > 0 ? (
+              <span className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                {totalSelectedCount} question{totalSelectedCount > 1 ? 's' : ''} selected
+              </span>
+            ) : (
+              'No questions selected'
+            )}
+          </div>
+        </div>
 
         <button
-          type="submit"
-          className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg shadow-sm transition-all duration-200 ${themeClasses.buttonPrimary}`}
-          aria-label="Continue to question bank"
+          type="button"
+          onClick={handleContinueToQuestionPaper}
+          disabled={totalSelectedCount === 0}
+          className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg shadow-sm transition-all duration-200 ${
+            totalSelectedCount === 0 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : themeClasses.buttonPrimary
+          }`}
+          aria-label="Continue to question paper"
         >
-          <span>Continue to Question Bank</span>
+          <span>Continue to Question Paper</span>
           <Play className="h-4 w-4" />
         </button>
       </div>

@@ -63,7 +63,7 @@ function Header() {
     }
   }, []);
 
-  // Handle scroll effect for navbar
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -111,6 +111,7 @@ function Header() {
           <div className="flex items-center justify-between h-16">
             {/* Logo and brand */}
             <div className="flex items-center group">
+              <a href="/">
               <div className="flex-shrink-0 transform transition-transform duration-300">
                 <img
                   src="/logo.jpeg"
@@ -118,12 +119,13 @@ function Header() {
                   className="h-12 w-auto rounded-lg"
                 />
               </div>
+              </a>
             </div>
 
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex items-center space-x-1">
               <a
-                href="#"
+                href="/"
                 className={`relative px-4 py-2 ${themeClasses.navLink} font-medium transition-all duration-300 group`}
               >
                 <span className="relative z-10">Home</span>

@@ -14,7 +14,7 @@ export const QuestionBankProvider = ({
   currentStep,
 }) => {
 
-  // UI State
+  
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState('fill');
   const [viewMode, setViewMode] = useState('grid');
@@ -119,10 +119,7 @@ export const QuestionBankProvider = ({
     practical: []
   });
   console.log(selectedQuestions,'selectedQuestions')
-  // Add this import at the top with other imports
-
-// Modify the loadQuestions function to use the new API when activeChapter is set
-// Replace the existing loadQuestions function with this:
+  
 const loadQuestions = async (filters = {}) => {
   if (!selectedSubjectId) {
     console.error('🚫 No subject selected');
@@ -144,10 +141,7 @@ const loadQuestions = async (filters = {}) => {
       ...filters,
     };
 
-    console.log('📤 Query Params:', params);
-    console.log('📍 Selected Subject:', selectedSubjectId);
-    console.log('📍 Active Chapter:', activeChapter);
-    console.log('📍 Active Tab (type):', activeTab);
+
 
     const response = await (activeChapter
       ? questionService.getQuestionsBySubjectAndChapter(selectedSubjectId, activeChapter, params)

@@ -99,7 +99,7 @@ function AuthForms() {
       const token = response.data.token;
       const roleType = response.data.institute.type;
       
-      // Save token to localStorage or cookie
+     
       localStorage.setItem("token", token);
       localStorage.setItem("roleType", roleType);
       
@@ -199,7 +199,7 @@ function AuthForms() {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className={`h-5 w-5 ${themeClasses.iconColor}`} />
+                <User className={`h-5 w-5 text-black`} />
               </div>
               <input
                 id="schoolName"
@@ -222,7 +222,7 @@ function AuthForms() {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className={`h-5 w-5 ${themeClasses.iconColor}`} />
+                <Lock className={`h-5 w-5 `} />
               </div>
               <input
                 id="password"

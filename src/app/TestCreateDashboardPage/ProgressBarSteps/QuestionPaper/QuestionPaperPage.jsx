@@ -419,12 +419,13 @@ const QuestionPaper = ({ formData, onPrevious }) => {
             <p className="text-gray-500">No questions selected. Please go back and select questions.</p>
           </div>
         ) : (
-          questionPaper.map((question, index) => (
-            <div key={question.id} className="question border-b border-gray-200 pb-4">
+          questionPaper.map((question, index) =>
+            (
+            <div key={question.id} className="question">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 pr-4">
                   <p className="text-sm font-medium">
-                    <span className="font-bold">Q{index + 1}.</span> {question.text}
+                    {question.text}
                   </p>
                 </div>
                 <span className="text-xs px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium whitespace-nowrap">
@@ -432,7 +433,7 @@ const QuestionPaper = ({ formData, onPrevious }) => {
                 </span>
               </div>
               
-              {/* MCQ Options */}
+           
               {question.options && question.type !== 'truefalse' && (
                 <div className="ml-6 mt-2 space-y-2">
                   {question.options.map((option, optIndex) => (
@@ -446,7 +447,7 @@ const QuestionPaper = ({ formData, onPrevious }) => {
                 </div>
               )}
 
-              {/* True/False Options */}
+            
               {question.type === 'truefalse' && (
                 <div className="ml-6 mt-2 space-y-2">
                   <div className="text-sm flex items-center">
@@ -460,7 +461,7 @@ const QuestionPaper = ({ formData, onPrevious }) => {
                 </div>
               )}
 
-              {/* Match the Following */}
+              
               {question.type === 'match' && question.items && (
                 <div className="ml-6 mt-2">
                   <div className="grid grid-cols-2 gap-8">
@@ -484,19 +485,6 @@ const QuestionPaper = ({ formData, onPrevious }) => {
                 </div>
               )}
 
-              {/* Answer space for written answers */}
-              {!question.options && question.type !== 'match' && (
-                <div className="ml-6 mt-3">
-                  <div className="border-t border-gray-200 pt-2">
-                    <p className="text-xs text-gray-500 mb-2">Answer:</p>
-                    <div className="space-y-2">
-                      {Array.from({ length: Math.max(2, Math.floor(question.marks / 2)) }, (_, i) => (
-                        <div key={i} className="border-b border-gray-300 h-6"></div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ))
         )}

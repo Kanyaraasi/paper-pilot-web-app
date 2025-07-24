@@ -138,89 +138,72 @@ const Dashboard = () => {
       };
 
       // Add question to the current tab
-      questionBank.setQuestions((prev) => ({
+      questionBank.setQuestions(prev => ({
         ...prev,
         [questionBank.activeTab]: editingQuestion.id
-          ? prev[questionBank.activeTab].map((q) =>
-              q.id === editingQuestion.id ? questionData : q
-            )
-          : [...prev[questionBank.activeTab], questionData],
+          ? prev[questionBank.activeTab].map(q => q.id === editingQuestion.id ? questionData : q)
+          : [...prev[questionBank.activeTab], questionData]
       }));
 
       questionBank.showToastMessage(
-        editingQuestion.id
-          ? "Question updated successfully"
-          : "Question created successfully"
+        editingQuestion.id ? 'Question updated successfully' : 'Question created successfully'
       );
 
       setIsCreating(false);
       setEditingQuestion(null);
     } catch (error) {
-      questionBank.showToastMessage("Error saving question", "error");
+      questionBank.showToastMessage('Error saving question', 'error');
     }
   };
 
   const handleDeleteQuestion = async (questionId) => {
     if (window.confirm("Are you sure you want to delete this question?")) {
       try {
-        questionBank.setQuestions((prev) => ({
+        questionBank.setQuestions(prev => ({
           ...prev,
-          [questionBank.activeTab]: prev[questionBank.activeTab].filter(
-            (q) => q.id !== questionId
-          ),
+          [questionBank.activeTab]: prev[questionBank.activeTab].filter(q => q.id !== questionId)
         }));
-
+        
         // Remove from selected questions if it was selected
-        questionBank.setSelectedQuestions((prev) => ({
+        questionBank.setSelectedQuestions(prev => ({
           ...prev,
-          [questionBank.activeTab]: prev[questionBank.activeTab].filter(
-            (id) => id !== questionId
-          ),
+          [questionBank.activeTab]: prev[questionBank.activeTab].filter(id => id !== questionId)
         }));
 
-        questionBank.showToastMessage("Question deleted successfully");
+        questionBank.showToastMessage('Question deleted successfully');
       } catch (error) {
-        questionBank.showToastMessage("Error deleting question", "error");
+        questionBank.showToastMessage('Error deleting question', 'error');
       }
     }
   };
 
   const handleContinueToQuestionPaper = () => {
     const allSelected = questionBank.getAllSelectedQuestions();
-    console.log("Selected questions for paper:", allSelected);
-
+    console.log('Selected questions for paper:', allSelected);
+    
     if (allSelected.length === 0) {
-      questionBank.showToastMessage(
-        "Please select at least one question to continue",
-        "error"
-      );
+      questionBank.showToastMessage('Please select at least one question to continue', 'error');
       return;
     }
-
+    
     // Save selected questions data to session storage
-    sessionStorage.setItem(
-      "selectedQuestionsData",
-      JSON.stringify(allSelected)
-    );
-    console.log("Saved to session storage:", allSelected);
-
+    sessionStorage.setItem('selectedQuestionsData', JSON.stringify(allSelected));
+    console.log('Saved to session storage:', allSelected);
+    
     // Continue to next step (question paper)
     if (questionBank.onNext) {
-      questionBank.onNext({
-        selectedQuestions: questionBank.selectedQuestions,
-      });
+      questionBank.onNext({ selectedQuestions: questionBank.selectedQuestions });
     }
   };
 
   // Get total selected questions count
-  const totalSelectedCount = Object.values(
-    questionBank.selectedQuestions
-  ).reduce((total, selections) => total + selections.length, 0);
+  const totalSelectedCount = Object.values(questionBank.selectedQuestions).reduce(
+    (total, selections) => total + selections.length,
+    0
+  );
 
   return (
-    <div
-      className={`min-h-screen flex flex-col ${themeClasses.pageBackground}`}
-    >
+    <div className={`min-h-screen flex flex-col ${themeClasses.pageBackground}`}>
       {questionBank.toast && (
         <Toast
           message={questionBank.toast.message}
@@ -249,8 +232,7 @@ const Dashboard = () => {
             setShowSortDropdown={setShowSortDropdown}
           />
 
-          {questionBank.selectedQuestions[questionBank.activeTab].length >
-            0 && (
+          {questionBank.selectedQuestions[questionBank.activeTab].length > 0 && (
             <SelectedBar
               selectedCount={
                 questionBank.selectedQuestions[questionBank.activeTab].length
@@ -306,11 +288,10 @@ const Dashboard = () => {
             {totalSelectedCount > 0 ? (
               <span className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
-                {totalSelectedCount} question{totalSelectedCount > 1 ? "s" : ""}{" "}
-                selected
+                {totalSelectedCount} question{totalSelectedCount > 1 ? 's' : ''} selected
               </span>
             ) : (
-              "No questions selected"
+              'No questions selected'
             )}
           </div>
         </div>
@@ -320,8 +301,8 @@ const Dashboard = () => {
           onClick={handleContinueToQuestionPaper}
           disabled={totalSelectedCount === 0}
           className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg shadow-sm transition-all duration-200 ${
-            totalSelectedCount === 0
-              ? "bg-gray-400 cursor-not-allowed"
+            totalSelectedCount === 0 
+              ? 'bg-gray-400 cursor-not-allowed' 
               : themeClasses.buttonPrimary
           }`}
           aria-label="Continue to question paper"

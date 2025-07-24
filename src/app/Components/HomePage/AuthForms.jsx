@@ -4,6 +4,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 import axios from "axios";
 import { BASE_URL } from "../../../../BASE_URL";
+// import { toast } from 'react-toastify';
 
 function AuthForms() {
   const { theme } = useTheme();
@@ -31,42 +32,32 @@ function AuthForms() {
 
   // Theme classes
   const getThemeClasses = () => {
-    const isDark = theme === "dark";
-
+    const isDark = theme === 'dark';
+    
     return {
-      pageBackground: isDark
-        ? "bg-gray-900"
-        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50",
-      cardBackground: isDark
-        ? "bg-gray-800/90 border-gray-700"
-        : "bg-white/90 border-gray-200",
-      cardHover: isDark ? "hover:bg-gray-700/90" : "hover:bg-white/95",
-      textPrimary: isDark ? "text-gray-100" : "text-gray-900",
-      textSecondary: isDark ? "text-gray-300" : "text-gray-600",
-      textMuted: isDark ? "text-gray-400" : "text-gray-500",
-      inputBase: isDark
-        ? "bg-gray-700/50 border-gray-600 text-gray-100 placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
-        : "bg-white/70 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-sky-500 focus:ring-sky-500",
-      buttonPrimary: isDark
-        ? "bg-blue-600 hover:bg-blue-700 text-white"
-        : "bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white",
-      linkPrimary: isDark
-        ? "text-blue-400 hover:text-blue-300"
-        : "text-blue-600 hover:text-blue-500",
-      iconColor: isDark ? "text-gray-400" : "text-gray-400",
-      iconHover: isDark ? "hover:text-blue-400" : "hover:text-blue-600",
-      errorBg: isDark
-        ? "bg-red-900/50 border-red-700 text-red-300"
-        : "bg-red-100 border-red-500 text-red-700",
-      successBg: isDark
-        ? "bg-green-900/50 border-green-700 text-green-300"
-        : "bg-green-100 border-green-500 text-green-700",
-      checkboxBase: isDark
-        ? "text-blue-400 focus:ring-blue-400 border-gray-600 bg-gray-700"
-        : "text-blue-600 focus:ring-blue-500 border-gray-300 bg-white",
-      gradientText: isDark
-        ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"
-        : "text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-indigo-600",
+      pageBackground: isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50',
+      cardBackground: isDark ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-gray-200',
+      cardHover: isDark ? 'hover:bg-gray-700/90' : 'hover:bg-white/95',
+      textPrimary: isDark ? 'text-gray-100' : 'text-gray-900',
+      textSecondary: isDark ? 'text-gray-300' : 'text-gray-600',
+      textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
+      inputBase: isDark 
+        ? 'bg-gray-700/50 border-gray-600 text-gray-100 placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400' 
+        : 'bg-white/70 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-sky-500 focus:ring-sky-500',
+      buttonPrimary: isDark 
+        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+        : 'bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white',
+      linkPrimary: isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500',
+      iconColor: isDark ? 'text-gray-400' : 'text-gray-400',
+      iconHover: isDark ? 'hover:text-blue-400' : 'hover:text-blue-600',
+      errorBg: isDark ? 'bg-red-900/50 border-red-700 text-red-300' : 'bg-red-100 border-red-500 text-red-700',
+      successBg: isDark ? 'bg-green-900/50 border-green-700 text-green-300' : 'bg-green-100 border-green-500 text-green-700',
+      checkboxBase: isDark 
+        ? 'text-blue-400 focus:ring-blue-400 border-gray-600 bg-gray-700' 
+        : 'text-blue-600 focus:ring-blue-500 border-gray-300 bg-white',
+      gradientText: isDark 
+        ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400' 
+        : 'text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-indigo-600',
     };
   };
 
@@ -107,15 +98,16 @@ function AuthForms() {
       console.log("respoooo", response);
       const token = response.data.token;
       const roleType = response.data.institute.type;
-
+      
+     
       localStorage.setItem("token", token);
       localStorage.setItem("roleType", roleType);
-
+      
       setSuccess("Login successful");
       setTimeout(() => {
         window.location.href = "/TestHistorySavedDashboard";
       }, 1000);
-
+      
       console.log("JWT Token:", token);
       setLoginData({
         schoolName: "",
@@ -159,9 +151,7 @@ function AuthForms() {
   };
 
   return (
-    <div
-      className={`${themeClasses.cardBackground} ${themeClasses.cardHover} p-6 rounded-xl shadow-xl w-full max-w-md mx-auto border backdrop-blur-sm transition-all duration-500 relative overflow-hidden`}
-    >
+    <div className={`${themeClasses.cardBackground} ${themeClasses.cardHover} p-6 rounded-xl shadow-xl w-full max-w-md mx-auto border backdrop-blur-sm transition-all duration-500 relative overflow-hidden`}>
       {/* Alert Messages */}
       {error && (
         <div
@@ -191,9 +181,7 @@ function AuthForms() {
         style={{ padding: "1rem" }}
       >
         <div className="text-center mb-8">
-          <h2
-            className={`text-3xl font-bold ${themeClasses.gradientText} mb-2`}
-          >
+          <h2 className={`text-3xl font-bold ${themeClasses.gradientText} mb-2`}>
             Welcome Back
           </h2>
           <p className={`${themeClasses.textSecondary} text-sm font-medium`}>
@@ -266,10 +254,7 @@ function AuthForms() {
                 id="remember"
                 className={`h-4 w-4 rounded ${themeClasses.checkboxBase} focus:ring-2 transition-colors duration-300`}
               />
-              <label
-                htmlFor="remember"
-                className={`ml-2 font-medium ${themeClasses.textSecondary}`}
-              >
+              <label htmlFor="remember" className={`ml-2 font-medium ${themeClasses.textSecondary}`}>
                 Remember me
               </label>
             </div>

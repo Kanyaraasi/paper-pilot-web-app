@@ -13,31 +13,33 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('light');
+  // const [theme, setTheme] = useState('light'); // Removed - always light
   const [font, setFont] = useState('poppins');
 
-  // Load theme and font from localStorage on component mount
+  // Load font from localStorage on component mount (theme is always light)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') || 'light';
+      // Always use light theme
       const savedFont = localStorage.getItem('font') || 'default';
-      setTheme(savedTheme);
       setFont(savedFont);
     }
   }, []);
 
   // Apply theme and font to document root
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    // Always set light theme
+    document.documentElement.setAttribute('data-theme', 'light');
     document.documentElement.setAttribute('data-font', font);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('theme', theme);
+      localStorage.setItem('theme', 'light');
       localStorage.setItem('font', font);
     }
-  }, [theme, font]);
+  }, [font]);
 
+  // Disabled theme toggle - always stays light
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    // Theme toggle disabled - always stays light
+    console.log('Theme toggle disabled - using light theme only');
   };
 
   const changeFont = (newFont) => {
@@ -45,11 +47,11 @@ export const ThemeProvider = ({ children }) => {
   };
 
   const value = {
-    theme,
+    theme: 'light', // Always light
     font,
     toggleTheme,
     changeFont,
-    setTheme,
+    setTheme: () => {}, // Disabled
     setFont
   };
 

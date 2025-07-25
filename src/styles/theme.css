@@ -111,7 +111,7 @@
   --focus-ring-offset: 0 0 0 2px var(--bg-primary);
 }
 
-/* Dark Theme - Rich & Comfortable */
+/* Dark Theme - Rich & Comfortable - DISABLED
 [data-theme="dark"] {
   --bg-primary: #0a0a0a;
   --bg-secondary: #111111;
@@ -135,13 +135,13 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
   
-  /* Adjusted Brand Colors for Dark Mode */
+  Adjusted Brand Colors for Dark Mode
   --accent-primary: var(--accent-400);
   --accent-hover: var(--accent-300);
   --accent-light: var(--accent-900);
   --accent-muted: var(--accent-800);
   
-  /* Status Colors - Dark Mode Variants */
+  Status Colors - Dark Mode Variants
   --success-500: #10b981;
   --success-600: #059669;
   --warning-500: #f59e0b;
@@ -151,10 +151,11 @@
   --info-500: #22d3ee;
   --info-600: #06b6d4;
   
-  /* Focus Ring for Dark Mode */
+  Focus Ring for Dark Mode
   --focus-ring: 0 0 0 2px var(--accent-primary);
   --focus-ring-offset: 0 0 0 2px var(--bg-primary);
 }
+*/
 
 /* Font Families */
 [data-font="default"] {
@@ -590,9 +591,11 @@ a:focus-visible {
     --text-secondary: var(--text-primary);
   }
   
+  /* Dark theme high contrast support disabled
   [data-theme="dark"] {
     --border-light: #ffffff;
     --border-medium: #ffffff;
     --text-secondary: var(--text-primary);
   }
+  */
 }

@@ -13,7 +13,11 @@ import {
   EyeOff, 
   Loader,
   FileText,
-  
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Layout,
+  Hash
 } from 'lucide-react';
 
 const QuestionPaper = ({ formData, onPrevious }) => {
@@ -24,6 +28,10 @@ const QuestionPaper = ({ formData, onPrevious }) => {
   const [showGeneralInstructions, setShowGeneralInstructions] = useState(true);
   const [showWatermark, setShowWatermark] = useState(true);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [previewZoom, setPreviewZoom] = useState(100);
+  const [showAnswerSpaces, setShowAnswerSpaces] = useState(true);
+  const [questionNumbering, setQuestionNumbering] = useState('numeric'); // 'numeric', 'roman', 'alpha'
+  const [paperLayout, setPaperLayout] = useState('standard'); // 'standard', 'compact', 'spacious'
 
   const { theme } = useTheme();
 
@@ -121,54 +129,60 @@ const QuestionPaper = ({ formData, onPrevious }) => {
     [questionPaper]
   );
 
-  const getThemeClasses = useMemo(() => {
-    const isDark = theme === 'dark';
-    
-    return {
-      pageBackground: isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50',
-      cardBackground: isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200',
-      cardHeader: isDark ? 'border-gray-700' : 'border-gray-200',
-      textPrimary: isDark ? 'text-gray-100' : 'text-gray-900',
-      textSecondary: isDark ? 'text-gray-300' : 'text-gray-600',
-      textMuted: isDark ? 'text-gray-400' : 'text-gray-500',
-      buttonPrimary: isDark 
-        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-        : 'bg-blue-600 hover:bg-blue-700 text-white',
-      buttonSecondary: isDark 
-        ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
-        : 'border-gray-300 text-gray-700 hover:bg-gray-50',
-      buttonBack: isDark 
-        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
-        : 'bg-gray-100 hover:bg-gray-200 text-gray-600',
-      headerBg: isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200',
-      toggleButton: isDark 
-        ? 'bg-gray-700 hover:bg-gray-600' 
-        : 'bg-gray-50 hover:bg-gray-100',
-      toggleActive: isDark ? 'bg-blue-600' : 'bg-blue-600',
-      toggleInactive: isDark ? 'bg-gray-600' : 'bg-gray-300',
-      notificationSuccess: isDark ? 'bg-green-600' : 'bg-green-500',
-      notificationError: isDark ? 'bg-red-600' : 'bg-red-500',
-      paperBackground: 'bg-white',
-      paperText: 'text-black',
-      paperBorder: 'border-gray-300',
-      printButton: isDark 
-        ? 'bg-blue-600 hover:bg-blue-700' 
-        : 'bg-blue-600 hover:bg-blue-700',
-      downloadButton: isDark 
-        ? 'bg-green-600 hover:bg-green-700 disabled:bg-green-500' 
-        : 'bg-green-600 hover:bg-green-700 disabled:bg-green-400',
-      saveButton: isDark 
-        ? 'bg-purple-600 hover:bg-purple-700' 
-        : 'bg-purple-600 hover:bg-purple-700',
-      backButton: isDark 
-        ? 'hover:bg-gray-700' 
-        : 'hover:bg-gray-100',
-      shadowCard: isDark ? 'shadow-lg shadow-gray-900/20' : 'shadow-sm',
-      shadowHover: isDark ? 'hover:shadow-xl hover:shadow-gray-900/30' : 'hover:shadow-md',
-    };
-  }, [theme]);
+  // Simplified theme classes for light theme only
+  const themeClasses = {
+    pageBackground: 'bg-gradient-to-br from-slate-50 to-blue-50',
+    cardBackground: 'bg-white border-gray-200',
+    cardHeader: 'border-gray-200',
+    textPrimary: 'text-gray-900',
+    textSecondary: 'text-gray-600',
+    textMuted: 'text-gray-500',
+    buttonPrimary: 'bg-blue-600 hover:bg-blue-700 text-white',
+    buttonSecondary: 'border-gray-300 text-gray-700 hover:bg-gray-50',
+    buttonBack: 'bg-gray-100 hover:bg-gray-200 text-gray-600',
+    headerBg: 'bg-white border-gray-200',
+    toggleButton: 'bg-gray-50 hover:bg-gray-100',
+    toggleActive: 'bg-blue-600',
+    toggleInactive: 'bg-gray-300',
+    notificationSuccess: 'bg-green-500',
+    notificationError: 'bg-red-500',
+    paperBackground: 'bg-white',
+    paperText: 'text-black',
+    paperBorder: 'border-gray-300',
+    printButton: 'bg-blue-600 hover:bg-blue-700',
+    downloadButton: 'bg-green-600 hover:bg-green-700 disabled:bg-green-400',
+    saveButton: 'bg-purple-600 hover:bg-purple-700',
+    backButton: 'hover:bg-gray-100',
+    shadowCard: 'shadow-sm',
+    shadowHover: 'hover:shadow-md',
+  };
 
-  const themeClasses = getThemeClasses;
+  // Helper function for question numbering
+  const getQuestionNumber = useCallback((index) => {
+    switch (questionNumbering) {
+      case 'roman':
+        return ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][index] || `${index + 1}`;
+      case 'alpha':
+        return String.fromCharCode(65 + index) || `Q${index + 1}`;
+      default:
+        return `${index + 1}`;
+    }
+  }, [questionNumbering]);
+
+  // Helper function for answer space height based on question type
+  const getAnswerSpaceHeight = useCallback((questionType, marks) => {
+    const heightMap = {
+      'fill': '40px',
+      'brief': '60px', 
+      'sentence': '80px',
+      'mcq': '0px',
+      'truefalse': '0px',
+      'match': '0px',
+      'essay': `${Math.max(120, marks * 15)}px`,
+      'numerical': '50px'
+    };
+    return heightMap[questionType] || '60px';
+  }, []);
 
   const showNotification = useCallback((message, type = 'success') => {
     setNotification({ message, type });
@@ -371,6 +385,16 @@ const QuestionPaper = ({ formData, onPrevious }) => {
     return [{ x: 200, y: 400, id: 'single-watermark' }];
   };
 
+  // Get spacing based on layout
+  const getLayoutSpacing = useCallback(() => {
+    const spacingMap = {
+      'compact': 'space-y-4',
+      'standard': 'space-y-6', 
+      'spacious': 'space-y-8'
+    };
+    return spacingMap[paperLayout] || 'space-y-6';
+  }, [paperLayout]);
+
   const QuestionPaperContent = () => (
     <>
       {/* School Header */}
@@ -382,7 +406,7 @@ const QuestionPaper = ({ formData, onPrevious }) => {
       </div>
 
       {/* Exam Details Grid */}
-      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+      <div className="grid grid-cols-2 gap-4 text-sm mb-6">
         <div className="space-y-2">
           <div><strong>SUBJECT:</strong> {examDetails.subject || "Subject"}</div>
           <div><strong>DATE:</strong> {examDetails.date || new Date().toLocaleDateString()}</div>
@@ -397,87 +421,95 @@ const QuestionPaper = ({ formData, onPrevious }) => {
 
       {/* General Instructions */}
       {showGeneralInstructions && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-          <h3 className="font-semibold text-sm mb-2">General Instructions:</h3>
-          <ul className="text-xs space-y-1 list-disc list-inside text-gray-700">
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+          <h3 className="font-semibold text-sm mb-3 text-blue-800">General Instructions:</h3>
+          <ul className="text-xs space-y-1.5 list-disc list-inside text-gray-700">
             <li>All questions are compulsory.</li>
             <li>Write answers clearly and legibly.</li>
             <li>Use of calculator is not allowed unless specified.</li>
             <li>Read the questions carefully before answering.</li>
             <li>Attempt all questions in the order given.</li>
+            <li>Write your name and roll number clearly at the top of the answer sheet.</li>
           </ul>
         </div>
       )}
       
-      <div className="border-t-2 border-gray-300 my-4"></div>
+      <div className="border-t-2 border-gray-300 my-6"></div>
       
       {/* Questions */}
-      <div className="space-y-6">
+      <div className={getLayoutSpacing()}>
         {questionPaper.length === 0 ? (
-          <div className="text-center py-8">
-            <FileText className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-            <p className="text-gray-500">No questions selected. Please go back and select questions.</p>
+          <div className="text-center py-12">
+            <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-500 text-lg">No questions selected</p>
+            <p className="text-gray-400 text-sm mt-2">Please go back and select questions to generate the paper.</p>
           </div>
         ) : (
-          questionPaper.map((question, index) =>
-            (
-            <div key={question.id} className="question">
+          questionPaper.map((question, index) => (
+            <div key={question.id} className="question border-l-2 border-gray-200 pl-4">
               <div className="flex justify-between items-start mb-3">
-                <div className="flex-1 pr-4">
-                  <p className="text-sm font-medium">
-                    {question.text}
-                  </p>
+                <div className="flex items-start gap-3 flex-1">
+                  <span className="font-bold text-lg text-blue-600 min-w-[40px]">
+                    {getQuestionNumber(index)}.
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium leading-relaxed">
+                      {question.text}
+                    </p>
+                  </div>
                 </div>
-                <span className="text-xs px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium whitespace-nowrap">
+                <span className="text-xs px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium whitespace-nowrap ml-4">
                   [{question.marks} Mark{question.marks > 1 ? 's' : ''}]
                 </span>
               </div>
               
-           
+              {/* MCQ Options */}
               {question.options && question.type !== 'truefalse' && (
-                <div className="ml-6 mt-2 space-y-2">
+                <div className="ml-12 mt-3 space-y-2">
                   {question.options.map((option, optIndex) => (
-                    <div key={optIndex} className="text-sm flex items-center">
-                      <span className="mr-3 font-medium w-6">
-                        {String.fromCharCode(97 + optIndex)})
+                    <div key={optIndex} className="text-sm flex items-start">
+                      <span className="mr-3 font-medium min-w-[24px]">
+                        ({String.fromCharCode(97 + optIndex)})
                       </span>
-                      <span>{option}</span>
+                      <span className="leading-relaxed">{option}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-            
+              {/* True/False Options */}
               {question.type === 'truefalse' && (
-                <div className="ml-6 mt-2 space-y-2">
+                <div className="ml-12 mt-3 space-y-2">
                   <div className="text-sm flex items-center">
-                    <span className="mr-3 font-medium w-6">a)</span>
+                    <span className="mr-3 font-medium min-w-[24px]">(a)</span>
                     <span>True</span>
                   </div>
                   <div className="text-sm flex items-center">
-                    <span className="mr-3 font-medium w-6">b)</span>
+                    <span className="mr-3 font-medium min-w-[24px]">(b)</span>
                     <span>False</span>
                   </div>
                 </div>
               )}
 
-              
+              {/* Matching Questions */}
               {question.type === 'match' && question.items && (
-                <div className="ml-6 mt-2">
+                <div className="ml-12 mt-3">
                   <div className="grid grid-cols-2 gap-8">
                     <div>
-                      <h5 className="font-semibold text-sm mb-2">Column A</h5>
+                      <h5 className="font-semibold text-sm mb-3 text-gray-700">Column A</h5>
                       {question.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="text-sm mb-1">
-                          {itemIndex + 1}. {item.left}
+                        <div key={itemIndex} className="text-sm mb-2 flex items-start">
+                          <span className="mr-2 font-medium min-w-[20px]">{itemIndex + 1}.</span>
+                          <span>{item.left}</span>
                         </div>
                       ))}
                     </div>
                     <div>
-                      <h5 className="font-semibold text-sm mb-2">Column B</h5>
+                      <h5 className="font-semibold text-sm mb-3 text-gray-700">Column B</h5>
                       {question.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="text-sm mb-1">
-                          {String.fromCharCode(97 + itemIndex)}. {item.right}
+                        <div key={itemIndex} className="text-sm mb-2 flex items-start">
+                          <span className="mr-2 font-medium min-w-[20px]">({String.fromCharCode(97 + itemIndex)})</span>
+                          <span>{item.right}</span>
                         </div>
                       ))}
                     </div>
@@ -485,13 +517,24 @@ const QuestionPaper = ({ formData, onPrevious }) => {
                 </div>
               )}
 
+              {/* Answer Space */}
+              {/* {showAnswerSpaces && ['fill', 'brief', 'sentence', 'essay', 'numerical'].includes(question.type) && (
+                <div className="ml-12 mt-4">
+                  <div 
+                    className="border border-dashed border-gray-300 rounded bg-gray-50/30"
+                    style={{ height: getAnswerSpaceHeight(question.type, question.marks) }}
+                  >
+                    <div className="text-xs text-gray-400 p-2">Answer:</div>
+                  </div>
+                </div>
+              )} */}
             </div>
           ))
         )}
       </div>
 
       {/* Footer */}
-      <div className="mt-8 pt-6 border-t-2 border-gray-300 text-center">
+      <div className="mt-10 pt-6 border-t-2 border-gray-300 text-center">
         <p className="font-bold text-sm">*** END OF THE QUESTION PAPER ***</p>
         <p className="text-xs text-gray-600 mt-2">Best of Luck!</p>
       </div>
@@ -499,8 +542,79 @@ const QuestionPaper = ({ formData, onPrevious }) => {
   );
 
   const QuestionPaperPreview = () => (
-    <div className={`${themeClasses.paperBackground} rounded-lg ${themeClasses.shadowCard} overflow-hidden`}>
-      {/* Print Section - Hidden from normal view */}
+    <div className="space-y-4">
+      {/* Preview Controls */}
+      <div className="flex items-center justify-between bg-white rounded-lg border p-3">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-700">Preview:</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPreviewZoom(Math.max(50, previewZoom - 10))}
+              className="p-1 hover:bg-gray-100 rounded"
+              disabled={previewZoom <= 50}
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <span className="text-sm min-w-[50px] text-center">{previewZoom}%</span>
+            <button
+              onClick={() => setPreviewZoom(Math.min(150, previewZoom + 10))}
+              className="p-1 hover:bg-gray-100 rounded"
+              disabled={previewZoom >= 150}
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setPreviewZoom(100)}
+              className="p-1 hover:bg-gray-100 rounded text-xs"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Paper Preview */}
+      <div className="bg-gray-100 p-6 rounded-lg">
+        <div 
+          className="bg-white shadow-lg mx-auto"
+          style={{ 
+            width: '210mm',
+            minHeight: '297mm',
+            transform: `scale(${previewZoom / 100})`,
+            transformOrigin: 'top center',
+            marginBottom: previewZoom !== 100 ? `${(297 * (previewZoom / 100 - 1))}px` : '0'
+          }}
+        >
+          <div className="relative p-8 text-black" style={{ minHeight: '297mm' }}>
+            {showWatermark && (
+              <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                <div
+                  className="absolute select-none"
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%) rotate(-45deg)',
+                    fontSize: '48px',
+                    fontWeight: 'bold',
+                    color: 'rgba(0, 0, 0, 0.08)',
+                    whiteSpace: 'nowrap',
+                    fontFamily: 'Inter, Arial, sans-serif',
+                    letterSpacing: '2px',
+                    userSelect: 'none',
+                  }}
+                >
+                  P.E.M HIGH SCHOOL
+                </div>
+              </div>
+            )}
+            <div className="relative z-10">
+              <QuestionPaperContent />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Hidden Print Section */}
       <div 
         id="print-section"
         className="hidden"
@@ -534,10 +648,10 @@ const QuestionPaper = ({ formData, onPrevious }) => {
         </div>
       </div>
 
-      {/* PDF Content - Optimized for PDF generation */}
+      {/* Hidden PDF Content */}
       <div 
         id="pdf-content"
-        className="relative bg-white text-black"
+        className="hidden relative bg-white text-black"
         style={{ width: '210mm', minHeight: '297mm', margin: '0 auto', padding: '4mm' }}
       >
         {showWatermark && (
@@ -565,9 +679,6 @@ const QuestionPaper = ({ formData, onPrevious }) => {
           <QuestionPaperContent />
         </div>
       </div>
-
-      {/* Display Content - Visible to users */}
-      
     </div>
   );
 
@@ -663,7 +774,7 @@ const QuestionPaper = ({ formData, onPrevious }) => {
                 </div>
               </div>
 
-              {/* Toggle Controls */}
+              {/* Display Options */}
               <div className={`${themeClasses.cardBackground} rounded-xl ${themeClasses.shadowCard} border p-6`}>
                 <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-4`}>Display Options</h3>
                 <div className="space-y-3">
@@ -679,6 +790,52 @@ const QuestionPaper = ({ formData, onPrevious }) => {
                     label="School Watermark"
                     icon={showWatermark ? Eye : EyeOff}
                   />
+                  <ToggleButton
+                    isOn={showAnswerSpaces}
+                    onToggle={() => setShowAnswerSpaces(!showAnswerSpaces)}
+                    label="Answer Spaces"
+                    icon={showAnswerSpaces ? Layout : EyeOff}
+                  />
+                </div>
+              </div>
+
+              {/* Formatting Options */}
+              <div className={`${themeClasses.cardBackground} rounded-xl ${themeClasses.shadowCard} border p-6`}>
+                <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-4`}>Formatting</h3>
+                <div className="space-y-4">
+                  {/* Question Numbering */}
+                  <div>
+                    <label className={`block text-sm font-medium ${themeClasses.textSecondary} mb-2`}>
+                      <Hash className="w-4 h-4 inline mr-1" />
+                      Question Numbering
+                    </label>
+                    <select
+                      value={questionNumbering}
+                      onChange={(e) => setQuestionNumbering(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="numeric">1, 2, 3...</option>
+                      <option value="roman">I, II, III...</option>
+                      <option value="alpha">A, B, C...</option>
+                    </select>
+                  </div>
+
+                  {/* Paper Layout */}
+                  <div>
+                    <label className={`block text-sm font-medium ${themeClasses.textSecondary} mb-2`}>
+                      <Layout className="w-4 h-4 inline mr-1" />
+                      Paper Layout
+                    </label>
+                    <select
+                      value={paperLayout}
+                      onChange={(e) => setPaperLayout(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="compact">Compact</option>
+                      <option value="standard">Standard</option>
+                      <option value="spacious">Spacious</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -686,18 +843,51 @@ const QuestionPaper = ({ formData, onPrevious }) => {
               {questionPaper.length > 0 && (
                 <div className={`${themeClasses.cardBackground} rounded-xl ${themeClasses.shadowCard} border p-6`}>
                   <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-4`}>Question Summary</h3>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-3 text-sm">
                     <div className={`flex justify-between ${themeClasses.textSecondary}`}>
                       <span>Total Questions:</span>
-                      <span className="font-medium">{questionPaper.length}</span>
+                      <span className="font-medium text-blue-600">{questionPaper.length}</span>
                     </div>
                     <div className={`flex justify-between ${themeClasses.textSecondary}`}>
                       <span>Total Marks:</span>
-                      <span className="font-medium">{totalMarks}</span>
+                      <span className="font-medium text-green-600">{totalMarks}</span>
                     </div>
                     <div className={`flex justify-between ${themeClasses.textSecondary}`}>
                       <span>Duration:</span>
                       <span className="font-medium">{examDetails.duration}</span>
+                    </div>
+                    
+                    {/* Question Type Breakdown */}
+                    <div className="pt-3 border-t border-gray-200">
+                      <h4 className="font-medium text-gray-700 mb-2">Question Types:</h4>
+                      {Object.entries(
+                        questionPaper.reduce((acc, q) => {
+                          acc[q.type] = (acc[q.type] || 0) + 1;
+                          return acc;
+                        }, {})
+                      ).map(([type, count]) => (
+                        <div key={type} className={`flex justify-between text-xs ${themeClasses.textMuted}`}>
+                          <span className="capitalize">{type}:</span>
+                          <span>{count}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Difficulty Breakdown */}
+                    <div className="pt-2 border-t border-gray-200">
+                      <h4 className="font-medium text-gray-700 mb-2">Difficulty:</h4>
+                      {Object.entries(
+                        questionPaper.reduce((acc, q) => {
+                          const difficulty = q.difficulty || 'medium';
+                          acc[difficulty] = (acc[difficulty] || 0) + 1;
+                          return acc;
+                        }, {})
+                      ).map(([difficulty, count]) => (
+                        <div key={difficulty} className={`flex justify-between text-xs ${themeClasses.textMuted}`}>
+                          <span className="capitalize">{difficulty}:</span>
+                          <span>{count}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
